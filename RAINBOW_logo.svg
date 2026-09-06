@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <!-- Neon Glow Filter -->
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur1" />
+      <feGaussianBlur stdDeviation="16" result="blur2" />
+      <feMerge>
+        <feMergeNode in="blur2" />
+        <feMergeNode in="blur1" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Balanced Rainbow Gradient -->
+    <linearGradient id="rainbowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ec4899" />
+      <stop offset="25%" stop-color="#8b5cf6" />
+      <stop offset="50%" stop-color="#3b82f6" />
+      <stop offset="75%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+
+    <!-- Sleek Overlay Gradient for Gemini Vibe -->
+    <linearGradient id="geminiSheen" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.8" />
+      <stop offset="50%" stop-color="#a855f7" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#f43f5e" stop-opacity="0.9" />
+    </linearGradient>
+  </defs>
+
+  <!-- Solid Black Square Background Layer -->
+  <rect width="500" height="500" fill="#000000" />
+
+  <!-- Outer Neon Glow Layer (Centered in 500x500 Square) -->
+  <g filter="url(#neonGlow)">
+    <!-- Main Outer Arch -->
+    <path d="M 80 410 
+             C 80 140, 420 140, 420 410 
+             L 365 410 
+             C 365 190, 135 190, 135 410 Z" 
+         fill="url(#rainbowGrad)" 
+         stroke="#ffffff" 
+         stroke-width="4" 
+         stroke-opacity="0.4" />
+
+    <!-- Inner Cutout Arch -->
+    <path d="M 160 410 
+             C 160 250, 340 250, 340 410 
+             L 295 410 
+             C 295 280, 205 280, 205 410 Z" 
+         fill="#000000" 
+         opacity="0.85" />
+         
+    <!-- Central Core Spark Line -->
+    <path d="M 185 410 C 185 305, 315 305, 315 410" 
+         fill="none" 
+         stroke="url(#geminiSheen)" 
+         stroke-width="7" 
+         stroke-linecap="round" />
+  </g>
+</svg>
