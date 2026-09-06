@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="icon" type="image/svg+xml" href="RAINBOW_favicon.svg" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rainbow Galaxy - Get started with Rainbow</title>
+    <!-- Google Fonts: Inter / Google Sans style typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg-deep: #020205;
+        --surface: #0a0a0f;
+        --card-bg: rgba(18, 18, 24, 0.75);
+        --border: rgba(255, 255, 255, 0.1);
+        --muted: rgba(255, 255, 255, 0.6);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body,
+      html {
+        width: 100%;
+        height: 100%;
+        background-color: var(--bg-deep);
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        color: #f8fafc;
+        scroll-behavior: smooth;
+      }
+
+      /* Fixed 3D Canvas Background */
+      #canvas-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+        cursor: grab;
+        pointer-events: auto;
+      }
+
+      #canvas-container:active {
+        cursor: grabbing;
+      }
+
+      .ambient-glow {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 70vw;
+        height: 70vh;
+        background: radial-gradient(
+          circle,
+          rgba(239, 68, 68, 0.04) 0%,
+          rgba(59, 130, 246, 0.04) 35%,
+          rgba(168, 85, 247, 0.03) 70%,
+          transparent 85%
+        );
+        z-index: 0;
+        pointer-events: none;
+        transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      /* Hero Section (First Fullscreen View) */
+      .hero-section {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        z-index: 5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        text-align: center;
+        padding: 0 20px;
+      }
+
+      .hero-title {
+        font-size: clamp(2.5rem, 6vw, 4.8rem);
+        font-weight: 200;
+        letter-spacing: -0.035em;
+        line-height: 1.15;
+        margin-bottom: 16px;
+        text-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.8),
+          0 0 40px rgba(139, 92, 246, 0.15);
+        animation: fadeInDown 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      .hero-subtitle {
+        color: var(--muted);
+        font-size: clamp(1rem, 2vw, 1.25rem);
+        font-weight: 300;
+        letter-spacing: -0.01em;
+        max-width: 560px;
+        line-height: 1.6;
+        text-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
+        animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+        opacity: 0;
+        margin-bottom: 28px;
+      }
+
+      /* Added Hero CTA Button */
+      .hero-cta {
+        pointer-events: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 28px;
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        color: #ffffff;
+        font-weight: 500;
+        font-size: 0.95rem;
+        border-radius: 14px;
+        text-decoration: none;
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        transition:
+          transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+          box-shadow 0.2s;
+        animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+        opacity: 0;
+      }
+
+      .hero-cta:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(139, 92, 246, 0.4);
+      }
+
+      .scroll-down-indicator {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        pointer-events: auto;
+        cursor: pointer;
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+
+      .scroll-down-indicator:hover {
+        color: #fff;
+      }
+
+      .scroll-arrow {
+        width: 16px;
+        height: 16px;
+        border-right: 1.5px solid currentColor;
+        border-bottom: 1.5px solid currentColor;
+        transform: rotate(45deg);
+        animation: bounce 2s infinite;
+      }
+
+      /* Feature Section */
+      .details-section {
+        position: relative;
+        z-index: 10;
+        width: 100%;
+        background: linear-gradient(
+          to bottom,
+          rgba(2, 2, 5, 0.8),
+          var(--surface) 20%
+        );
+        backdrop-filter: blur(30px);
+        border-top: 1px solid var(--border);
+        padding: 120px 20px 100px 20px;
+      }
+
+      .details-container {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .section-header {
+        text-align: center;
+        max-width: 700px;
+        margin: 0 auto 80px auto;
+      }
+
+      .section-tag {
+        display: inline-block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: #3b82f6;
+        margin-bottom: 16px;
+        font-weight: 500;
+      }
+
+      .section-header h2 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 300;
+        letter-spacing: -0.025em;
+        line-height: 1.2;
+        margin-bottom: 20px;
+      }
+
+      .section-header p {
+        color: var(--muted);
+        font-size: 1.05rem;
+        line-height: 1.6;
+        font-weight: 300;
+      }
+
+      /* Feature Cards Grid (Blank Cards Layout) */
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 24px;
+        margin-bottom: 80px;
+      }
+
+      .feature-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 40px;
+        min-height: 280px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition:
+          transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+          border-color 0.3s;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(255, 255, 255, 0.25);
+      }
+
+      .card-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: 24px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        color: rgba(255, 255, 255, 0.4);
+      }
+
+      .card-content h3 {
+        font-size: 1.35rem;
+        font-weight: 400;
+        margin-bottom: 12px;
+        letter-spacing: -0.01em;
+        color: rgba(255, 255, 255, 0.3);
+      }
+
+      .card-content p {
+        color: rgba(255, 255, 255, 0.25);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        font-weight: 300;
+      }
+
+      .card-footer-placeholder {
+        height: 20px;
+        width: 100px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 6px;
+        margin-top: 24px;
+      }
+
+      /* Footer info */
+      .site-footer {
+        text-align: center;
+        padding: 40px 0;
+        border-top: 1px solid var(--border);
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 0.85rem;
+        font-weight: 300;
+      }
+
+      /* Particle Discovery Drawer Panel */
+      .details-panel {
+        position: fixed;
+        bottom: -100%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 680px;
+        background: rgba(15, 15, 20, 0.92);
+        border: 1px solid var(--border);
+        border-bottom: none;
+        border-top-left-radius: 28px;
+        border-top-right-radius: 28px;
+        padding: 32px 36px 40px 36px;
+        z-index: 50;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.7);
+        pointer-events: auto;
+        text-align: left;
+        transition: bottom 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .details-panel.active {
+        bottom: 0;
+      }
+
+      .panel-handle {
+        width: 36px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+        margin: 0 auto 24px auto;
+      }
+
+      .details-panel h3 {
+        font-size: 1.5rem;
+        color: #fff;
+        margin-bottom: 12px;
+        font-weight: 300;
+        letter-spacing: -0.02em;
+      }
+
+      .details-panel p {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 28px;
+        font-weight: 300;
+      }
+
+      .panel-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .btn-launch {
+        display: inline-flex;
+        align-items: center;
+        padding: 12px 24px;
+        background: #f8fafc;
+        color: #020205;
+        font-weight: 500;
+        font-size: 0.9rem;
+        border-radius: 12px;
+        text-decoration: none;
+        transition:
+          background 0.2s,
+          transform 0.2s;
+      }
+
+      .btn-launch:hover {
+        background: #ffffff;
+        transform: translateY(-1px);
+      }
+
+      .btn-close {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 12px 20px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 400;
+        transition:
+          color 0.2s,
+          border-color 0.2s,
+          background 0.2s;
+      }
+
+      .btn-close:hover {
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes bounce {
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+          transform: translateY(0) rotate(45deg);
+        }
+        40% {
+          transform: translateY(-6px) rotate(45deg);
+        }
+        60% {
+          transform: translateY(-3px) rotate(45deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="ambient-glow" id="ambientGlow"></div>
+    <div id="canvas-container"></div>
+
+    <!-- Hero Section (Fullscreen 3D View) -->
+    <div class="hero-section">
+      <h1 class="hero-title">
+        Finishes teamwork in Seconds, that's Rainbow AI
+      </h1>
+      <p class="hero-subtitle">
+        Explore the particle field to discover hidden portals. Drag to orbit,
+        hold <b>Shift + scroll</b> to zoom in/out, or scroll down normally to
+        explore custom subsystem features.
+      </p>
+
+      <!-- New CTA Button added here -->
+      <a href="index.html" class="hero-cta">
+        Get Started
+        <link rel="icon" type="image/svg+xml" href="RAINBOW_favicon.svg" />                                   
+      </a>
+
+      <a href="#detailsSection" class="scroll-down-indicator">
+        <span>Explore Features</span>
+        <div class="scroll-arrow"></div>
+      </a>
+    </div>
+
+    <!-- Feature Showcase Section with Blank Cards -->
+    <section id="detailsSection" class="details-section">
+      <div class="details-container">
+        <div class="section-header">
+          <span class="section-tag">System Modules</span>
+          <h2>Learn More about Rainbow</h2>
+          <p>
+            We made Rainbow with a team of <b>2</b>. yet still competes with top
+            - tier platforms.
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <!-- Blank Card 1 -->
+          <div class="feature-card">
+            <div>
+              <div class="card-icon">01</div>
+              <div class="card-content">
+                <h3>Spectra</h3>
+                <p>
+                  Our Image generating tool, combined with Rainbow to give that
+                  Seamless experience.
+                </p>
+              </div>
+            </div>
+            <div class="card-footer-placeholder"></div>
+          </div>
+
+
+            <div class="card-footer-placeholder"></div>
+          </div>
+
+          <!-- Blank Card 2 -->
+          <div class="feature-card">
+            <div>
+              <div class="card-icon">02</div>
+              <div class="card-content">
+                <h3>Nova</h3>
+                <p>
+                  This feature lets Rainbow assist your children to help them
+                  feel more safer, friendly and personalized, while signing up
+                  you can activate this. It also
+                  <b>Blocks inappropriate websites</b>.
+                </p>
+              </div>
+            </div>
+            <div class="card-footer-placeholder"></div>
+          </div>
+        </div>
+
+        <footer class="site-footer">
+          &copy; 2026 Rainbow Portal Hub. Built with Three.js &amp; Spatial Web
+          Design.
+        </footer>
+      </div>
+    </section>
+
+    <!-- Particle Discovery Drawer Panel -->
+    <div id="detailsPanel" class="details-panel">
+      <div class="panel-handle"></div>
+      <h3 id="panelTitle">Portal Node</h3>
+      <p id="panelDesc">Detailed description of the discovered module.</p>
+      <div class="panel-actions">
+        <a id="panelLink" href="#" target="_blank" class="btn-launch"
+          >Launch Module</a
+        >
+        <button class="btn-close" onclick="closeDetails()">Dismiss</button>
+      </div>
+    </div>
+
+    <!-- Three.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+      // --- Configuration & State ---
+      const config = {
+        particleCount: window.innerWidth < 768 ? 4000 : 10000,
+        fieldSize: 60,
+        driftSpeed: 0.0008,
+      };
+
+      const state = {
+        windowHalfX: window.innerWidth / 2,
+        windowHalfY: window.innerHeight / 2,
+        reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)")
+          .matches,
+
+        cameraDistance: 35,
+        targetCameraDistance: 35,
+        orbitAngleX: 0,
+        orbitAngleY: 0.3,
+        targetOrbitAngleX: 0,
+        targetOrbitAngleY: 0.3,
+
+        isDragging: false,
+        previousMousePosition: { x: 0, y: 0 },
+        isCrownShape: false,
+        morphProgress: 0.0,
+      };
+
+      // --- Hidden Portal Particles Data ---
+      const portalParticles = [
+        {
+          index: 420,
+          name: "Rainbow Language Engine",
+          description:
+            "You discovered a hidden linguistic portal! Step into an interactive multi-unit vocabulary platform featuring practice tests, progress logs, and daily tracking modules.",
+          url: "language-engine.html",
+          color: new THREE.Color(0x22c55e),
+        },
+        {
+          index: 1337,
+          name: "Rainbow Calculator",
+          description:
+            "You unlocked a hidden mathematical node! A feature-rich scientific calculator equipped with real-time numeric-to-words conversion and advanced session history tracking.",
+          url: "calculator.html",
+          color: new THREE.Color(0x3b82f6),
+        },
+        {
+          index: 2500,
+          name: "Quantum Core Protocol",
+          description:
+            "A mysterious experimental sector floating deep within the spatial cluster. This node is currently secured pending future subsystem deployments.",
+          url: "#",
+          color: new THREE.Color(0xf97316),
+        },
+      ];
+
+      // --- Scene Setup ---
+      const container = document.getElementById("canvas-container");
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x020205, 0.012);
+
+      const camera = new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000,
+      );
+
+      const renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        powerPreference: "high-performance",
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      // --- Balanced Rainbow Color Palette ---
+      const colorPalette = [
+        new THREE.Color(0xef4444),
+        new THREE.Color(0xf97316),
+        new THREE.Color(0xeab308),
+        new THREE.Color(0x22c55e),
+        new THREE.Color(0x06b6d4),
+        new THREE.Color(0x3b82f6),
+        new THREE.Color(0x8b5cf6),
+        new THREE.Color(0xec4899),
+      ];
+
+      function generateCloudPosition() {
+        const u = Math.random();
+        const v = Math.random();
+        const theta = u * 2.0 * Math.PI;
+        const phi = Math.acos(2.0 * v - 1.0);
+        const r = Math.cbrt(Math.random()) * config.fieldSize * 0.6;
+
+        return {
+          x: r * Math.sin(phi) * Math.cos(theta),
+          y: r * Math.sin(phi) * Math.sin(theta) * 0.7,
+          z: r * Math.cos(phi),
+        };
+      }
+
+      function generateCrownPosition(index, total) {
+        const u = (index / total) * Math.PI * 2;
+        const crownRadius = 12;
+        const heightFactor = Math.sin(u * 5) * 4.5 + Math.cos(u * 2) * 2;
+
+        const layer = (index % 5) / 5;
+        const r = (crownRadius - layer * 2) * (0.8 + 0.2 * Math.sin(u * 5));
+
+        const x = r * Math.cos(u);
+        const z = r * Math.sin(u);
+        const y = -4 + layer * 3 + heightFactor * (1.0 - layer * 0.5);
+
+        if (index % 7 === 0) {
+          return {
+            x: (Math.random() - 0.5) * 6,
+            y: Math.sin(u * 5) * 3 + (Math.random() - 0.5) * 2,
+            z: (Math.random() - 0.5) * 6,
+          };
+        }
+
+        return { x, y, z };
+      }
+
+      const geometry = new THREE.BufferGeometry();
+      const positions = [];
+      const originalPositions = [];
+      const crownPositions = [];
+      const scales = [];
+      const colors = [];
+
+      for (let i = 0; i < config.particleCount; i++) {
+        const cloudPos = generateCloudPosition();
+        const crownPos = generateCrownPosition(i, config.particleCount);
+
+        positions.push(cloudPos.x, cloudPos.y, cloudPos.z);
+        originalPositions.push(cloudPos.x, cloudPos.y, cloudPos.z);
+        crownPositions.push(crownPos.x, crownPos.y, crownPos.z);
+
+        scales.push(Math.random() * 1.5 + 0.5);
+
+        const paletteIndex = Math.floor(
+          (i / config.particleCount) * colorPalette.length,
+        );
+        const baseColor = colorPalette[paletteIndex % colorPalette.length];
+        colors.push(baseColor.r, baseColor.g, baseColor.b);
+      }
+
+      // Inject discoverable hidden portal highlights
+      portalParticles.forEach((portal) => {
+        if (portal.index < config.particleCount) {
+          colors[portal.index * 3] = portal.color.r;
+          colors[portal.index * 3 + 1] = portal.color.g;
+          colors[portal.index * 3 + 2] = portal.color.b;
+          scales[portal.index] = 3.2;
+        }
+      });
+
+      geometry.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(positions, 3),
+      );
+      geometry.setAttribute(
+        "customColor",
+        new THREE.Float32BufferAttribute(colors, 3),
+      );
+      geometry.setAttribute(
+        "scale",
+        new THREE.Float32BufferAttribute(scales, 1),
+      );
+
+      const particleMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+          time: { value: 0 },
+          pixelRatio: { value: renderer.getPixelRatio() },
+        },
+        vertexShader: `
+                uniform float time;
+                uniform float pixelRatio;
+                attribute vec3 customColor;
+                attribute float scale;
+                varying vec3 vColor;
+                varying float vAlpha;
+
+                void main() {
+                    vColor = customColor;
+                    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                    float depth = -mvPosition.z;
+                    vAlpha = smoothstep(90.0, 4.0, depth) * 0.9 + 0.2;
+                    gl_PointSize = scale * pixelRatio * (38.0 / max(depth, 1.0));
+                    gl_Position = projectionMatrix * mvPosition;
+                }
+            `,
+        fragmentShader: `
+                varying vec3 vColor;
+                varying float vAlpha;
+
+                void main() {
+                    float dist = length(gl_PointCoord - vec2(0.5));
+                    if (dist > 0.5) discard;
+                    float core = smoothstep(0.5, 0.0, dist);
+                    float glow = exp(-dist * 3.5);
+                    float intensity = (core * 0.7 + glow * 0.5);
+                    vec3 vibrantColor = vColor * 1.5;
+                    gl_FragColor = vec4(vibrantColor, intensity * vAlpha);
+                }
+            `,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      });
+
+      const particleSystem = new THREE.Points(geometry, particleMaterial);
+      scene.add(particleSystem);
+
+      // --- Shift + Wheel Zoom Listener ---
+      window.addEventListener(
+        "wheel",
+        (e) => {
+          if (e.shiftKey) {
+            e.preventDefault(); // Stop normal document scroll when holding Shift and scrolling over the canvas
+            state.targetCameraDistance += e.deltaY * 0.03;
+            state.targetCameraDistance = Math.max(
+              8,
+              Math.min(80, state.targetCameraDistance),
+            );
+          }
+        },
+        { passive: false },
+      );
+
+      // --- Raycasting to discover hidden particles ---
+      const raycaster = new THREE.Raycaster();
+      raycaster.params.Points.threshold = 0.8;
+      const mouse = new THREE.Vector2();
+
+      window.addEventListener("click", (e) => {
+        if (
+          e.target.closest("#detailsPanel") ||
+          e.target.closest("#detailsSection")
+        )
+          return;
+
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObject(particleSystem);
+
+        if (intersects.length > 0) {
+          const clickedIndex = intersects[0].index;
+          const foundPortal = portalParticles.find(
+            (p) => p.index === clickedIndex,
+          );
+          if (foundPortal) {
+            showDetails(foundPortal);
+          } else {
+            closeDetails();
+          }
+        }
+      });
+
+      function showDetails(node) {
+        document.getElementById("panelTitle").textContent = node.name;
+        document.getElementById("panelDesc").textContent = node.description;
+        const linkBtn = document.getElementById("panelLink");
+        linkBtn.href = node.url;
+
+        if (node.url === "#") {
+          linkBtn.style.opacity = "0.5";
+          linkBtn.textContent = "Locked Sector";
+        } else {
+          linkBtn.style.opacity = "1";
+          linkBtn.textContent = "Launch Module";
+        }
+
+        document.getElementById("detailsPanel").classList.add("active");
+      }
+
+      function closeDetails() {
+        document.getElementById("detailsPanel").classList.remove("active");
+      }
+
+      // --- Controls & Listeners ---
+      container.addEventListener("mousedown", (e) => {
+        state.isDragging = true;
+        state.previousMousePosition = { x: e.clientX, y: e.clientY };
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        const mouseXNorm = (e.clientX - state.windowHalfX) / state.windowHalfX;
+        const mouseYNorm = (e.clientY - state.windowHalfY) / state.windowHalfY;
+
+        if (state.isDragging) {
+          const deltaX = e.clientX - state.previousMousePosition.x;
+          const deltaY = e.clientY - state.previousMousePosition.y;
+
+          state.targetOrbitAngleX -= deltaX * 0.005;
+          state.targetOrbitAngleY += deltaY * 0.005;
+          state.targetOrbitAngleY = Math.max(
+            -Math.PI / 2.2,
+            Math.min(Math.PI / 2.2, state.targetOrbitAngleY),
+          );
+
+          state.previousMousePosition = { x: e.clientX, y: e.clientY };
+        }
+
+        const ambientGlow = document.getElementById("ambientGlow");
+        ambientGlow.style.transform = `translate(calc(-50% + ${mouseXNorm * 30}px), calc(-50% + ${mouseYNorm * 30}px))`;
+      });
+
+      window.addEventListener("mouseup", () => {
+        state.isDragging = false;
+      });
+
+      window.addEventListener("dblclick", () => {
+        state.isCrownShape = !state.isCrownShape;
+      });
+
+      // --- Animation Loop ---
+      const clock = new THREE.Clock();
+
+      function animate() {
+        requestAnimationFrame(animate);
+        if (state.reducedMotion) return;
+
+        const elapsedTime = clock.getElapsedTime();
+        particleMaterial.uniforms.time.value = elapsedTime;
+
+        state.cameraDistance +=
+          (state.targetCameraDistance - state.cameraDistance) * 0.08;
+        state.orbitAngleX +=
+          (state.targetOrbitAngleX - state.orbitAngleX) * 0.08;
+        state.orbitAngleY +=
+          (state.targetOrbitAngleY - state.orbitAngleY) * 0.08;
+
+        camera.position.x =
+          state.cameraDistance *
+          Math.cos(state.orbitAngleY) *
+          Math.sin(state.orbitAngleX);
+        camera.position.y = state.cameraDistance * Math.sin(state.orbitAngleY);
+        camera.position.z =
+          state.cameraDistance *
+          Math.cos(state.orbitAngleY) *
+          Math.cos(state.orbitAngleX);
+        camera.lookAt(scene.position);
+
+        const targetMorph = state.isCrownShape ? 1.0 : 0.0;
+        state.morphProgress += (targetMorph - state.morphProgress) * 0.05;
+
+        particleSystem.rotation.y =
+          elapsedTime * (state.isCrownShape ? 0.4 : config.driftSpeed);
+
+        const positionAttribute = geometry.attributes.position;
+        const positionsArray = positionAttribute.array;
+
+        for (let i = 0; i < config.particleCount; i++) {
+          let ix = i * 3,
+            iy = i * 3 + 1,
+            iz = i * 3 + 2;
+          let ox = originalPositions[ix],
+            oy = originalPositions[iy],
+            oz = originalPositions[iz];
+          let cx = crownPositions[ix],
+            cy = crownPositions[iy],
+            cz = crownPositions[iz];
+
+          let targetX = ox + (cx - ox) * state.morphProgress;
+          let targetY = oy + (cy - oy) * state.morphProgress;
+          let targetZ = oz + (cz - oz) * state.morphProgress;
+
+          let px = positionsArray[ix],
+            py = positionsArray[iy],
+            pz = positionsArray[iz];
+          px += (targetX - px) * 0.04;
+          py += (targetY - py) * 0.04;
+          pz += (targetZ - pz) * 0.04;
+
+          positionsArray[ix] = px;
+          positionsArray[iy] = py;
+          positionsArray[iz] = pz;
+        }
+
+        positionAttribute.needsUpdate = true;
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("resize", () => {
+        state.windowHalfX = window.innerWidth / 2;
+        state.windowHalfY = window.innerHeight / 2;
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      animate();
+    </script>
+  </body>
+</html>

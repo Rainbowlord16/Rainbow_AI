@@ -1,0 +1,2439 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <
+    <link rel="icon" type="image/svg+xml" href="RAINBOW_favicon.svg" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rainbow-Language-Engine | Language Learning Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&display=block"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --green: #1a73e8;
+        --green-dark: #185abc;
+        --blue: #1a73e8;
+        --yellow: #f9ab00;
+        --red: #d93025;
+        --bg: #f8fafd;
+        --card: #ffffff;
+        --text: #202124;
+        --muted: #5f6368;
+        --border: #dadce0;
+        --shadow:
+          0 1px 2px rgba(60, 64, 67, 0.12), 0 2px 6px rgba(60, 64, 67, 0.08);
+        --radius: 16px;
+        --rainbow-red: #ea4335;
+        --rainbow-orange: #f29900;
+        --rainbow-yellow: #f9c840;
+        --rainbow-green: #34a853;
+        --rainbow-cyan: #12b5cb;
+        --rainbow-blue: #4285f4;
+        --rainbow-purple: #9334e6;
+        --rainbow-gradient: linear-gradient(
+          110deg,
+          #ea4335 0%,
+          #f9ab00 18%,
+          #f9c840 32%,
+          #34a853 48%,
+          #12b5cb 64%,
+          #4285f4 80%,
+          #9334e6 100%
+        );
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "DM Sans", "Google Sans", Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        overflow-x: hidden;
+      }
+
+      button {
+        font-family: inherit;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s ease;
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed !important;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        width: 280px;
+        background: rgba(255, 255, 255, 0.94);
+        border-right: 1px solid #e7e9ec;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        padding: 28px 16px 20px;
+        display: flex;
+        flex-direction: column;
+        z-index: 100;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        margin: 0 10px 32px;
+      }
+
+      .logo-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        background: var(--rainbow-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 23px;
+        box-shadow: 0 8px 18px rgba(26, 115, 232, 0.22);
+      }
+
+      .logo h1 {
+        color: var(--text);
+        font-size: 21px;
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+      }
+
+      .logo small {
+        color: #80868b;
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .nav button {
+        min-height: 48px;
+        padding: 0 14px;
+        border-radius: 12px;
+        background: transparent;
+        text-align: left;
+        font-size: 14px;
+        font-weight: 600;
+        color: #5f6368;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .nav button .material-symbols-rounded {
+        font-size: 20px;
+      }
+
+      .nav button:hover {
+        background: #f1f3f4;
+        color: #202124;
+      }
+
+      .nav button.active {
+        color: #4b2478;
+        background: linear-gradient(
+          100deg,
+          rgba(234, 67, 53, 0.12),
+          rgba(249, 200, 64, 0.16),
+          rgba(52, 168, 83, 0.12),
+          rgba(66, 133, 244, 0.14),
+          rgba(147, 52, 230, 0.13)
+        );
+        font-weight: 700;
+      }
+
+      .goal {
+        margin: auto 4px 4px;
+        background: linear-gradient(135deg, #fbf8ff, #f1f8ff 48%, #f5fff8);
+        border: 1px solid rgba(147, 52, 230, 0.18);
+        border-radius: 16px;
+        padding: 18px;
+      }
+
+      .goal h3 {
+        font-size: 13px;
+        font-weight: 700;
+        color: #3c4043;
+        margin-bottom: 5px;
+      }
+
+      .goal-value {
+        font-size: 20px;
+        color: #7b1fa2;
+        font-weight: 700;
+        margin-bottom: 10px;
+        letter-spacing: -0.03em;
+      }
+
+      .goal-bar {
+        height: 7px;
+        background: #d2e3fc;
+        border-radius: 20px;
+        overflow: hidden;
+      }
+
+      .goal-fill {
+        height: 100%;
+        width: 0%;
+        background: var(--rainbow-gradient);
+        transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .menu-btn {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--green);
+        color: white;
+        font-size: 24px;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        z-index: 101;
+      }
+
+      .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 99;
+      }
+
+      .main {
+        margin-left: 280px;
+        width: calc(100% - 280px);
+        max-width: 1600px;
+        padding: 24px 40px 56px;
+        transition: margin-left 0.3s;
+      }
+
+      .topbar {
+        background: transparent;
+        border-bottom: 1px solid #e8eaed;
+        min-height: 72px;
+        padding: 10px 4px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 32px;
+      }
+
+      .course {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+      }
+
+      .flag {
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        font-size: 11px;
+        font-weight: 700;
+        border-radius: 14px;
+        border: 1px solid #e8eaed;
+        background: #fff;
+      }
+      .flag-spain {
+        background: linear-gradient(
+          #aa151b 0 24%,
+          #f1bf00 24% 76%,
+          #aa151b 76% 100%
+        );
+        color: #202124;
+      }
+      .flag-france {
+        background: linear-gradient(
+          90deg,
+          #244aa5 0 33%,
+          #fff 33% 67%,
+          #e43d30 67%
+        );
+        color: #202124;
+      }
+      .flag-japan {
+        background:
+          radial-gradient(circle, #d93025 0 28%, transparent 29%), #fff;
+        color: #202124;
+      }
+      .flag-germany {
+        background: linear-gradient(
+          #202124 0 33%,
+          #dd3d35 33% 66%,
+          #f9c840 66%
+        );
+        color: #fff;
+      }
+
+      .course strong {
+        display: block;
+        color: #202124;
+        font-size: 15px;
+        font-weight: 700;
+      }
+      .course span {
+        color: #80868b;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .stats {
+        display: flex;
+        gap: 8px;
+      }
+      .stat {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        background: transparent;
+        padding: 8px 10px;
+        color: #3c4043;
+        font-size: 13px;
+        font-weight: 700;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .stat:hover {
+        background: #f1f3f4;
+      }
+      .stat .material-symbols-rounded {
+        font-size: 17px;
+      }
+      .stat:first-child .material-symbols-rounded {
+        color: #d93025;
+      }
+      .stat:nth-child(2) .material-symbols-rounded {
+        color: #1a73e8;
+      }
+      .stat:nth-child(3) .material-symbols-rounded {
+        color: #ea8600;
+      }
+
+      .profile {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 14px;
+        padding: 4px 7px 4px 4px;
+        border-radius: 999px;
+        background: transparent;
+        color: #202124;
+      }
+      .profile:hover {
+        background: #f1f3f4;
+      }
+      .avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #fbbc04, #ea4335);
+        border: 2px solid white;
+        box-shadow: 0 1px 3px rgba(60, 64, 67, 0.25);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 19px;
+        overflow: hidden;
+      }
+      .avatar .material-symbols-rounded {
+        color: white;
+        font-size: 20px;
+      }
+
+      .view-panel {
+        display: none;
+        animation: fadeIn 0.25s ease-out;
+      }
+      .view-panel.active-view {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(5px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        min-height: 250px;
+        padding: 42px 48px;
+        border-radius: 24px;
+        background: linear-gradient(
+          116deg,
+          #613ba6 0%,
+          #3975df 24%,
+          #14a7bd 43%,
+          #39a957 61%,
+          #f2a40c 79%,
+          #e65b45 100%
+        );
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 12px 28px rgba(79, 70, 163, 0.22);
+      }
+      .hero h2 {
+        font-size: clamp(30px, 4vw, 42px);
+        letter-spacing: -0.05em;
+        font-weight: 700;
+      }
+      .hero p {
+        margin-top: 10px;
+        max-width: 490px;
+        color: rgba(255, 255, 255, 0.84);
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+      .primary {
+        margin-top: 27px;
+        padding: 13px 20px;
+        border-radius: 10px;
+        background: white;
+        color: #5c2b9b;
+        font-weight: 700;
+        font-size: 14px;
+        box-shadow:
+          0 1px 2px rgba(0, 0, 0, 0.24),
+          0 2px 5px rgba(0, 0, 0, 0.14);
+      }
+      .primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.22);
+      }
+      .hero-icon {
+        font-size: clamp(80px, 11vw, 130px);
+        filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.16));
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-top: 20px;
+      }
+      .card {
+        background: white;
+        min-height: 126px;
+        padding: 22px;
+        border-radius: 16px;
+        border: 1px solid #e8eaed;
+        box-shadow: 0 1px 2px rgba(60, 64, 67, 0.08);
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease,
+          border-color 0.2s ease;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        border-color: #d2e3fc;
+        box-shadow: 0 7px 18px rgba(60, 64, 67, 0.12);
+      }
+      .card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        height: 4px;
+      }
+      .card:nth-child(1)::before {
+        background: var(--rainbow-purple);
+      }
+      .card:nth-child(2)::before {
+        background: var(--rainbow-orange);
+      }
+      .card:nth-child(3)::before {
+        background: var(--rainbow-green);
+      }
+      .card:nth-child(4)::before {
+        background: var(--rainbow-red);
+      }
+
+      .card h3 {
+        color: #80868b;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.055em;
+      }
+      .card strong {
+        display: block;
+        font-size: 29px;
+        margin-top: 10px;
+        color: #202124;
+        font-weight: 700;
+        letter-spacing: -0.045em;
+      }
+
+      .section {
+        margin-top: 4px;
+      }
+      .section h2 {
+        color: #202124;
+        font-size: 25px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        margin-bottom: 20px;
+      }
+
+      .path {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .unit {
+        background: white;
+        border-radius: 16px;
+        padding: 22px;
+        border: 1px solid #e3e7eb;
+        box-shadow: 0 1px 2px rgba(60, 64, 67, 0.07);
+      }
+      .unit.current {
+        border-color: #a56be8;
+        box-shadow: 0 3px 12px rgba(147, 52, 230, 0.14);
+      }
+      .unit-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      .unit-number {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 15px;
+        background: #f1f3f4;
+        color: #5f6368;
+      }
+      .unit.completed .unit-number {
+        background: #e6f4ea;
+        color: #137333;
+      }
+      .unit.current .unit-number {
+        background: #f3e8fd;
+        color: #7024a8;
+      }
+      .lessons {
+        display: flex;
+        gap: 12px;
+        margin-top: 18px;
+        flex-wrap: wrap;
+      }
+      .lesson-node {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        background: #f1f3f4;
+        font-size: 14px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #80868b;
+      }
+      .lesson-node.clickable {
+        cursor: pointer;
+      }
+      .lesson-node.clickable:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(60, 64, 67, 0.16);
+      }
+      .lesson-node.done {
+        background: #e6f4ea;
+        color: #137333;
+      }
+      .lesson-node.active-node {
+        background: linear-gradient(135deg, #7e3ac8, #4285f4);
+        color: white;
+        box-shadow: 0 3px 8px rgba(111, 45, 189, 0.26);
+      }
+      .lesson-node.locked {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* Lesson Hub / Interactive Instructional Guide View Styles */
+      .lessons-hub {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      @media (max-width: 900px) {
+        .lessons-hub {
+          grid-template-columns: 1fr;
+        }
+      }
+      .lesson-card {
+        background: white;
+        border: 1px solid #e3e7eb;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 1px 2px rgba(60, 64, 67, 0.07);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .lesson-card h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #202124;
+        margin-bottom: 8px;
+      }
+      .lesson-card p {
+        color: #5f6368;
+        font-size: 14px;
+        line-height: 1.5;
+        margin-bottom: 16px;
+      }
+      .vocab-preview {
+        background: #f8fafd;
+        border-radius: 10px;
+        padding: 12px;
+        margin-bottom: 16px;
+        font-size: 13px;
+      }
+      .vocab-preview strong {
+        display: block;
+        color: #1a73e8;
+        margin-bottom: 4px;
+      }
+
+      /* Detailed Instruction modal/reader view */
+      .instruction-view {
+        background: white;
+        border-radius: 20px;
+        padding: 35px;
+        box-shadow: 0 2px 6px rgba(60, 64, 67, 0.08);
+        border: 1px solid #e3e7eb;
+        max-width: 860px;
+        margin: 0 auto;
+      }
+      .instruction-view h2 {
+        font-size: 26px;
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+      .grammar-box {
+        background: #f8f9fa;
+        border-left: 4px solid #1a73e8;
+        padding: 16px;
+        border-radius: 0 10px 10px 0;
+        margin: 20px 0;
+        font-size: 15px;
+        line-height: 1.6;
+      }
+      .vocab-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      .vocab-table th,
+      .vocab-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #e8eaed;
+      }
+      .vocab-table th {
+        color: #5f6368;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .lesson-area {
+        background: white;
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 2px 6px rgba(60, 64, 67, 0.08);
+        border: 1px solid #e3e7eb;
+        max-width: 860px;
+        margin: 20px auto;
+      }
+      .lesson-area h2 {
+        font-size: 25px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        margin-bottom: 20px;
+      }
+      .question {
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 1.45;
+        margin-bottom: 25px;
+      }
+      .answers {
+        display: grid;
+        gap: 15px;
+      }
+      .answer {
+        padding: 17px 18px;
+        border-radius: 12px;
+        background: white;
+        border: 1px solid #dadce0;
+        color: #3c4043;
+        font-weight: 600;
+        text-align: left;
+        font-size: 15px;
+      }
+      .answer:not(:disabled):hover {
+        border-color: #1a73e8;
+        background: #f8fbff;
+        box-shadow: 0 1px 3px rgba(26, 115, 232, 0.14);
+      }
+      .answer.correct {
+        background: #e6f4ea !important;
+        color: #137333 !important;
+        border-color: #81c995 !important;
+      }
+      .answer.wrong {
+        background: #fce8e6 !important;
+        color: #c5221f !important;
+        border-color: #f28b82 !important;
+      }
+
+      .lesson-footer {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+        align-items: center;
+      }
+      .action {
+        padding: 12px 18px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .check {
+        background: linear-gradient(100deg, #613ba6, #4285f4, #12a7bf, #34a853);
+        color: white;
+        box-shadow:
+          0 1px 2px rgba(0, 0, 0, 0.24),
+          0 2px 5px rgba(0, 0, 0, 0.14);
+      }
+      .check:hover {
+        background: linear-gradient(100deg, #4e2b8a, #2f69c9, #108da1, #278440);
+        transform: translateY(-1px);
+      }
+      .secondary {
+        color: #7b1fa2;
+        background: #f3e8fd;
+      }
+      .secondary:hover {
+        background: #e9d7fa;
+        transform: translateY(-1px);
+      }
+
+      .leaderboard-container {
+        background: white;
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 2px 6px rgba(60, 64, 67, 0.08);
+        border: 1px solid #e3e7eb;
+        max-width: 860px;
+        margin: 0 auto;
+      }
+      .leaderboard-container h2 {
+        font-size: 25px;
+        font-weight: 700;
+      }
+      .leaderboard-container h2 .material-symbols-rounded {
+        color: #f9ab00;
+        vertical-align: -0.12em;
+      }
+      .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      .leaderboard-table th,
+      .leaderboard-table td {
+        padding: 17px 15px;
+        text-align: left;
+        border-bottom: 1px solid #edf0f2;
+      }
+      .leaderboard-table th {
+        font-weight: 700;
+        color: #5f6368;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .leaderboard-table tr.highlight {
+        background: #e8f0fe;
+        color: #174ea6;
+        font-weight: 700;
+      }
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(32, 33, 36, 0.52);
+        backdrop-filter: blur(3px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 200;
+      }
+      .modal.show {
+        display: flex;
+      }
+      .modal-box {
+        background: white;
+        width: 400px;
+        border-radius: 20px;
+        padding: 35px;
+        text-align: center;
+        animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.24);
+      }
+      @keyframes modalPop {
+        from {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .modal-box h2 {
+        font-size: 25px;
+        font-weight: 700;
+      }
+      .modal-box h2 .material-symbols-rounded {
+        color: #f9ab00;
+        vertical-align: -0.12em;
+      }
+      .reward {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 25px 0;
+      }
+      .reward span {
+        background: #f1f3f4;
+        padding: 12px 15px;
+        border-radius: 15px;
+        font-weight: 700;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .reward .material-symbols-rounded {
+        color: #1a73e8;
+        font-size: 17px;
+      }
+
+      .notifications {
+        position: fixed;
+        right: 25px;
+        top: 90px;
+        background: white;
+        width: 320px;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 10px 28px rgba(60, 64, 67, 0.18);
+        display: none;
+        z-index: 100;
+        border: 1px solid var(--border);
+      }
+      .notifications.show {
+        display: block;
+      }
+      .notifications h3 {
+        font-size: 15px;
+        font-weight: 700;
+        border-bottom: 2px solid var(--border);
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+      }
+      .notifications ul {
+        list-style: none;
+      }
+      .notifications li {
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .app-loader {
+        position: fixed;
+        inset: 0;
+        background: #f8fafd;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 300;
+        transition: opacity 0.4s ease;
+      }
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #e8eaed;
+        border-top: 5px solid #1a73e8;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .profile-modal {
+        width: min(460px, calc(100% - 32px));
+        padding: 30px;
+        text-align: left;
+      }
+      .profile-modal-heading {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        margin-bottom: 14px;
+      }
+      .profile-modal-icon {
+        display: grid;
+        width: 46px;
+        height: 46px;
+        place-items: center;
+        border-radius: 14px;
+        color: #174ea6;
+        background: #e8f0fe;
+      }
+      .profile-modal-icon .material-symbols-rounded {
+        font-size: 26px;
+      }
+      .profile-modal .eyebrow {
+        color: #1a73e8;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+      }
+      .profile-modal h2 {
+        margin-top: 2px;
+        font-size: 25px;
+      }
+      .profile-modal-copy {
+        margin: 0 0 22px;
+        color: #5f6368;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .profile-modal label {
+        display: block;
+        margin: 16px 0 7px;
+        color: #3c4043;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .profile-modal input,
+      .profile-modal select {
+        width: 100%;
+        height: 48px;
+        padding: 0 13px;
+        color: #202124;
+        border: 1px solid #dadce0;
+        border-radius: 10px;
+        background: #fff;
+        font: inherit;
+        outline: none;
+      }
+      .profile-modal select {
+        cursor: pointer;
+      }
+      .profile-modal input:focus,
+      .profile-modal select:focus {
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.16);
+      }
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 26px;
+      }
+
+      @media (max-width: 900px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-backdrop.show {
+          display: block;
+        }
+        .main {
+          margin-left: 0;
+          width: 100%;
+        }
+        .menu-btn {
+          display: flex;
+        }
+        .cards {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .hero {
+          flex-direction: column;
+          text-align: center;
+        }
+      }
+      @media (max-width: 600px) {
+        .cards {
+          grid-template-columns: 1fr;
+        }
+        .topbar {
+          flex-wrap: wrap;
+          gap: 15px;
+        }
+        .stats {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app-loader" id="appLoader">
+      <div class="spinner"></div>
+      <p style="margin-top: 20px; font-weight: 700; color: var(--muted)">
+        Loading your learning space...
+      </p>
+    </div>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <button class="menu-btn" id="mobileMenuToggle" aria-label="Open navigation">
+      <span class="material-symbols-rounded" aria-hidden="true">menu</span>
+    </button>
+
+    <div class="app">
+      <aside class="sidebar" id="sidebar">
+        <div class="logo">
+          <div class="logo-icon">
+            <span class="material-symbols-rounded" aria-hidden="true"
+              >translate</span
+            >
+          </div>
+          <div>
+            <h1>Rainbow - Language</h1>
+            <small>Learn Every Day!</small>
+          </div>
+        </div>
+
+        <nav class="nav">
+          <button class="nav-btn active" data-path="/dashboard">
+            <span class="material-symbols-rounded" aria-hidden="true"
+              >home</span
+            >
+            <span class="nav-label">Home</span>
+          </button>
+          <button class="nav-btn" data-path="/lessons">
+            <span class="material-symbols-rounded" aria-hidden="true"
+              >menu_book</span
+            >
+            <span class="nav-label">Lessons</span>
+          </button>
+          <button class="nav-btn" data-path="/practice">
+            <span class="material-symbols-rounded" aria-hidden="true"
+              >psychology</span
+            >
+            <span class="nav-label">Practice</span>
+          </button>
+          <button class="nav-btn" data-path="/leaderboard">
+            <span class="material-symbols-rounded" aria-hidden="true"
+              >trophy</span
+            >
+            <span class="nav-label">Leaderboard</span>
+          </button>
+        </nav>
+
+        <div class="goal">
+          <h3>Daily Goal</h3>
+          <div class="goal-value" id="dailyGoalLabel">0 / 50 XP</div>
+          <div class="goal-bar">
+            <div class="goal-fill" id="dailyGoalBar"></div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="course">
+            <div
+              class="flag flag-spain"
+              id="courseFlag"
+              aria-label="Spanish course"
+            >
+              ES
+            </div>
+            <div>
+              <strong id="headerCourseName">Spanish</strong>
+              <span id="headerCourseLevel">Beginner path</span>
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <span class="material-symbols-rounded" aria-hidden="true"
+                >favorite</span
+              >
+              <span id="headerHearts">5</span>
+            </div>
+            <div class="stat">
+              <span class="material-symbols-rounded" aria-hidden="true"
+                >diamond</span
+              >
+              <span id="headerGems">0</span>
+            </div>
+            <button
+              class="stat"
+              id="headerStreak"
+              type="button"
+              aria-label="View activity feed"
+            >
+              <span class="material-symbols-rounded" aria-hidden="true"
+                >local_fire_department</span
+              >
+              <span id="headerStreakValue">0</span>
+            </button>
+          </div>
+
+          <button
+            class="profile"
+            id="profileButton"
+            type="button"
+            aria-label="Edit your learning profile"
+          >
+            <div class="avatar" id="userAvatar">
+              <img
+                id="avatarImage"
+                src=""
+                alt="Profile Picture"
+                style="
+                  width: 100%;
+                  height: 100%;
+                  border-radius: 50%;
+                  object-fit: cover;
+                  display: none;
+                "
+              />
+              <span id="avatarIcon" class="material-symbols-rounded"
+                >person</span
+              >
+            </div>
+            <strong id="headerProfileName">Alex</strong>
+          </button>
+        </header>
+
+        <!-- DASHBOARD VIEW -->
+        <div id="view-dashboard" class="view-panel active-view">
+          <section class="hero">
+            <div>
+              <h2>
+                Welcome back, <span id="dashboardGreetingName">Alex</span>
+              </h2>
+              <p>
+                Review your study material in the Lessons tab, or keep your
+                streak alive with practice tests.
+              </p>
+              <button class="primary" id="dashboardStartBtn">
+                Start Learning
+              </button>
+            </div>
+            <div class="hero-icon">
+              <span class="material-symbols-rounded" aria-hidden="true"
+                >auto_awesome</span
+              >
+            </div>
+          </section>
+
+          <section class="cards">
+            <div class="card">
+              <h3>Total XP</h3>
+              <strong id="dashXp">0</strong>
+            </div>
+            <div class="card">
+              <h3>Streak</h3>
+              <strong id="dashStreak">0 Days</strong>
+            </div>
+            <div class="card">
+              <h3>Lessons Solved</h3>
+              <strong id="dashLessonsCount">0</strong>
+            </div>
+            <div class="card">
+              <h3>League</h3>
+              <strong id="dashLeague">Diamond</strong>
+            </div>
+          </section>
+        </div>
+
+        <!-- LESSONS INSTRUCTION HUB VIEW -->
+        <div id="view-lessons" class="view-panel">
+          <section class="section">
+            <h2>Instructional Hub & Grammar Guides</h2>
+            <p
+              style="color: var(--muted); margin-bottom: 20px; font-size: 15px"
+            >
+              Select a unit to study rules, grammar explanations, and core
+              vocabulary before taking a practice test.
+            </p>
+            <div id="lessonsInstructionContainer" class="lessons-hub">
+              <!-- Dynamically populated instructional guides -->
+            </div>
+          </section>
+        </div>
+
+        <!-- PRACTICE / QUIZ TEST VIEW -->
+        <div id="view-practice" class="view-panel">
+          <section class="lesson-area">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <h2>Practice Test Workspace</h2>
+              <span
+                id="lessonProgressIndicator"
+                style="font-weight: 700; color: var(--blue)"
+                >Q: 0/0</span
+              >
+            </div>
+            <div class="question" id="quizQuestion">
+              Select a lesson from the Lessons Hub or Learning Map to begin
+              testing!
+            </div>
+            <div class="answers" id="quizAnswers"></div>
+            <div class="lesson-footer">
+              <button class="action hidden" id="nextQuestionBtn">
+                Next Question
+              </button>
+              <button class="action check hidden" id="startActiveLessonBtn">
+                Start Test
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <!-- LEADERBOARD VIEW -->
+        <div id="view-leaderboard" class="view-panel">
+          <div class="leaderboard-container">
+            <h2>
+              <span class="material-symbols-rounded" aria-hidden="true"
+                >trophy</span
+              >
+              Diamond League
+            </h2>
+            <p
+              style="color: var(--muted); font-size: 14px; margin-bottom: 20px"
+            >
+              Live rankings updated dynamically.
+            </p>
+            <table class="leaderboard-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Student</th>
+                  <th>Weekly XP</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboardList"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="notifications" id="notificationsTray">
+          <h3>Activity Feed</h3>
+          <ul id="notificationList"></ul>
+        </div>
+      </main>
+    </div>
+
+    <div class="modal" id="completeModal">
+      <div class="modal-box">
+        <h2>
+          <span class="material-symbols-rounded" aria-hidden="true"
+            >celebration</span
+          >
+          Lesson Complete!
+        </h2>
+        <p id="resultText">Local updates complete.</p>
+        <div class="reward">
+          <span>
+            <span class="material-symbols-rounded" aria-hidden="true"
+              >star</span
+            >
+            <span id="earnedXpTag">+0 XP</span>
+          </span>
+          <span>
+            <span class="material-symbols-rounded" aria-hidden="true"
+              >diamond</span
+            >
+            <span id="earnedGemsTag">+0 Gems</span>
+          </span>
+          <span>
+            <span class="material-symbols-rounded" aria-hidden="true"
+              >local_fire_department</span
+            >
+            Streak safe
+          </span>
+        </div>
+        <button class="action check" id="closeModalBtn">Return Home</button>
+      </div>
+    </div>
+
+    <div
+      class="modal"
+      id="profileModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="profileModalTitle"
+    >
+      <form class="modal-box profile-modal" id="profileForm">
+        <div class="profile-modal-heading">
+          <div class="profile-modal-icon">
+            <span class="material-symbols-rounded" aria-hidden="true"
+              >account_circle</span
+            >
+          </div>
+          <div>
+            <p class="eyebrow">YOUR LEARNING SPACE</p>
+            <h2 id="profileModalTitle">Make it yours</h2>
+          </div>
+        </div>
+        <p class="profile-modal-copy">
+          Your preferences stay on this device and shape your daily learning
+          plan.
+        </p>
+        <label for="profileNameInput">Your name</label>
+        <input
+          id="profileNameInput"
+          name="name"
+          type="text"
+          maxlength="28"
+          autocomplete="name"
+          required
+        />
+
+        <label for="profileImageInput">Profile Picture</label>
+        <input id="profileImageInput" type="file" accept="image/*" />
+
+        <label for="courseSelect">Learning language</label>
+        <select id="courseSelect" name="course">
+          <option value="spanish">Spanish</option>
+          <option value="french">French</option>
+          <option value="japanese">Japanese</option>
+          <option value="german">German</option>
+        </select>
+
+        <label for="dailyGoalInput">Daily XP goal</label>
+        <input
+          id="dailyGoalInput"
+          name="dailyGoal"
+          type="number"
+          min="10"
+          max="200"
+          step="10"
+          required
+        />
+
+        <div class="modal-actions">
+          <button class="action secondary" id="cancelProfileBtn" type="button">
+            Cancel
+          </button>
+          <button class="action check" type="submit">Save preferences</button>
+        </div>
+      </form>
+    </div>
+
+    <script type="module">
+      const STORAGE_KEY = "rainbow_language-progress-v3";
+
+      const CourseCatalog = {
+        spanish: {
+          name: "Spanish",
+          code: "ES",
+          level: "Beginner path",
+          flagClass: "flag-spain",
+          units: [
+            {
+              id: 1,
+              name: "First words",
+              description:
+                "Master basic greetings, polite expressions, and essential yes/no responses.",
+              grammar:
+                "In Spanish, greetings change depending on formality (e.g., *Hola* is universal, whereas proper pronouns help establish context). Nouns are typically categorized by gender (masculine/feminine).",
+              vocab: [
+                ["Hello", "Hola"],
+                ["Goodbye", "Adiós"],
+                ["Please", "Por favor"],
+                ["Thank you", "Gracias"],
+              ],
+            },
+            {
+              id: 2,
+              name: "Everyday conversation",
+              description:
+                "Learn how to introduce yourself and ask how someone is doing.",
+              grammar:
+                "Questions in Spanish are framed using upside-down interrogation marks (¿). Verbs like *estar* (to be - temporary states) are core for asking how someone feels.",
+              vocab: [
+                ["My name is", "Me llamo"],
+                ["How are you?", "¿Cómo estás?"],
+                ["I am well", "Estoy bien"],
+                ["Nice to meet you", "Mucho gusto"],
+              ],
+            },
+            {
+              id: 3,
+              name: "Food and travel",
+              description:
+                "Order items at a restaurant and navigate food essentials.",
+              grammar:
+                "When ordering food or making requests politely, use conditional modal forms like *Quisiera* (I would like) instead of direct commands.",
+              vocab: [
+                ["Water", "Agua"],
+                ["Coffee", "Café"],
+                ["The bill, please", "La cuenta, por favor"],
+                ["I would like", "Quisiera"],
+              ],
+            },
+            {
+              id: 4,
+              name: "Time and directions",
+              description:
+                "Understand basic coordinates, transit terms, and temporal indicators.",
+              grammar:
+                "Directional markers precede locations. Expressions of time like *hoy* (today) and *mañana* (tomorrow/morning) help anchor conversational context.",
+              vocab: [
+                ["Train", "Tren"],
+                ["Station", "Estación"],
+                ["Today", "Hoy"],
+                ["Tomorrow", "Mañana"],
+              ],
+            },
+          ],
+          phrases: [
+            ["Hello", "Hola"],
+            ["Goodbye", "Adiós"],
+            ["Please", "Por favor"],
+            ["Thank you", "Gracias"],
+            ["Yes", "Sí"],
+            ["No", "No"],
+            ["My name is", "Me llamo"],
+            ["How are you?", "¿Cómo estás?"],
+            ["I am well", "Estoy bien"],
+            ["Where is it?", "¿Dónde está?"],
+            ["I need help", "Necesito ayuda"],
+            ["Nice to meet you", "Mucho gusto"],
+            ["Water", "Agua"],
+            ["Coffee", "Café"],
+            ["The bill, please", "La cuenta, por favor"],
+            ["I would like", "Quisiera"],
+            ["Train", "Tren"],
+            ["Station", "Estación"],
+            ["Today", "Hoy"],
+            ["Tomorrow", "Mañana"],
+            ["Left", "Izquierda"],
+            ["Right", "Derecha"],
+            ["Open", "Abierto"],
+            ["Closed", "Cerrado"],
+          ],
+        },
+        french: {
+          name: "French",
+          code: "FR",
+          level: "Beginner path",
+          flagClass: "flag-france",
+          units: [
+            {
+              id: 1,
+              name: "First words",
+              description:
+                "Master basic greetings and formal expressions of courtesy.",
+              grammar:
+                "French relies heavily on liaison and formal distinctions (e.g., *Bonjour* vs informal greetings). Politeness markers like *S'il vous plaît* are essential.",
+              vocab: [
+                ["Hello", "Bonjour"],
+                ["Goodbye", "Au revoir"],
+                ["Please", "S'il vous plaît"],
+                ["Thank you", "Merci"],
+              ],
+            },
+            {
+              id: 2,
+              name: "Everyday conversation",
+              description:
+                "Learn how to introduce yourself and express how you feel.",
+              grammar:
+                "Verbs like *s'appeler* (to call oneself) handle introductions, while structural phrasing like *Comment ça va ?* manages casual wellness checks.",
+              vocab: [
+                ["My name is", "Je m'appelle"],
+                ["How are you?", "Comment ça va ?"],
+                ["I am well", "Je vais bien"],
+                ["Nice to meet you", "Enchanté"],
+              ],
+            },
+            {
+              id: 3,
+              name: "Food and travel",
+              description: "Order drinks and request bills politely.",
+              grammar:
+                "Use conditional phrasing such as *Je voudrais* (I would like) to make polite requests when ordering food or services.",
+              vocab: [
+                ["Water", "Eau"],
+                ["Coffee", "Café"],
+                ["The bill, please", "L'addition, s'il vous plaît"],
+                ["I would like", "Je voudrais"],
+              ],
+            },
+            {
+              id: 4,
+              name: "Time and directions",
+              description: "Navigate stations and track temporal indicators.",
+              grammar:
+                "Spatial prepositions combine with definite articles to form smooth directional phrasing.",
+              vocab: [
+                ["Train", "Train"],
+                ["Station", "Gare"],
+                ["Today", "Aujourd'hui"],
+                ["Tomorrow", "Demain"],
+              ],
+            },
+          ],
+          phrases: [
+            ["Hello", "Bonjour"],
+            ["Goodbye", "Au revoir"],
+            ["Please", "S'il vous plaît"],
+            ["Thank you", "Merci"],
+            ["Yes", "Oui"],
+            ["No", "Non"],
+            ["My name is", "Je m'appelle"],
+            ["How are you?", "Comment ça va ?"],
+            ["I am well", "Je vais bien"],
+            ["Where is it?", "Où est-ce ?"],
+            ["I need help", "J'ai besoin d'aide"],
+            ["Nice to meet you", "Enchanté"],
+            ["Water", "Eau"],
+            ["Coffee", "Café"],
+            ["The bill, please", "L'addition, s'il vous plaît"],
+            ["I would like", "Je voudrais"],
+            ["Train", "Train"],
+            ["Station", "Gare"],
+            ["Today", "Aujourd'hui"],
+            ["Tomorrow", "Demain"],
+            ["Left", "Gauche"],
+            ["Right", "Droite"],
+            ["Open", "Ouvert"],
+            ["Closed", "Fermé"],
+          ],
+        },
+        japanese: {
+          name: "Japanese",
+          code: "JP",
+          level: "Beginner path",
+          flagClass: "flag-japan",
+          units: [
+            {
+              id: 1,
+              name: "First words",
+              description:
+                "Understand fundamental greetings and politeness levels.",
+              grammar:
+                "Japanese sentences typically follow a Subject-Object-Verb (SOV) structure. Honorifics and context dictate how greetings are applied.",
+              vocab: [
+                ["Hello", "こんにちは (Konnichiwa)"],
+                ["Goodbye", "さようなら (Sayōnara)"],
+                ["Please", "お願いします (Onegaishimasu)"],
+                ["Thank you", "ありがとう (Arigatō)"],
+              ],
+            },
+            {
+              id: 2,
+              name: "Everyday conversation",
+              description:
+                "Introduce yourself using standard topic markers (は).",
+              grammar:
+                "The topic marker *wa* (written as は) marks the subject of a sentence, followed by the copula verb *desu* (is/am/are).",
+              vocab: [
+                ["My name is", "わたしは…です"],
+                ["How are you?", "お元気ですか"],
+                ["I am well", "元気です"],
+                ["Nice to meet you", "はじめまして"],
+              ],
+            },
+            {
+              id: 3,
+              name: "Food and travel",
+              description: "Order menu items and handle restaurant requests.",
+              grammar:
+                "Use polite request endings like *onegaishimasu* when asking for the bill or specific services.",
+              vocab: [
+                ["Water", "水 (Mizu)"],
+                ["Coffee", "コーヒー (Kōhī)"],
+                ["The bill, please", "お会計お願いします"],
+                ["I would like", "欲しいです"],
+              ],
+            },
+            {
+              id: 4,
+              name: "Time and directions",
+              description: "Identify railway stations and track time markers.",
+              grammar:
+                "Temporal nouns like *kyō* (today) and *ashita* (tomorrow) generally occupy the front position of a sentence for time anchoring.",
+              vocab: [
+                ["Train", "電車 (Densha)"],
+                ["Station", "駅 (Eki)"],
+                ["Today", "今日 (Kyō)"],
+                ["Tomorrow", "明日 (Ashita)"],
+              ],
+            },
+          ],
+          phrases: [
+            ["Hello", "こんにちは (Konnichiwa)"],
+            ["Goodbye", "さようなら (Sayōnara)"],
+            ["Please", "お願いします (Onegaishimasu)"],
+            ["Thank you", "ありがとう (Arigatō)"],
+            ["Yes", "はい (Hai)"],
+            ["No", "いいえ (Iie)"],
+            ["My name is", "わたしは…です (Watashi wa... desu)"],
+            ["How are you?", "元気ですか (Genki desu ka)"],
+            ["I am well", "元気です (Genki desu)"],
+            ["Where is it?", "どこですか (Doko desu ka)"],
+            ["I need help", "助けが必要です (Tasuke ga hitsuyō desu)"],
+            ["Nice to meet you", "はじめまして (Hajimemashite)"],
+            ["Water", "水 (Mizu)"],
+            ["Coffee", "コーヒー (Kōhī)"],
+            ["The bill, please", "お会計お願いします (Okaikei onegaishimasu)"],
+            ["I would like", "欲しいです (Hoshii desu)"],
+            ["Train", "電車 (Densha)"],
+            ["Station", "駅 (Eki)"],
+            ["Today", "今日 (Kyō)"],
+            ["Tomorrow", "明日 (Ashita)"],
+            ["Left", "左 (Hidari)"],
+            ["Right", "右 (Migi)"],
+            ["Open", "開いています (Aite imasu)"],
+            ["Closed", "閉まっています (Shimatte imasu)"],
+          ],
+        },
+        german: {
+          name: "German",
+          code: "DE",
+          level: "Beginner path",
+          flagClass: "flag-germany",
+          units: [
+            {
+              id: 1,
+              name: "First words",
+              description: "Learn core greetings and fundamental courtesies.",
+              grammar:
+                "German utilizes grammatical gender (der, die, das) and strict verb placement rules in standard sentences.",
+              vocab: [
+                ["Hello", "Hallo"],
+                ["Goodbye", "Auf Wiedersehen"],
+                ["Please", "Bitte"],
+                ["Thank you", "Danke"],
+              ],
+            },
+            {
+              id: 2,
+              name: "Everyday conversation",
+              description:
+                "Learn formal and informal inquiries about well-being.",
+              grammar:
+                "Verb conjugation changes depending on whether you address someone formally (*Sie*) or informally (*du*).",
+              vocab: [
+                ["My name is", "Ich heiße"],
+                ["How are you?", "Wie geht es dir?"],
+                ["I am well", "Mir geht es gut"],
+                ["Nice to meet you", "Freut mich"],
+              ],
+            },
+            {
+              id: 3,
+              name: "Food and travel",
+              description: "Order refreshments and request receipts.",
+              grammar:
+                "Modal verbs like *möchte* (would like) allow you to state preferences smoothly.",
+              vocab: [
+                ["Water", "Wasser"],
+                ["Coffee", "Kaffee"],
+                ["The bill, please", "Die Rechnung, bitte"],
+                ["I would like", "Ich möchte"],
+              ],
+            },
+            {
+              id: 4,
+              name: "Time and directions",
+              description: "Navigate stations and temporal terms.",
+              grammar:
+                "Nouns in German are always capitalized, and compound words combine easily to form clear transit terms like *Bahnhof* (train station).",
+              vocab: [
+                ["Train", "Zug"],
+                ["Station", "Bahnhof"],
+                ["Today", "Heute"],
+                ["Tomorrow", "Morgen"],
+              ],
+            },
+          ],
+          phrases: [
+            ["Hello", "Hallo"],
+            ["Goodbye", "Auf Wiedersehen"],
+            ["Please", "Bitte"],
+            ["Thank you", "Danke"],
+            ["Yes", "Ja"],
+            ["No", "Nein"],
+            ["My name is", "Ich heiße"],
+            ["How are you?", "Wie geht es dir?"],
+            ["I am well", "Mir geht es gut"],
+            ["Where is it?", "Wo ist es?"],
+            ["I need help", "Ich brauche Hilfe"],
+            ["Nice to meet you", "Freut mich"],
+            ["Water", "Wasser"],
+            ["Coffee", "Kaffee"],
+            ["The bill, please", "Die Rechnung, bitte"],
+            ["I would like", "Ich möchte"],
+            ["Train", "Zug"],
+            ["Station", "Bahnhof"],
+            ["Today", "Heute"],
+            ["Tomorrow", "Morgen"],
+            ["Links", "Links"],
+            ["Right", "Rechts"],
+            ["Open", "Geöffnet"],
+            ["Closed", "Geschlossen"],
+          ],
+        },
+      };
+
+      function readSavedProgress() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        } catch {
+          return {};
+        }
+      }
+
+      const savedProgress = readSavedProgress();
+
+      const AppState = {
+        user: {
+          id: "usr_94210",
+          name: "Alex",
+          avatar: "",
+          courseId: "spanish",
+          xp: 0,
+          gems: 0,
+          hearts: 5,
+          streak: 0,
+          dailyGoalLimit: 50,
+          todayXpEarned: 0,
+          lessonsCompleted: 0,
+          ...(savedProgress.user || {}),
+        },
+        units: [],
+        completedLessons: new Set(savedProgress.completedLessons || []),
+        lessonState: {
+          questions: [],
+          currentIndex: 0,
+          score: 0,
+          selectedUnitId: null,
+          selectedLessonId: null,
+        },
+      };
+
+      const notifications = [];
+
+      function saveProgress() {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            user: AppState.user,
+            completedLessons: [...AppState.completedLessons],
+          }),
+        );
+      }
+
+      function getActiveCourse() {
+        return CourseCatalog[AppState.user.courseId] || CourseCatalog.spanish;
+      }
+
+      function lessonKey(unitId, lessonIndex) {
+        return `${AppState.user.courseId}:${unitId}:${lessonIndex}`;
+      }
+
+      function createCurriculum() {
+        return getActiveCourse().units.map((unit, index) => ({
+          id: unit.id,
+          name: unit.name,
+          description: unit.description,
+          grammar: unit.grammar,
+          vocab: unit.vocab,
+          status: index === 0 ? "current" : "locked",
+          lessons: 2,
+        }));
+      }
+
+      function buildQuestion(course, phraseIndex, prompt, answer) {
+        const choices = [answer];
+        for (let offset = 5; choices.length < 4; offset += 5) {
+          const candidate =
+            course.phrases[(phraseIndex + offset) % course.phrases.length][1];
+          if (!choices.includes(candidate)) choices.push(candidate);
+        }
+
+        const answers = choices
+          .map((value, index) => ({
+            value,
+            sort: (phraseIndex * 17 + index * 11) % 29,
+          }))
+          .sort((a, b) => a.sort - b.sort)
+          .map(({ value }) => value);
+
+        return {
+          q: `Translate: ${prompt}`,
+          answers,
+          correct: answers.indexOf(answer),
+        };
+      }
+
+      function updateCourseUi() {
+        const course = getActiveCourse();
+        const flag = document.getElementById("courseFlag");
+        document.getElementById("headerCourseName").textContent = course.name;
+        document.getElementById("headerCourseLevel").textContent = course.level;
+        flag.textContent = course.code;
+        flag.className = `flag ${course.flagClass}`;
+        flag.setAttribute("aria-label", `${course.name} course`);
+      }
+
+      function updateAvatar() {
+        const avatarImage = document.getElementById("avatarImage");
+        const avatarIcon = document.getElementById("avatarIcon");
+        if (AppState.user.avatar) {
+          avatarImage.src = AppState.user.avatar;
+          avatarImage.style.display = "block";
+          avatarIcon.style.display = "none";
+        } else {
+          avatarImage.style.display = "none";
+          avatarIcon.style.display = "block";
+        }
+      }
+
+      function loadActiveCourse() {
+        AppState.units = createCurriculum();
+        refreshUnitAvailability();
+        updateCourseUi();
+        updateAvatar();
+        renderLessonsInstructionHub();
+      }
+
+      const ApiService = {
+        async getCurriculum() {
+          return createCurriculum();
+        },
+        async getQuestions(unitId, lessonIndex) {
+          const course = getActiveCourse();
+          const startIndex = ((unitId - 1) * 2 + lessonIndex) * 3;
+          return course.phrases
+            .slice(startIndex, startIndex + 3)
+            .map(([prompt, answer], index) =>
+              buildQuestion(course, startIndex + index, prompt, answer),
+            );
+        },
+        async submitResult(unitId, lessonIndex, score) {
+          const xpGained = score * 20;
+          return {
+            success: true,
+            xpEarned: xpGained,
+            gemsEarned: 5,
+            newTotalXp: AppState.user.xp + xpGained,
+            newTotalGems: AppState.user.gems + 5,
+            streakVal: AppState.user.streak + 1,
+          };
+        },
+      };
+
+      const Router = {
+        routes: {
+          "/dashboard": "view-dashboard",
+          "/lessons": "view-lessons",
+          "/practice": "view-practice",
+          "/leaderboard": "view-leaderboard",
+        },
+        init() {
+          window.addEventListener("hashchange", () => {
+            const path = window.location.hash.slice(1) || "/dashboard";
+            this.navigate(path, false);
+          });
+
+          document.querySelectorAll(".nav-btn").forEach((button) => {
+            button.addEventListener("click", () => {
+              const targetPath = button.getAttribute("data-path");
+              this.navigate(targetPath);
+              closeMobileDrawer();
+            });
+          });
+
+          const requestedPath = window.location.hash.slice(1);
+          const initialPath =
+            requestedPath in this.routes ? requestedPath : "/dashboard";
+          this.navigate(initialPath, false);
+        },
+        navigate(path, updateHash = true) {
+          if (updateHash && window.location.hash !== `#${path}`) {
+            window.location.hash = path;
+          }
+
+          document.querySelectorAll(".nav-btn").forEach((btn) => {
+            if (btn.getAttribute("data-path") === path) {
+              btn.classList.add("active");
+            } else {
+              btn.classList.remove("active");
+            }
+          });
+
+          const activePanelId = this.routes[path] || "view-dashboard";
+          document.querySelectorAll(".view-panel").forEach((panel) => {
+            panel.classList.remove("active-view");
+          });
+          document.getElementById(activePanelId).classList.add("active-view");
+        },
+      };
+
+      function syncStateToUi() {
+        updateCourseUi();
+        updateAvatar();
+        document.getElementById("headerHearts").textContent =
+          AppState.user.hearts;
+        document.getElementById("headerGems").textContent = AppState.user.gems;
+        document.getElementById("headerStreakValue").textContent =
+          AppState.user.streak;
+        document.getElementById("headerProfileName").textContent =
+          AppState.user.name;
+        document.getElementById("dashboardGreetingName").textContent =
+          AppState.user.name;
+
+        document.getElementById("dashXp").textContent =
+          AppState.user.xp.toLocaleString();
+        document.getElementById("dashStreak").textContent =
+          `${AppState.user.streak} Days`;
+        document.getElementById("dashLessonsCount").textContent =
+          AppState.user.lessonsCompleted;
+
+        document.getElementById("dailyGoalLabel").textContent =
+          `${AppState.user.todayXpEarned} / ${AppState.user.dailyGoalLimit} XP`;
+        const fillPercentage = Math.min(
+          100,
+          (AppState.user.todayXpEarned / AppState.user.dailyGoalLimit) * 100,
+        );
+        document.getElementById("dailyGoalBar").style.width =
+          `${fillPercentage}%`;
+
+        renderLeaderboard();
+      }
+
+      function renderLessonsInstructionHub() {
+        const container = document.getElementById(
+          "lessonsInstructionContainer",
+        );
+        if (!container) return;
+        container.innerHTML = "";
+
+        AppState.units.forEach((unit) => {
+          const card = document.createElement("div");
+          card.className = "lesson-card";
+
+          let vocabListHtml = unit.vocab
+            .map(([en, target]) => `• ${en} → <strong>${target}</strong>`)
+            .join("<br>");
+
+          card.innerHTML = `
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 11px; font-weight: 700; color: #1a73e8; text-transform: uppercase;">Unit ${unit.id}</span>
+                <span style="font-size: 11px; font-weight: 700; color: #5f6368; text-transform: uppercase;">Status: ${unit.status}</span>
+              </div>
+              <h3>${unit.name}</h3>
+              <p>${unit.description}</p>
+              <div class="vocab-preview">
+                <strong>Core Vocabulary:</strong>
+                ${vocabListHtml}
+              </div>
+            </div>
+            <div>
+              <button class="action secondary" style="width: 100%; margin-bottom: 8px;" onclick="window.viewDetailedLesson(${unit.id})">
+                Read Grammar Guide
+              </button>
+              <button class="action check" style="width: 100%; text-align: center;" onclick="window.startLessonTest(${unit.id}, 0)">
+                Take Practice Test
+              </button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
+
+      window.viewDetailedLesson = function (unitId) {
+        const unit = AppState.units.find((u) => u.id === unitId);
+        if (!unit) return;
+
+        Router.navigate("/lessons");
+        const container = document.getElementById(
+          "lessonsInstructionContainer",
+        );
+
+        let vocabRows = unit.vocab
+          .map(
+            ([en, target]) =>
+              `<tr><td>${en}</td><td><strong>${target}</strong></td></tr>`,
+          )
+          .join("");
+
+        container.innerHTML = `
+          <div style="grid-column: span 2;">
+            <div class="instruction-view">
+              <button class="action secondary" style="margin-bottom: 16px;" onclick="window.renderLessonsHubBack()">← Back to Units</button>
+              <span style="font-size: 12px; font-weight: 700; color: #1a73e8; text-transform: uppercase;">Unit ${unit.id} Guide</span>
+              <h2>${unit.name}</h2>
+              <p style="color: #5f6368; margin-top: 6px; font-size: 15px;">${unit.description}</p>
+
+              <div class="grammar-box">
+                <strong style="display: block; margin-bottom: 6px; color: #202124;">Grammar & Usage Rules:</strong>
+                ${unit.grammar}
+              </div>
+
+              <h3 style="margin-top: 25px; font-size: 18px; font-weight: 700;">Vocabulary Reference</h3>
+              <table class="vocab-table">
+                <thead>
+                  <tr><th>English</th><th>Target Language</th></tr>
+                </thead>
+                <tbody>
+                  ${vocabRows}
+                </tbody>
+              </table>
+
+              <div style="margin-top: 30px; display: flex; gap: 12px;">
+                <button class="action check" onclick="window.startLessonTest(${unit.id}, 0)">Start Practice Test for Unit ${unit.id}</button>
+              </div>
+            </div>
+          </div>
+        `;
+      };
+
+      window.renderLessonsHubBack = function () {
+        renderLessonsInstructionHub();
+      };
+
+      window.startLessonTest = function (unitId, lessonIndex) {
+        setupLessonWorkspace(unitId, lessonIndex);
+      };
+
+      function refreshUnitAvailability() {
+        let activeUnitIndex = AppState.units.findIndex(
+          (unit) => unit.status === "current",
+        );
+        while (activeUnitIndex !== -1) {
+          const activeUnit = AppState.units[activeUnitIndex];
+          const unitFinished = Array.from(
+            { length: activeUnit.lessons },
+            (_, index) =>
+              AppState.completedLessons.has(lessonKey(activeUnit.id, index)),
+          ).every(Boolean);
+
+          if (!unitFinished) return;
+
+          activeUnit.status = "completed";
+          const nextUnit = AppState.units[activeUnitIndex + 1];
+          if (!nextUnit) return;
+          nextUnit.status = "current";
+          activeUnitIndex++;
+        }
+      }
+
+      function getNextLesson() {
+        const currentUnit = AppState.units.find(
+          (unit) => unit.status === "current",
+        );
+        if (!currentUnit) return { unitId: 1, lessonIndex: 0 };
+
+        const lessonIndex = Array.from(
+          { length: currentUnit.lessons },
+          (_, index) => index,
+        ).find(
+          (index) =>
+            !AppState.completedLessons.has(lessonKey(currentUnit.id, index)),
+        );
+
+        return lessonIndex === undefined
+          ? { unitId: currentUnit.id, lessonIndex: 0 }
+          : { unitId: currentUnit.id, lessonIndex };
+      }
+
+      function renderLeaderboard() {
+        const list = document.getElementById("leaderboardList");
+        if (!list) return;
+
+        const players = [
+          { name: "Sophia Miller", xp: 24390 },
+          { name: "Marcus Wright", xp: 19820 },
+          {
+            name: AppState.user.name + " (You)",
+            xp: AppState.user.xp,
+            current: true,
+          },
+          { name: "Emma Watson", xp: 15300 },
+          { name: "Kenji Sato", xp: 12110 },
+        ];
+
+        players.sort((a, b) => b.xp - a.xp);
+
+        list.innerHTML = "";
+        players.forEach((p, index) => {
+          const tr = document.createElement("tr");
+          if (p.current) tr.className = "highlight";
+          tr.innerHTML = `
+            <td><strong>#${index + 1}</strong></td>
+            <td>${escapeHtml(p.name)}</td>
+            <td>${p.xp.toLocaleString()} XP</td>
+          `;
+          list.appendChild(tr);
+        });
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(
+          /[&<>'"]/g,
+          (character) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              "'": "&#39;",
+              '"': "&quot;",
+            })[character],
+        );
+      }
+
+      async function setupLessonWorkspace(unitId, lessonIndex) {
+        Router.navigate("/practice");
+
+        const qText = document.getElementById("quizQuestion");
+        const aBox = document.getElementById("quizAnswers");
+
+        qText.textContent = "Loading test questions...";
+        aBox.innerHTML = "";
+
+        try {
+          const questions = await ApiService.getQuestions(unitId, lessonIndex);
+          AppState.lessonState.questions = questions;
+          AppState.lessonState.currentIndex = 0;
+          AppState.lessonState.score = 0;
+          AppState.lessonState.selectedUnitId = unitId;
+          AppState.lessonState.selectedLessonId = lessonIndex;
+
+          qText.textContent = "Test is ready.";
+          const startBtn = document.getElementById("startActiveLessonBtn");
+          startBtn.classList.remove("hidden");
+          startBtn.onclick = runActiveQuiz;
+        } catch (err) {
+          qText.textContent = "Error configuring the test engine.";
+        }
+      }
+
+      function runActiveQuiz() {
+        document.getElementById("startActiveLessonBtn").classList.add("hidden");
+        loadWorkspaceQuestion();
+      }
+
+      function loadWorkspaceQuestion() {
+        const state = AppState.lessonState;
+        const currentItem = state.questions[state.currentIndex];
+
+        document.getElementById("lessonProgressIndicator").textContent =
+          `Q: ${state.currentIndex + 1} / ${state.questions.length}`;
+
+        if (!currentItem) {
+          terminateLessonSession();
+          return;
+        }
+
+        document.getElementById("quizQuestion").textContent = currentItem.q;
+        const aBox = document.getElementById("quizAnswers");
+        aBox.innerHTML = "";
+
+        currentItem.answers.forEach((ans, idx) => {
+          const optionBtn = document.createElement("button");
+          optionBtn.className = "answer";
+          optionBtn.textContent = ans;
+          optionBtn.onclick = () => verifyChoice(optionBtn, idx);
+          aBox.appendChild(optionBtn);
+        });
+      }
+
+      function verifyChoice(button, index) {
+        const state = AppState.lessonState;
+        const correctIdx = state.questions[state.currentIndex].correct;
+        const allButtons = document.querySelectorAll("#quizAnswers .answer");
+
+        allButtons.forEach((btn) => (btn.disabled = true));
+
+        if (index === correctIdx) {
+          button.classList.add("correct");
+          state.score++;
+        } else {
+          button.classList.add("wrong");
+          allButtons[correctIdx].classList.add("correct");
+        }
+
+        const nextBtn = document.getElementById("nextQuestionBtn");
+        nextBtn.classList.remove("hidden");
+        nextBtn.onclick = () => {
+          nextBtn.classList.add("hidden");
+          state.currentIndex++;
+          loadWorkspaceQuestion();
+        };
+      }
+
+      async function terminateLessonSession() {
+        const state = AppState.lessonState;
+        document.getElementById("quizQuestion").textContent =
+          "Saving session data...";
+        document.getElementById("quizAnswers").innerHTML = "";
+
+        try {
+          const res = await ApiService.submitResult(
+            state.selectedUnitId,
+            state.selectedLessonId,
+            state.score,
+          );
+
+          if (res.success) {
+            AppState.user.xp = res.newTotalXp;
+            AppState.user.gems = res.newTotalGems;
+            AppState.user.streak = res.streakVal;
+            AppState.user.todayXpEarned += res.xpEarned;
+            AppState.user.lessonsCompleted++;
+            AppState.completedLessons.add(
+              lessonKey(state.selectedUnitId, state.selectedLessonId),
+            );
+            refreshUnitAvailability();
+            saveProgress();
+
+            syncStateToUi();
+            renderLessonsInstructionHub();
+
+            document.getElementById("earnedXpTag").textContent =
+              `+${res.xpEarned} XP`;
+            document.getElementById("earnedGemsTag").textContent =
+              `+${res.gemsEarned} Gems`;
+            document.getElementById("resultText").textContent =
+              `Great job! You got ${state.score} of ${state.questions.length} correct.`;
+            document.getElementById("completeModal").classList.add("show");
+
+            appendNotificationFeed(
+              `Practice test completed. +${res.xpEarned} XP earned.`,
+            );
+          }
+        } catch (err) {
+          alert("Your progress could not be saved.");
+        }
+      }
+
+      const sidebar = document.getElementById("sidebar");
+      const backdrop = document.getElementById("sidebarBackdrop");
+
+      function openMobileDrawer() {
+        sidebar.classList.add("open");
+        backdrop.classList.add("show");
+      }
+
+      function closeMobileDrawer() {
+        sidebar.classList.remove("open");
+        backdrop.classList.remove("show");
+      }
+
+      function appendNotificationFeed(message) {
+        notifications.unshift(message);
+        const list = document.getElementById("notificationList");
+        if (!list) return;
+
+        list.innerHTML = "";
+        notifications.slice(0, 5).forEach((msg) => {
+          const li = document.createElement("li");
+          li.textContent = msg;
+          list.appendChild(li);
+        });
+
+        const tray = document.getElementById("notificationsTray");
+        tray.classList.add("show");
+        setTimeout(() => tray.classList.remove("show"), 4000);
+      }
+
+      function toggleNotifications() {
+        document.getElementById("notificationsTray").classList.toggle("show");
+      }
+
+      function openProfileModal() {
+        document.getElementById("profileNameInput").value = AppState.user.name;
+        document.getElementById("courseSelect").value = AppState.user.courseId;
+        document.getElementById("dailyGoalInput").value =
+          AppState.user.dailyGoalLimit;
+        document.getElementById("profileModal").classList.add("show");
+      }
+
+      function closeProfileModal() {
+        document.getElementById("profileModal").classList.remove("show");
+      }
+
+      function saveProfile(e) {
+        e.preventDefault();
+        const oldCourse = AppState.user.courseId;
+        AppState.user.name =
+          document.getElementById("profileNameInput").value.trim() || "Alex";
+        AppState.user.courseId = document.getElementById("courseSelect").value;
+        AppState.user.dailyGoalLimit =
+          parseInt(document.getElementById("dailyGoalInput").value) || 50;
+
+        const imageInput = document.getElementById("profileImageInput");
+        if (imageInput.files && imageInput.files[0]) {
+          const file = imageInput.files[0];
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            AppState.user.avatar = event.target.result;
+            completeProfileSave(oldCourse);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          completeProfileSave(oldCourse);
+        }
+      }
+
+      function completeProfileSave(oldCourse) {
+        if (oldCourse !== AppState.user.courseId) {
+          loadActiveCourse();
+        }
+        saveProgress();
+        syncStateToUi();
+        closeProfileModal();
+        appendNotificationFeed("Preferences updated successfully.");
+      }
+
+      function setupUIEventListeners() {
+        document.getElementById("mobileMenuToggle").onclick = openMobileDrawer;
+        backdrop.onclick = closeMobileDrawer;
+        document.getElementById("headerStreak").onclick = toggleNotifications;
+        document.getElementById("profileButton").onclick = openProfileModal;
+        document.getElementById("profileForm").onsubmit = saveProfile;
+        document.getElementById("cancelProfileBtn").onclick = closeProfileModal;
+
+        document.getElementById("closeModalBtn").onclick = () => {
+          document.getElementById("completeModal").classList.remove("show");
+          Router.navigate("/dashboard");
+          document.getElementById("quizQuestion").textContent =
+            "Select a lesson from the Lessons Hub to begin testing!";
+          document.getElementById("lessonProgressIndicator").textContent =
+            "Q: 0/0";
+        };
+
+        document.getElementById("dashboardStartBtn").onclick = () => {
+          Router.navigate("/lessons");
+        };
+      }
+
+      async function initializeApp() {
+        Router.init();
+        setupUIEventListeners();
+
+        try {
+          await ApiService.getCurriculum();
+          loadActiveCourse();
+
+          syncStateToUi();
+
+          const loader = document.getElementById("appLoader");
+          loader.style.opacity = "0";
+          setTimeout(() => (loader.style.display = "none"), 400);
+
+          appendNotificationFeed(
+            savedProgress.user
+              ? `Welcome back, ${AppState.user.name}.`
+              : "Set your preferences to personalize your learning plan.",
+          );
+
+          if (!savedProgress.user) {
+            setTimeout(openProfileModal, 420);
+          }
+        } catch (err) {
+          document.querySelector("#appLoader p").textContent =
+            "Error initializing curriculum engine.";
+          console.error(err);
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", initializeApp);
+    </script>
+  </body>
+</html>
