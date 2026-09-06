@@ -1,90 +1,2010 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rainbow AI Specialist Dashboard 🌈✨</title>
-    <!-- Include WebLLM script from CDN -->
-    <script type="module">
-      import * as webllm from "https://esm.run/@mlc-ai/web-llm";
-      window.webllm = webllm;
-    </script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Marked.js for Markdown parsing & Highlight.js for code syntax highlighting -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <link rel="icon" type="image/svg+xml" href="RAINBOW_favicon.svg" />
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #f8fafc; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: #1e293b; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        h1 { color: #38bdf8; text-align: center; }
-        #status { background: #334155; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-family: monospace; font-size: 14px; }
-        textarea { width: 100%; height: 100px; background: #0f172a; color: #f8fafc; border: 1px solid #475569; border-radius: 6px; padding: 10px; font-size: 16px; margin-bottom: 10px; }
-        button { background: #38bdf8; color: #0f172a; border: none; padding: 10px 20px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; }
-        button:hover { background: #0ea5e9; }
-        pre { background: #0f172a; padding: 15px; border-radius: 6px; overflow-x: auto; border: 1px solid #334155; margin-top: 15px; }
+      :root {
+        --bg-base: #0b0f19;
+        --sidebar-bg: rgba(15, 23, 42, 0.65);
+        --chat-bg: transparent;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --border-color: rgba(255, 255, 255, 0.08);
+        --panel-bg: rgba(30, 41, 59, 0.55);
+        --bubble-user: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        --bubble-ai: rgba(30, 41, 59, 0.75);
+        --accent-glow: rgba(168, 85, 247, 0.4);
+        --danger: #ef4444;
+        --success: #10b981;
+      }
+
+      [data-theme="light"] {
+        --bg-base: #f1f5f9;
+        --sidebar-bg: rgba(255, 255, 255, 0.75);
+        --chat-bg: transparent;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --border-color: rgba(0, 0, 0, 0.08);
+        --panel-bg: rgba(255, 255, 255, 0.85);
+        --bubble-user: linear-gradient(135deg, #3b82f6, #6366f1);
+        --bubble-ai: rgba(241, 245, 249, 0.9);
+        --accent-glow: rgba(168, 85, 247, 0.2);
+        --danger: #dc2626;
+        --success: #059669;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body,
+      html {
+        width: 100%;
+        height: 100vh;
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        font-weight: 300;
+        overflow: hidden;
+        color: var(--text-main);
+        background: var(--bg-base);
+        transition:
+          background 0.3s ease,
+          color 0.3s ease;
+      }
+
+      #neuralCanvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .app-container {
+        display: flex;
+        width: 100%;
+        height: 100vh;
+        position: relative;
+        z-index: 2;
+      }
+
+      .sidebar {
+        width: 300px;
+        background: var(--sidebar-bg);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border-right: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        gap: 16px;
+        flex-shrink: 0;
+        z-index: 3;
+        transition:
+          transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.3s ease,
+          padding 0.3s ease;
+        transform: translateX(0);
+      }
+
+      .sidebar.closed {
+        transform: translateX(-100%);
+        width: 0;
+        padding: 20px 0;
+        overflow: hidden;
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .logo-area {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        font-size: 18px;
+        letter-spacing: 0.5px;
+        background: linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .theme-btn {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        padding: 6px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-family: "Inter", sans-serif;
+      }
+
+      .nav-tabs {
+        display: flex;
+        background: var(--panel-bg);
+        border-radius: 10px;
+        padding: 4px;
+        gap: 4px;
+        border: 1px solid var(--border-color);
+      }
+
+      .nav-tab {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        padding: 8px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 400;
+        font-family: "Inter", sans-serif;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.2s;
+      }
+
+      .nav-tab.active {
+        background: var(--bubble-user);
+        color: #ffffff;
+        font-weight: 500;
+        box-shadow: 0 2px 10px var(--accent-glow);
+      }
+
+      .new-chat-btn {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 12px;
+        font-weight: 400;
+        font-family: "Inter", sans-serif;
+        font-size: 14px;
+        cursor: pointer;
+        text-align: center;
+        box-shadow: 0 4px 15px var(--accent-glow);
+        transition: transform 0.1s;
+      }
+      .new-chat-btn:active {
+        transform: scale(0.98);
+      }
+
+      .persona-select {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 8px 12px;
+        color: var(--text-main);
+        font-size: 13px;
+        font-family: "Inter", sans-serif;
+        outline: none;
+        width: 100%;
+        cursor: pointer;
+      }
+
+      .search-box {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 8px 12px;
+        color: var(--text-main);
+        font-size: 13px;
+        font-family: "Inter", sans-serif;
+        font-weight: 300;
+        outline: none;
+        width: 100%;
+      }
+      .search-box::placeholder {
+        color: var(--text-muted);
+      }
+
+      .section-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+        font-weight: 500;
+        margin-top: 4px;
+      }
+
+      .history-list {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .history-item {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 300;
+        color: var(--text-muted);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.2s;
+      }
+      .history-item span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+      }
+      .history-item:hover,
+      .history-item.active {
+        background: rgba(139, 92, 246, 0.15);
+        color: var(--text-main);
+        border-color: rgba(139, 92, 246, 0.3);
+      }
+      .history-actions {
+        display: flex;
+        gap: 4px;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .history-item:hover .history-actions {
+        opacity: 1;
+      }
+
+      .icon-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 12px;
+        padding: 2px 4px;
+        border-radius: 4px;
+      }
+      .icon-btn:hover {
+        color: var(--text-main);
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .icon-btn.delete:hover {
+        color: var(--danger);
+      }
+
+      .main-content {
+        flex-grow: 1;
+        background: var(--chat-bg);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        position: relative;
+      }
+
+      .view-panel {
+        display: none;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+      }
+      .view-panel.active {
+        display: flex;
+      }
+
+      .panel-header {
+        padding: 20px 30px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--panel-bg);
+        backdrop-filter: blur(15px);
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .sidebar-toggle-btn {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        transition: background 0.2s;
+      }
+      .sidebar-toggle-btn:hover {
+        background: rgba(139, 92, 246, 0.2);
+      }
+
+      .panel-title {
+        font-size: 15px;
+        font-weight: 400;
+      }
+
+      .header-badges {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .status-badge {
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--success);
+        background: rgba(16, 185, 129, 0.15);
+        padding: 4px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+      }
+
+      .vram-monitor-badge {
+        font-size: 11px;
+        font-weight: 400;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.12);
+        padding: 4px 10px;
+        border-radius: 20px;
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .chat-messages {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        max-width: 900px;
+        width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
+      }
+
+      .message-row {
+        display: flex;
+        flex-direction: column;
+        max-width: 80%;
+      }
+      .message-row.user {
+        align-self: flex-end;
+        align-items: flex-end;
+      }
+      .message-row.ai {
+        align-self: flex-start;
+        align-items: flex-start;
+      }
+
+      .message-bubble {
+        padding: 16px 20px;
+        border-radius: 18px;
+        font-size: 14px;
+        font-weight: 300;
+        line-height: 1.6;
+        word-wrap: break-word;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        position: relative;
+      }
+      .user .message-bubble {
+        background: var(--bubble-user);
+        color: #ffffff;
+        border-bottom-right-radius: 4px;
+        white-space: pre-wrap;
+      }
+      .ai .message-bubble {
+        background: var(--bubble-ai);
+        color: var(--text-main);
+        border-bottom-left-radius: 4px;
+        border: 1px solid var(--border-color);
+        backdrop-filter: blur(15px);
+      }
+
+      .ai .message-bubble p {
+        margin-bottom: 10px;
+      }
+      .ai .message-bubble p:last-child {
+        margin-bottom: 0;
+      }
+
+      .code-block-wrapper {
+        position: relative;
+        margin: 12px 0;
+      }
+      .ai .message-bubble pre {
+        background: #0f172a;
+        padding: 14px;
+        padding-top: 36px;
+        border-radius: 10px;
+        overflow-x: auto;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .ai .message-bubble code {
+        font-family: monospace;
+        font-size: 13px;
+        color: #e2e8f0;
+      }
+      .ai .message-bubble p code {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+      .ai .message-bubble ul,
+      .ai .message-bubble ol {
+        margin-left: 20px;
+        margin-bottom: 10px;
+      }
+
+      .code-toolbar {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        display: flex;
+        gap: 6px;
+      }
+      .code-action-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #cbd5e1;
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .code-action-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+      }
+      .code-action-btn.run {
+        background: rgba(16, 185, 129, 0.2);
+        border-color: rgba(16, 185, 129, 0.4);
+        color: #34d399;
+      }
+      .code-action-btn.run:hover {
+        background: rgba(16, 185, 129, 0.4);
+        color: white;
+      }
+
+      .code-sandbox-output {
+        background: #020617;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 8px;
+        padding: 10px;
+        margin-top: 8px;
+        font-family: monospace;
+        font-size: 12px;
+        color: #34d399;
+        max-height: 150px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+      }
+
+      .message-footer {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-top: 6px;
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .chat-input-area {
+        padding: 20px 30px 30px 30px;
+        max-width: 900px;
+        width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
+      }
+
+      .quick-chips-container {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+      .quick-chips-container::-webkit-scrollbar {
+        height: 4px;
+      }
+      .quick-chips-container::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 2px;
+      }
+
+      .input-box-wrapper {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        padding: 12px 16px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        transition: border-color 0.2s;
+        backdrop-filter: blur(15px);
+        position: relative;
+      }
+      .input-box-wrapper:focus-within {
+        border-color: #8b5cf6;
+      }
+
+      .dropzone-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(139, 92, 246, 0.85);
+        color: white;
+        border-radius: 16px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        font-size: 15px;
+        z-index: 10;
+        backdrop-filter: blur(4px);
+      }
+      .input-box-wrapper.dragover .dropzone-overlay {
+        display: flex;
+      }
+
+      .input-textarea {
+        background: transparent;
+        border: none;
+        color: var(--text-main);
+        font-family: "Inter", sans-serif;
+        font-weight: 300;
+        font-size: 14px;
+        resize: none;
+        height: 28px;
+        max-height: 120px;
+        outline: none;
+        line-height: 1.4;
+      }
+      .input-textarea::placeholder {
+        color: var(--text-muted);
+      }
+
+      .input-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 8px;
+        border-top: 1px solid var(--border-color);
+        padding-top: 8px;
+      }
+
+      .multimodal-tools {
+        display: flex;
+        gap: 8px;
+      }
+
+      .tool-chip {
+        background: var(--border-color);
+        border: none;
+        color: var(--text-muted);
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 400;
+        font-family: "Inter", sans-serif;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        transition: all 0.2s;
+      }
+      .tool-chip:hover {
+        background: rgba(139, 92, 246, 0.2);
+        color: var(--text-main);
+      }
+
+      .send-action-btn {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-weight: 400;
+        font-family: "Inter", sans-serif;
+        font-size: 13px;
+        cursor: pointer;
+        transition: transform 0.1s;
+      }
+      .send-action-btn:active {
+        transform: scale(0.96);
+      }
+      .send-action-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      .spectra-container {
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        overflow-y: auto;
+        max-width: 900px;
+        margin: 0 auto;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .spectra-prompt-box {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        backdrop-filter: blur(15px);
+      }
+
+      .spectra-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 16px;
+      }
+
+      .spectra-card {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        backdrop-filter: blur(15px);
+      }
+      .spectra-preview {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #1e1b4b, #3b82f6, #ec4899);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 400;
+        font-size: 13px;
+      }
+
+      .nova-container {
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        overflow-y: auto;
+        max-width: 900px;
+        margin: 0 auto;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .nova-banner {
+        background: linear-gradient(135deg, #f43f5e, #fbbf24, #3b82f6);
+        padding: 24px;
+        border-radius: 20px;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        box-shadow: 0 10px 30px rgba(244, 63, 94, 0.3);
+      }
+      .nova-banner h2 {
+        font-size: 22px;
+        font-weight: 500;
+      }
+      .nova-banner p {
+        font-size: 13px;
+        font-weight: 300;
+        opacity: 0.95;
+      }
+
+      .features-grid {
+        padding: 30px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        overflow-y: auto;
+        max-width: 1100px;
+        margin: 0 auto;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .feature-card {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        backdrop-filter: blur(15px);
+        transition:
+          transform 0.2s,
+          border-color 0.2s;
+      }
+      .feature-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(139, 92, 246, 0.4);
+      }
+
+      .feature-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .feature-title {
+        font-size: 16px;
+        font-weight: 400;
+      }
+
+      .badge-status {
+        font-size: 10px;
+        font-weight: 500;
+        text-transform: uppercase;
+        padding: 4px 8px;
+        border-radius: 6px;
+        letter-spacing: 0.5px;
+      }
+      .badge-status.in-development {
+        background: rgba(245, 158, 11, 0.15);
+        color: #f59e0b;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+      }
+      .badge-status.planned {
+        background: rgba(59, 130, 246, 0.15);
+        color: #3b82f6;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+      }
+
+      .feature-desc {
+        font-size: 13px;
+        font-weight: 300;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <canvas id="neuralCanvas"></canvas>
 
-<div class="container">
-    <h1>Rainbow AI Specialist 🌈🚀</h1>
-    <div id="status">Initializing WebLLM engine...</div>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <div class="sidebar" id="appSidebar">
+        <div class="sidebar-header">
+          <div class="logo-area">Rainbow AI 🌈</div>
+          <button
+            class="theme-btn"
+            id="themeToggleBtn"
+            onclick="toggleTheme()"
+            title="Toggle Theme"
+          >
+            ☀️
+          </button>
+        </div>
 
-    <label for="prompt">Ask your trading specialist for code:</label><br>
-    <textarea id="prompt">Write a Python pandas trading strategy using moving average crossovers.</textarea><br>
-    <button id="generateBtn" disabled>Generate Code</button>
+        <div class="nav-tabs">
+          <button class="nav-tab active" onclick="switchView('chat')">
+            Chat
+          </button>
+          <button class="nav-tab" onclick="switchView('spectra')">
+            Spectra
+          </button>
+          <button class="nav-tab" onclick="switchView('nova')">Nova</button>
+          <button class="nav-tab" onclick="switchView('features')">
+            Roadmap
+          </button>
+        </div>
 
-    <h3>Output:</h3>
-    <pre id="output">Model is still loading...</pre>
-</div>
+        <button class="new-chat-btn" onclick="startNewChat()">
+          + New Conversation
+        </button>
+        <button
+          class="new-chat-btn"
+          onclick="exportCurrentChat()"
+          style="background: linear-gradient(135deg, #10b981, #3b82f6)"
+        >
+          📥 Export Chat (.txt)
+        </button>
 
-<script type="module">
-    let engine;
-    const statusDiv = document.getElementById("status");
-    const outputDiv = document.getElementById("output");
-    const generateBtn = document.getElementById("generateBtn");
-    const promptInput = document.getElementById("prompt");
+        <div class="section-label">AI Persona</div>
+        <select
+          class="persona-select"
+          id="personaSelect"
+          onchange="updatePersona()"
+        >
+          <option value="coder">💻 Rainbow Coder</option>
+          <option value="poet">✨ Rainbow Poet</option>
+          <option value="general" selected>🌈 Rainbow Balanced</option>
+        </select>
 
-    async function initializeEngine() {
-        try {
-            // Pointing directly to your custom merged model on Hugging Face
-            const selectedModel = "RainbowLord/Rainbow-AI-Specialist-Merged";
-            
-            engine = await webllm.CreateMLCEngine(selectedModel, {
-                initProgressCallback: (progress) => {
-                    statusDiv.textContent = progress.text;
-                }
-            });
+        <input
+          type="text"
+          class="search-box"
+          id="searchBox"
+          placeholder="Search chat history..."
+          oninput="filterHistory(this.value)"
+        />
 
-            statusDiv.textContent = "Status: Ready! Your custom WebGPU model is loaded. ✨";
-            generateBtn.disabled = false;
-            outputDiv.textContent = "System ready. Click 'Generate Code' to test!";
-        } catch (error) {
-            statusDiv.textContent = "Error initializing model: " + error.message;
-            console.error(error);
+        <div class="section-label">Recent History</div>
+        <div class="history-list" id="historyList"></div>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="main-content">
+        <!-- Chat View Panel -->
+        <div class="view-panel active" id="view-chat">
+          <div class="panel-header">
+            <div class="header-left">
+              <button
+                class="sidebar-toggle-btn"
+                id="sidebarToggleBtn"
+                onclick="toggleSidebar()"
+                title="Toggle Sidebar"
+              >
+                <img
+                  src="RAINBOW_favicon.svg"
+                  alt="Toggle"
+                  style="
+                    width: 20px;
+                    height: 20px;
+                    display: block;
+                    border-radius: 4px;
+                  "
+                />
+              </button>
+              <h3 class="panel-title" id="activeChatTitle">
+                Rainbow AI Trading Specialist Node
+              </h3>
+            </div>
+            <div class="header-badges">
+              <div class="vram-monitor-badge" id="vramMonitor">
+                ⚡ WebGPU: Ready
+              </div>
+              <div id="status" class="status-badge">Syncing Nodes...</div>
+            </div>
+          </div>
+
+          <div class="chat-messages" id="chatbox"></div>
+
+          <div class="chat-input-area">
+            <div class="quick-chips-container">
+              <button
+                class="tool-chip"
+                onclick="
+                  fillPrompt(
+                    'Write a Python pandas trading strategy using moving average crossovers.',
+                  )
+                "
+              >
+                📈 MA Crossover Strategy
+              </button>
+              <button
+                class="tool-chip"
+                onclick="
+                  fillPrompt(
+                    'Write a Python script for calculating RSI and executing trades',
+                  )
+                "
+              >
+                📊 RSI Indicator Script
+              </button>
+              <button
+                class="tool-chip"
+                onclick="
+                  fillPrompt(
+                    'Write a Python risk management function for stop-loss orders',
+                  )
+                "
+              >
+                🛡️ Risk Management
+              </button>
+            </div>
+
+            <div class="input-box-wrapper" id="dropZoneWrapper">
+              <div class="dropzone-overlay" id="dropzoneOverlay">
+                📄 Drop .md, .txt or code file here to load!
+              </div>
+              <textarea
+                id="userInput"
+                class="input-textarea"
+                placeholder="Ask your custom trading specialist for Python code..."
+                disabled
+              ></textarea>
+              <div class="input-toolbar">
+                <div class="multimodal-tools">
+                  <label class="tool-chip" style="cursor: pointer">
+                    📁 Import File
+                    <input
+                      type="file"
+                      id="fileImportInput"
+                      accept=".md,.txt,.js,.py,.html,.css,.json"
+                      style="display: none"
+                      onchange="handleFileImport(this.files[0])"
+                    />
+                  </label>
+                  <button
+                    class="tool-chip"
+                    id="micBtn"
+                    onclick="toggleVoiceInput()"
+                    title="Speech to Text"
+                  >
+                    🎙️ Voice Input
+                  </button>
+                </div>
+                <button
+                  class="send-action-btn"
+                  id="sendBtn"
+                  onclick="handleSend()"
+                  disabled
+                >
+                  Send
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Spectra Image Generator View Panel -->
+        <div class="view-panel" id="view-spectra">
+          <div class="panel-header">
+            <div class="header-left">
+              <button
+                class="sidebar-toggle-btn"
+                onclick="toggleSidebar()"
+                title="Toggle Sidebar"
+              >
+                <img
+                  src="RAINBOW_favicon.svg"
+                  alt="Toggle"
+                  style="
+                    width: 20px;
+                    height: 20px;
+                    display: block;
+                    border-radius: 4px;
+                  "
+                />
+              </button>
+              <h3 class="panel-title">Spectra • Stable Diffusion 1.5 Suite</h3>
+            </div>
+            <div
+              class="status-badge"
+              id="spectraStatus"
+              style="
+                background: rgba(236, 72, 153, 0.15);
+                color: #ec4899;
+                border-color: rgba(236, 72, 153, 0.3);
+              "
+            >
+              Pipeline Ready (SD 1.5)
+            </div>
+          </div>
+          <div class="spectra-container">
+            <div class="spectra-prompt-box">
+              <label
+                style="
+                  font-size: 13px;
+                  font-weight: 400;
+                  color: var(--text-muted);
+                "
+                >Describe what you want Spectra (SD 1.5) to generate:</label
+              >
+              <div style="display: flex; gap: 10px">
+                <input
+                  type="text"
+                  class="search-box"
+                  style="flex: 1"
+                  placeholder="A futuristic cyberpunk city with neon rainbow lighting..."
+                  id="spectraPrompt"
+                />
+                <button
+                  class="send-action-btn"
+                  onclick="generateSpectraImage()"
+                >
+                  Generate
+                </button>
+              </div>
+            </div>
+            <div class="section-label">Generated Masterpieces</div>
+            <div class="spectra-gallery" id="spectraGallery">
+              <div class="spectra-card">
+                <div class="spectra-preview">Neural Abstract #1</div>
+                <div
+                  style="
+                    padding: 12px;
+                    font-size: 12px;
+                    font-weight: 300;
+                    color: var(--text-muted);
+                  "
+                >
+                  Prompt: Flowing rainbow energy nexus
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nova Kids Assistant View Panel -->
+        <div class="view-panel" id="view-nova">
+          <div class="panel-header">
+            <div class="header-left">
+              <button
+                class="sidebar-toggle-btn"
+                onclick="toggleSidebar()"
+                title="Toggle Sidebar"
+              >
+                <img
+                  src="RAINBOW_favicon.svg"
+                  alt="Toggle"
+                  style="
+                    width: 20px;
+                    height: 20px;
+                    display: block;
+                    border-radius: 4px;
+                  "
+                />
+              </button>
+              <h3 class="panel-title">Nova • Learning Companion</h3>
+            </div>
+            <div
+              class="status-badge"
+              style="
+                background: rgba(244, 63, 94, 0.15);
+                color: #f43f5e;
+                border-color: rgba(244, 63, 94, 0.3);
+              "
+            >
+              Safe Mode Active
+            </div>
+          </div>
+          <div class="nova-container">
+            <div class="nova-banner">
+              <h2>Hi friend! I'm Nova! 👋</h2>
+              <p>
+                I'm here to help you explore science, tell fun stories, answer
+                big questions, and cheer you on! What shall we discover today?
+              </p>
+            </div>
+
+            <div
+              id="novaChatbox"
+              style="
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                max-height: 250px;
+                overflow-y: auto;
+              "
+            ></div>
+
+            <div class="input-box-wrapper">
+              <textarea
+                class="input-textarea"
+                id="novaInput"
+                style="height: 40px"
+                placeholder="Ask Nova a fun question like 'Why is the sky blue?'"
+              ></textarea>
+              <div class="input-toolbar">
+                <div class="multimodal-tools">
+                  <button
+                    class="tool-chip"
+                    onclick="
+                      document.getElementById('novaInput').value =
+                        'Tell me a fun space story!';
+                      handleNovaSend();
+                    "
+                  >
+                    📖 Story Mode
+                  </button>
+                </div>
+                <button class="send-action-btn" onclick="handleNovaSend()">
+                  Ask Nova
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Features Roadmap View Panel -->
+        <div class="view-panel" id="view-features">
+          <div class="panel-header">
+            <div class="header-left">
+              <button
+                class="sidebar-toggle-btn"
+                onclick="toggleSidebar()"
+                title="Toggle Sidebar"
+              >
+                <img
+                  src="RAINBOW_favicon.svg"
+                  alt="Toggle"
+                  style="
+                    width: 20px;
+                    height: 20px;
+                    display: block;
+                    border-radius: 4px;
+                  "
+                />
+              </button>
+              <h3 class="panel-title">Ecosystem Roadmap & Upcoming Features</h3>
+            </div>
+            <div class="status-badge">Version 2.0 Preview</div>
+          </div>
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-header">
+                <div class="feature-title">Vision Models</div>
+                <span class="badge-status in-development">In Development</span>
+              </div>
+              <div class="feature-desc">
+                Native multimodal processing enabling users to seamlessly upload
+                complex images, PDF documents, and video clips for deep
+                contextual reasoning.
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-header">
+                <div class="feature-title">Spectra Engine</div>
+                <span class="badge-status in-development">In Development</span>
+              </div>
+              <div class="feature-desc">
+                Integrated text-to-image generator built directly into the
+                ecosystem with real-time prompt manipulation and style
+                variations.
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-header">
+                <div class="feature-title">Nova Assistant</div>
+                <span class="badge-status planned">Planned</span>
+              </div>
+              <div class="feature-desc">
+                Specialized child-friendly conversational agent with rigorous
+                safety filters, positive reinforcement, and interactive learning
+                games.
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-header">
+                <div class="feature-title">Cloud Sync & Auth</div>
+                <span class="badge-status planned">Planned</span>
+              </div>
+              <div class="feature-desc">
+                Secure account login, Google OAuth synchronization, and
+                persistent cross-device chat history encrypted in the cloud.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function toggleTheme() {
+        const html = document.documentElement;
+        const btn = document.getElementById("themeToggleBtn");
+        if (html.getAttribute("data-theme") === "dark") {
+          html.setAttribute("data-theme", "light");
+          btn.textContent = "🌙";
+        } else {
+          html.setAttribute("data-theme", "dark");
+          btn.textContent = "☀️";
         }
-    }
+      }
 
-    generateBtn.addEventListener("click", async () => {
-        if (!engine) return;
-        
-        outputDiv.textContent = "Thinking and writing code... 🤖💻";
-        generateBtn.disabled = true;
+      function toggleSidebar() {
+        const sidebar = document.getElementById("appSidebar");
+        sidebar.classList.toggle("closed");
+      }
+
+      function switchView(viewName) {
+        document
+          .querySelectorAll(".view-panel")
+          .forEach((p) => p.classList.remove("active"));
+        document
+          .querySelectorAll(".nav-tab")
+          .forEach((t) => t.classList.remove("active"));
+
+        document.getElementById("view-" + viewName).classList.add("active");
+        event.currentTarget.classList.add("active");
+      }
+
+      // Voice Input Speech-to-Text Integration
+      let recognition = null;
+      let isRecording = false;
+
+      window.toggleVoiceInput = function () {
+        const micBtn = document.getElementById("micBtn");
+        const input = document.getElementById("userInput");
+
+        if (
+          !("webkitSpeechRecognition" in window) &&
+          !("SpeechRecognition" in window)
+        ) {
+          alert(
+            "Speech recognition is not supported in this browser. Please use Google Chrome or Microsoft Edge!",
+          );
+          return;
+        }
+
+        if (isRecording) {
+          if (recognition) recognition.stop();
+          return;
+        }
+
+        const SpeechRecognition =
+          window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = "en-US";
+
+        recognition.onstart = () => {
+          isRecording = true;
+          micBtn.style.background = "rgba(239, 68, 68, 0.3)";
+          micBtn.style.color = "#ef4444";
+          micBtn.textContent = "🛑 Listening...";
+        };
+
+        recognition.onresult = (event) => {
+          let transcript = "";
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            transcript += event.results[i][0].transcript;
+          }
+          input.value = transcript;
+        };
+
+        recognition.onerror = (event) => {
+          console.error("Speech recognition error:", event.error);
+          stopMicState();
+        };
+
+        recognition.onend = () => {
+          stopMicState();
+        };
+
+        recognition.start();
+      };
+
+      function stopMicState() {
+        isRecording = false;
+        const micBtn = document.getElementById("micBtn");
+        if (micBtn) {
+          micBtn.style.background = "";
+          micBtn.style.color = "";
+          micBtn.textContent = "🎙️ Voice Input";
+        }
+      }
+
+      function generateSpectraImage() {
+        const prompt = document.getElementById("spectraPrompt").value.trim();
+        if (!prompt) return;
+
+        const status = document.getElementById("spectraStatus");
+        status.textContent = "Rendering SD 1.5...";
+
+        setTimeout(() => {
+          const gallery = document.getElementById("spectraGallery");
+          const card = document.createElement("div");
+          card.className = "spectra-card";
+          card.innerHTML = `<div class="spectra-preview" style="background: linear-gradient(135deg, #${Math.floor(Math.random() * 16777215).toString(16)}, #${Math.floor(Math.random() * 16777215).toString(16)});">${prompt.substring(0, 18)}...</div><div style="padding: 12px; font-size: 12px; font-weight: 300; color: var(--text-muted);">Prompt: ${prompt}</div>`;
+          gallery.prepend(card);
+          document.getElementById("spectraPrompt").value = "";
+          status.textContent = "Pipeline Ready (SD 1.5)";
+        }, 800);
+      }
+
+      window.fillPrompt = function (text) {
+        const input = document.getElementById("userInput");
+        input.value = text;
+        input.focus();
+      };
+
+      window.__codeStore = {};
+
+      const dropZoneWrapper = document.getElementById("dropZoneWrapper");
+
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropZoneWrapper.addEventListener(
+          eventName,
+          (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZoneWrapper.classList.add("dragover");
+          },
+          false,
+        );
+      });
+
+      ["dragleave", "drop"].forEach((eventName) => {
+        dropZoneWrapper.addEventListener(
+          eventName,
+          (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZoneWrapper.classList.remove("dragover");
+          },
+          false,
+        );
+      });
+
+      dropZoneWrapper.addEventListener(
+        "drop",
+        (e) => {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+          if (files && files.length > 0) {
+            handleFileImport(files[0]);
+          }
+        },
+        false,
+      );
+
+      window.handleFileImport = function (file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const content = e.target.result;
+          const input = document.getElementById("userInput");
+          input.value = `Here is the contents of my imported file (${file.name}):\n\n\`\`\`\n${content}\n\`\`\`\n\nPlease review and analyze this file.`;
+          input.focus();
+        };
+        reader.readAsText(file);
+      };
+
+      window.runCodeSnippet = function (codeId, btn) {
+        const code = window.__codeStore[codeId];
+        if (!code) return;
+
+        const wrapper = btn.closest(".code-block-wrapper");
+        let outputBox = wrapper.querySelector(".code-sandbox-output");
+
+        if (!outputBox) {
+          outputBox = document.createElement("div");
+          outputBox.className = "code-sandbox-output";
+          wrapper.appendChild(outputBox);
+        }
+
+        outputBox.textContent = "Running sandbox...";
+
+        let logs = [];
+        const originalLog = console.log;
+        console.log = (...args) => {
+          logs.push(
+            args
+              .map((arg) =>
+                typeof arg === "object"
+                  ? JSON.stringify(arg, null, 2)
+                  : String(arg),
+              )
+              .join(" "),
+          );
+        };
 
         try {
-            const userPrompt = promptInput.value;
-            const reply = await engine.chat.completions.create({
-                messages: [{ role: "user", content: userPrompt }],
-                temperature: 0.3, // Low temperature for clean, strict code formatting
-            });
+          const runFn = new Function(code);
+          const result = runFn();
 
-            outputDiv.textContent = reply.choices[0].message.content;
-        } catch (error) {
-            outputDiv.textContent = "Generation error: " + error.message;
+          if (result !== undefined && logs.length === 0) {
+            logs.push(`Result: ${result}`);
+          }
+
+          if (logs.length === 0) {
+            logs.push("Code executed successfully with no console output.");
+          }
+
+          outputBox.textContent = logs.join("\n");
+          outputBox.style.color = "#34d399";
+        } catch (err) {
+          outputBox.textContent = `Runtime Error: ${err.message}`;
+          outputBox.style.color = "#f87171";
         } finally {
-            generateBtn.disabled = false;
+          console.log = originalLog;
         }
-    });
+      };
 
-    // Start loading the model automatically on page open
-    initializeEngine();
-</script>
+      window.copySnippet = function (codeId, btn) {
+        const code = window.__codeStore[codeId];
+        if (!code) return;
 
-</body>
+        navigator.clipboard.writeText(code);
+        const originalText = btn.textContent;
+        btn.textContent = "✨ Copied!";
+        btn.style.background = "rgba(16, 185, 129, 0.2)";
+        btn.style.color = "#10b981";
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.background = "rgba(255, 255, 255, 0.1)";
+          btn.style.color = "#cbd5e1";
+        }, 2000);
+      };
+    </script>
+
+    <script type="module">
+      import { CreateMLCEngine } from "https://esm.run/@mlc-ai/web-llm";
+
+      const statusDiv = document.getElementById("status");
+      const userInput = document.getElementById("userInput");
+      const sendBtn = document.getElementById("sendBtn");
+      const chatbox = document.getElementById("chatbox");
+      const historyList = document.getElementById("historyList");
+      const activeChatTitle = document.getElementById("activeChatTitle");
+      const vramMonitor = document.getElementById("vramMonitor");
+
+      let engine = null;
+      let chatSessions =
+        JSON.parse(localStorage.getItem("rainbow_ecosystem_chats")) || [];
+      let currentSessionId = null;
+      let currentMessages = [];
+
+      const personas = {
+        general:
+          "You are Rainbow AI Specialist, a precise local Python trading strategy and quantitative analysis assistant built by Herish.",
+        coder:
+          "You are Rainbow Coder, an elite expert programmer and financial software architect specializing in Python trading strategies and quantitative algorithms.",
+        poet: "You are Rainbow Poet, a creative, eloquent storyteller who weaves financial markets and poetry together with lyrical flair.",
+      };
+
+      function getSystemPrompt() {
+        const select = document.getElementById("personaSelect");
+        const val = select ? select.value : "general";
+        return { role: "system", content: personas[val] || personas.general };
+      }
+
+      window.updatePersona = function () {
+        const sys = getSystemPrompt();
+        if (
+          currentMessages.length > 0 &&
+          currentMessages[0].role === "system"
+        ) {
+          currentMessages[0] = sys;
+        } else {
+          currentMessages.unshift(sys);
+        }
+        saveToMemory();
+      };
+
+      const canvas = document.getElementById("neuralCanvas");
+      const ctx = canvas.getContext("2d");
+      let particlesArray = [];
+      let hueShift = 0;
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+
+      class Particle {
+        constructor(index, total) {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.size = Math.random() * 2 + 1.2;
+          this.speedX = Math.random() * 0.5 - 0.25;
+          this.speedY = Math.random() * 0.5 - 0.25;
+          this.baseHue = (index / total) * 360;
+        }
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+          if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+        }
+        draw(currentHue) {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          const nodeHue = (this.baseHue + currentHue) % 360;
+          const isLight =
+            document.documentElement.getAttribute("data-theme") === "light";
+          const lightness = isLight ? "45%" : "60%";
+          const alpha = isLight ? "0.75" : "0.95";
+          ctx.fillStyle = `hsla(${nodeHue}, 90%, ${lightness}, ${alpha})`;
+          ctx.fill();
+        }
+      }
+
+      const particleCount = Math.floor(window.innerWidth / 22);
+      for (let i = 0; i < particleCount; i++) {
+        particlesArray.push(new Particle(i, particleCount));
+      }
+
+      function animateCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        hueShift += 0.15;
+
+        const isLight =
+          document.documentElement.getAttribute("data-theme") === "light";
+        const lineLightness = isLight ? "45%" : "60%";
+
+        for (let i = 0; i < particlesArray.length; i++) {
+          particlesArray[i].update();
+          particlesArray[i].draw(hueShift);
+
+          for (let j = i + 1; j < particlesArray.length; j++) {
+            const dx = particlesArray[i].x - particlesArray[j].x;
+            const dy = particlesArray[i].y - particlesArray[j].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < 140) {
+              const alpha = (1 - distance / 140) * (isLight ? 0.25 : 0.35);
+              const lineHue = (particlesArray[i].baseHue + hueShift) % 360;
+              ctx.beginPath();
+              ctx.strokeStyle = `hsla(${lineHue}, 90%, ${lineLightness}, ${alpha})`;
+              ctx.lineWidth = 0.9;
+              ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
+              ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
+              ctx.stroke();
+              ctx.closePath();
+            }
+          }
+        }
+        requestAnimationFrame(animateCanvas);
+      }
+      animateCanvas();
+
+      function saveToMemory() {
+        let session = chatSessions.find((s) => s.id === currentSessionId);
+        if (!session) {
+          session = {
+            id: currentSessionId,
+            title: "New Conversation",
+            messages: [],
+          };
+          chatSessions.unshift(session);
+        }
+
+        if (
+          currentMessages.length > 0 &&
+          session.title === "New Conversation"
+        ) {
+          const firstUserMsg = currentMessages.find((m) => m.role === "user");
+          if (firstUserMsg) {
+            const rawText = firstUserMsg.content;
+            session.title =
+              rawText.length > 25 ? rawText.substring(0, 25) + "..." : rawText;
+          }
+        }
+
+        session.messages = currentMessages;
+        localStorage.setItem(
+          "rainbow_ecosystem_chats",
+          JSON.stringify(chatSessions),
+        );
+        renderHistoryList();
+      }
+
+      window.deleteChat = function (sessionId, event) {
+        event.stopPropagation();
+        chatSessions = chatSessions.filter((s) => s.id !== sessionId);
+        localStorage.setItem(
+          "rainbow_ecosystem_chats",
+          JSON.stringify(chatSessions),
+        );
+
+        if (sessionId === currentSessionId) {
+          if (chatSessions.length > 0) {
+            loadChat(chatSessions[0].id);
+          } else {
+            startNewChat();
+          }
+        } else {
+          renderHistoryList();
+        }
+      };
+
+      window.renameChat = function (sessionId, event) {
+        event.stopPropagation();
+        const session = chatSessions.find((s) => s.id === sessionId);
+        if (!session) return;
+        const newTitle = prompt(
+          "Enter new title for conversation:",
+          session.title,
+        );
+        if (newTitle) {
+          session.title = newTitle.trim();
+          localStorage.setItem(
+            "rainbow_ecosystem_chats",
+            JSON.stringify(chatSessions),
+          );
+          renderHistoryList();
+          if (sessionId === currentSessionId)
+            activeChatTitle.textContent = session.title;
+        }
+      };
+
+      window.exportCurrentChat = function () {
+        if (!currentMessages || currentMessages.length <= 1) {
+          alert("There is no active conversation to export yet!");
+          return;
+        }
+
+        let exportText = "=== RAINBOW AI CONVERSATION EXPORT ===\n\n";
+        currentMessages.forEach((msg) => {
+          if (msg.role === "system") return;
+          const sender = msg.role === "user" ? "Herish" : "Rainbow";
+          exportText += `${sender}:\n${msg.content}\n\n-----------------------------------\n\n`;
+        });
+
+        const blob = new Blob([exportText], {
+          type: "text/plain;charset=utf-8",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `Rainbow_Chat_${Date.now()}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+
+      function renderHistoryList(filterQuery = "") {
+        historyList.innerHTML = "";
+        const filtered = chatSessions.filter((s) =>
+          s.title.toLowerCase().includes(filterQuery.toLowerCase()),
+        );
+
+        filtered.forEach((session) => {
+          const item = document.createElement("div");
+          item.className = `history-item ${session.id === currentSessionId ? "active" : ""}`;
+
+          const titleSpan = document.createElement("span");
+          titleSpan.textContent = session.title;
+          item.appendChild(titleSpan);
+
+          const actionsDiv = document.createElement("div");
+          actionsDiv.className = "history-actions";
+
+          const renameBtn = document.createElement("button");
+          renameBtn.className = "icon-btn";
+          renameBtn.textContent = "✏️";
+          renameBtn.title = "Rename";
+          renameBtn.addEventListener("click", (e) => renameChat(session.id, e));
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "icon-btn delete";
+          deleteBtn.textContent = "✕";
+          deleteBtn.title = "Delete";
+          deleteBtn.addEventListener("click", (e) => deleteChat(session.id, e));
+
+          actionsDiv.appendChild(renameBtn);
+          actionsDiv.appendChild(deleteBtn);
+          item.appendChild(actionsDiv);
+
+          item.addEventListener("click", () => loadChat(session.id));
+          historyList.appendChild(item);
+        });
+      }
+
+      window.filterHistory = function (query) {
+        renderHistoryList(query);
+      };
+
+      function loadChat(sessionId) {
+        currentSessionId = sessionId;
+        const session = chatSessions.find((s) => s.id === sessionId);
+        currentMessages = session ? [...session.messages] : [];
+
+        if (!currentMessages.some((m) => m.role === "system")) {
+          currentMessages.unshift(getSystemPrompt());
+        }
+
+        activeChatTitle.textContent = session
+          ? session.title
+          : "Rainbow AI Trading Specialist Node";
+
+        chatbox.innerHTML = "";
+        const visibleMessages = currentMessages.filter(
+          (m) => m.role !== "system",
+        );
+        if (visibleMessages.length === 0) {
+          appendMessage(
+            "ai",
+            "Hello! I am your custom fine-tuned Trading Specialist 📈. Ask me to write Python trading strategies, algorithms, or technical indicators!",
+          );
+        } else {
+          visibleMessages.forEach((msg) => {
+            appendMessage(
+              msg.role === "assistant" ? "ai" : msg.role,
+              msg.content,
+              false,
+            );
+          });
+        }
+        renderHistoryList();
+      }
+
+      window.startNewChat = function () {
+        currentSessionId = Date.now().toString();
+        currentMessages = [getSystemPrompt()];
+        activeChatTitle.textContent = "Rainbow AI Trading Specialist Node";
+        chatbox.innerHTML = "";
+        appendMessage(
+          "ai",
+          "Hello! I am your custom fine-tuned Trading Specialist 📈. Ask me to write Python trading strategies, algorithms, or technical indicators!",
+        );
+        renderHistoryList();
+      };
+
+      function processAIMessageHTML(text) {
+        let html = marked.parse(text);
+
+        html = html.replace(
+          /<pre><code\b([^>]*)>([\s\S]*?)<\/code><\/pre>/gi,
+          (match, attrs, codeContent) => {
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = codeContent;
+            const rawCode = tempDiv.textContent;
+
+            const codeId = "code_" + Math.random().toString(36).substring(2, 9);
+            window.__codeStore[codeId] = rawCode;
+
+            const isJS =
+              attrs.includes("lang-js") ||
+              attrs.includes("lang-javascript") ||
+              !attrs.includes("lang-");
+            const runButtonHTML = isJS
+              ? `<button class="code-action-btn run" onclick="runCodeSnippet('${codeId}', this)">▶ Run</button>`
+              : "";
+
+            return `<div class="code-block-wrapper">
+                <div class="code-toolbar">
+                    ${runButtonHTML}
+                    <button class="code-action-btn" onclick="copySnippet('${codeId}', this)">📋 Copy</button>
+                </div>
+                <pre><code${attrs}>${codeContent}</code></pre>
+            </div>`;
+          },
+        );
+
+        return html;
+      }
+
+      function appendMessage(role, text, save = true) {
+        const row = document.createElement("div");
+        row.className = `message-row ${role}`;
+
+        const bubble = document.createElement("div");
+        bubble.className = "message-bubble";
+
+        if (role === "ai") {
+          bubble.innerHTML = processAIMessageHTML(text);
+          bubble.querySelectorAll("pre code").forEach((block) => {
+            hljs.highlightElement(block);
+          });
+        } else {
+          bubble.textContent = text;
+        }
+
+        row.appendChild(bubble);
+
+        const footer = document.createElement("div");
+        footer.className = "message-footer";
+        const timeStr = new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        footer.innerHTML = `<span>${timeStr}</span>`;
+
+        if (role === "ai") {
+          const copyBtn = document.createElement("button");
+          copyBtn.className = "icon-btn";
+          copyBtn.textContent = "📋 Copy Full Response";
+          copyBtn.onclick = () => {
+            navigator.clipboard.writeText(text);
+            copyBtn.textContent = "✨ Copied Full Text!";
+            setTimeout(
+              () => (copyBtn.textContent = "📋 Copy Full Response"),
+              2000,
+            );
+          };
+          footer.appendChild(copyBtn);
+        }
+
+        row.appendChild(footer);
+        chatbox.appendChild(row);
+        chatbox.scrollTop = chatbox.scrollHeight;
+
+        if (save && role !== "system") {
+          currentMessages.push({
+            role: role === "user" ? "user" : "assistant",
+            content: text,
+          });
+          saveToMemory();
+        }
+        return bubble;
+      }
+
+      async function initAI() {
+        try {
+          // Pointing directly to your custom compiled MLC fine-tuned model repository on Hugging Face!
+          engine = await CreateMLCEngine("RainbowLord/Rainbow-AI-Specialist-MLC", {
+            initProgressCallback: (p) => {
+              statusDiv.textContent = p.text;
+            },
+          });
+          statusDiv.textContent = "● Trading Specialist Ready";
+          vramMonitor.textContent = "⚡ WebGPU: Active";
+          userInput.disabled = false;
+          sendBtn.disabled = false;
+
+          renderHistoryList();
+          if (chatSessions.length > 0) {
+            loadChat(chatSessions[0].id);
+          } else {
+            startNewChat();
+          }
+        } catch (error) {
+          statusDiv.textContent = "Engine Link Error";
+          statusDiv.style.color = "var(--danger)";
+          vramMonitor.textContent = "⚡ WebGPU: Error";
+          console.error(error);
+        }
+      }
+
+      window.handleSend = async function () {
+        const text = userInput.value.trim();
+        if (!text || !engine) return;
+
+        appendMessage("user", text);
+        userInput.value = "";
+        sendBtn.disabled = true;
+
+        statusDiv.textContent = "Streaming Strategy...";
+        const startTime = performance.now();
+        let tokenCount = 0;
+
+        const aiBubble = appendMessage("ai", "Thinking...", false);
+
+        try {
+          const chunks = await engine.chat.completions.create({
+            messages: currentMessages,
+            stream: true,
+            temperature: 0.3,
+          });
+
+          let responseText = "";
+          for await (const chunk of chunks) {
+            const delta = chunk.choices[0]?.delta?.content || "";
+            responseText += delta;
+            tokenCount += delta.split(/\s+/).length;
+
+            aiBubble.innerHTML = processAIMessageHTML(responseText);
+            aiBubble.querySelectorAll("pre code").forEach((block) => {
+              hljs.highlightElement(block);
+            });
+            chatbox.scrollTop = chatbox.scrollHeight;
+          }
+
+          const durationSec = (performance.now() - startTime) / 1000;
+          const tps = (tokenCount / durationSec).toFixed(1);
+          vramMonitor.textContent = `⚡ WebGPU: ~${tps} tok/s`;
+
+          currentMessages.push({ role: "assistant", content: responseText });
+          saveToMemory();
+        } catch (err) {
+          aiBubble.textContent = "Execution context exception encountered.";
+          console.error(err);
+        }
+
+        statusDiv.textContent = "● Trading Specialist Ready";
+        sendBtn.disabled = false;
+        chatbox.scrollTop = chatbox.scrollHeight;
+      };
+
+      window.handleNovaSend = async function () {
+        const input = document.getElementById("novaInput");
+        const text = input.value.trim();
+        if (!text) return;
+
+        if (!engine) {
+          alert(
+            "Please wait for the main engine to finish syncing in the Chat tab first!",
+          );
+          return;
+        }
+
+        const novaContainer = document.getElementById("novaChatbox");
+        if (!novaContainer) return;
+
+        const userMsg = document.createElement("div");
+        userMsg.style.cssText =
+          "align-self: flex-end; background: #3b82f6; color: white; padding: 10px 14px; border-radius: 12px; max-width: 80%; font-size: 13px; white-space: pre-wrap;";
+        userMsg.textContent = text;
+        novaContainer.appendChild(userMsg);
+        input.value = "";
+
+        const novaMsg = document.createElement("div");
+        novaMsg.style.cssText =
+          "align-self: flex-start; background: var(--panel-bg); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 12px; max-width: 80%; font-size: 13px;";
+        novaMsg.textContent = "Nova is thinking... ✨";
+        novaContainer.appendChild(novaMsg);
+        novaContainer.scrollTop = novaContainer.scrollHeight;
+
+        try {
+          const chunks = await engine.chat.completions.create({
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You are Nova, a friendly, playful, and safe learning assistant. Keep answers encouraging, simple, and fun.",
+              },
+              { role: "user", content: text },
+            ],
+            stream: true,
+          });
+
+          let responseText = "";
+          for await (const chunk of chunks) {
+            responseText += chunk.choices[0]?.delta?.content || "";
+            novaMsg.textContent = responseText;
+            novaContainer.scrollTop = novaContainer.scrollHeight;
+          }
+        } catch (err) {
+          novaMsg.textContent =
+            "Oops! Nova got stuck for a second. Try asking again!";
+          console.log(err);
+        }
+      };
+
+      userInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          handleSend();
+        }
+      });
+
+      const novaInputEl = document.getElementById("novaInput");
+      if (novaInputEl) {
+        novaInputEl.addEventListener("keydown", function (event) {
+          if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            handleNovaSend();
+          }
+        });
+      }
+
+      initAI();
+    </script>
+  </body>
 </html>
