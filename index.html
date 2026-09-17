@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rainbow AI Specialist Dashboard 🌈✨</title>
+    <title>Rainbow AI</title>
     <!-- Google Fonts: Google Sans & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -1625,7 +1625,7 @@
     </script>
 
     <script type="module">
-      import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm";
+      import { CreateMLCEngine, modelLibURLPrefix, modelVersion } from "https://esm.run/@mlc-ai/web-llm";
 
       const statusDiv = document.getElementById("status");
       const userInput = document.getElementById("userInput");
@@ -2022,19 +2022,18 @@
 
       async function initAI() {
         try {
-          // Override the weights of the official prebuilt gemma-2-2b-it model while reusing its working .wasm library! 🚀
+          // Custom AppConfig mapping your Hugging Face custom shards and providing the required WebAssembly library
           const customAppConfig = {
-            ...prebuiltAppConfig,
             model_list: [
               {
                 model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/resolve/main/",
-                model_id: "gemma-2-2b-it-q4f16_1-MLC",
-              },
-              ...prebuiltAppConfig.model_list
+                model_id: "Rainbow-AI-Specialist-MLC",
+                model_lib: modelLibURLPrefix + modelVersion + "/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm"
+              }
             ]
           };
 
-          engine = await CreateMLCEngine("gemma-2-2b-it-q4f16_1-MLC", {
+          engine = await CreateMLCEngine("Rainbow-AI-Specialist-MLC", {
             appConfig: customAppConfig,
             initProgressCallback: (p) => {
               statusDiv.textContent = p.text;
