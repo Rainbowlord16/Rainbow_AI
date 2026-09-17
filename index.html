@@ -2019,19 +2019,16 @@
         }
         return bubble;
       }
-
-      async function initAI() {
+async function initAI() {
         try {
-          // Override the standard prebuilt model configuration to point weights to your custom Hugging Face repository 🚀
+          // Explicitly map the stable webgpu wasm bundle path directly to bypass dynamic version mismatch 404s
           const customAppConfig = {
-            ...prebuiltAppConfig,
             model_list: [
               {
                 model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/resolve/main/",
                 model_id: "gemma-2-2b-it-q4f16_1-MLC",
-                model_lib: modelLibURLPrefix + modelVersion + "/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm"
-              },
-              ...prebuiltAppConfig.model_list
+                model_lib: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_20/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm"
+              }
             ]
           };
 
@@ -2121,7 +2118,7 @@
           console.error(err);
         }
 
-        statusDiv.textContent = "● Trading Specialist Ready";
+        statusDiv.textContent = "● Rainbow Specialist Ready";
         sendBtn.disabled = false;
         chatbox.scrollTop = chatbox.scrollHeight;
       };
