@@ -2022,12 +2022,12 @@
 
       async function initAI() {
         try {
-          // Merge custom model definition with prebuiltAppConfig so runtime core assets route properly
+          // Using Hugging Face 'resolve/main/' raw endpoint to prevent cache 404 blockages
           const customAppConfig = {
             ...prebuiltAppConfig,
             model_list: [
               {
-                model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/",
+                model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/resolve/main/",
                 model_id: "Rainbow-AI-Specialist",
                 model_lib: modelLibURLPrefix + modelVersion + "/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm"
               },
