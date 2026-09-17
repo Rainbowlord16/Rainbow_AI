@@ -181,10 +181,9 @@
       }
 
       body {
-  font-family: 'Google Sans', sans-serif;
-  /* Optional: smoothing for that ultra-clean high-tech look */
-  -webkit-font-smoothing: antialiased;
-}
+        font-family: 'Google Sans', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
 
       .sidebar.closed {
         transform: translateX(-100%);
@@ -1643,7 +1642,7 @@
     </script>
 
     <script type="module">
-      import { CreateMLCEngine } from "https://esm.run/@mlc-ai/web-llm";
+      import { CreateMLCEngine, modelLibURLPrefix, modelVersion } from "https://esm.run/@mlc-ai/web-llm";
 
       const statusDiv = document.getElementById("status");
       const userInput = document.getElementById("userInput");
@@ -2040,8 +2039,19 @@
 
       async function initAI() {
         try {
-          // Pointing directly to your custom compiled MLC fine-tuned model repository on Hugging Face!
-          engine = await CreateMLCEngine("RainbowLord/Rainbow-AI-Specialist-MLC", {
+          // Define custom AppConfig pointing directly to your fine-tuned MLC repository
+          const customAppConfig = {
+            model_list: [
+              {
+                model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC",
+                model_id: "Rainbow-AI-Specialist",
+                model_lib: modelLibURLPrefix + modelVersion + "/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm"
+              }
+            ]
+          };
+
+          engine = await CreateMLCEngine("Rainbow-AI-Specialist", {
+            appConfig: customAppConfig,
             initProgressCallback: (p) => {
               statusDiv.textContent = p.text;
               const statusEl = document.getElementById("statusLabel");
