@@ -1625,7 +1625,7 @@
     </script>
 
     <script type="module">
-      import { CreateMLCEngine, modelLibURLPrefix, modelVersion } from "https://esm.run/@mlc-ai/web-llm";
+      import { CreateMLCEngine, prebuiltAppConfig, modelLibURLPrefix, modelVersion } from "https://esm.run/@mlc-ai/web-llm";
 
       const statusDiv = document.getElementById("status");
       const userInput = document.getElementById("userInput");
@@ -2022,14 +2022,16 @@
 
       async function initAI() {
         try {
-          // Custom AppConfig pointing directly to your fine-tuned MLC repository with the trailing slash fix! 🚀
+          // Merge custom model definition with prebuiltAppConfig so runtime core assets route properly
           const customAppConfig = {
+            ...prebuiltAppConfig,
             model_list: [
               {
                 model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/",
                 model_id: "Rainbow-AI-Specialist",
                 model_lib: modelLibURLPrefix + modelVersion + "/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm"
-              }
+              },
+              ...prebuiltAppConfig.model_list
             ]
           };
 
