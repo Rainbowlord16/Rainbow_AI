@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rainbow AI Specialist Dashboard 🌈✨</title>
-    <!-- Google Fonts: Inter -->
-<link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Google Sans & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -62,20 +62,13 @@
       html {
         width: 100%;
         height: 100vh;
-        font-family:
-          "Inter",
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          Roboto,
-          sans-serif;
+        font-family: 'Google Sans', "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         font-weight: 300;
         overflow: hidden;
         color: var(--text-main);
         background: var(--bg-base);
-        transition:
-          background 0.3s ease,
-          color 0.3s ease;
+        -webkit-font-smoothing: antialiased;
+        transition: background 0.3s ease, color 0.3s ease;
       }
 
       #neuralCanvas {
@@ -173,16 +166,8 @@
         gap: 16px;
         flex-shrink: 0;
         z-index: 3;
-        transition:
-          transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-          width 0.3s ease,
-          padding 0.3s ease;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease, padding 0.3s ease;
         transform: translateX(0);
-      }
-
-      body {
-        font-family: 'Google Sans', sans-serif;
-        -webkit-font-smoothing: antialiased;
       }
 
       .sidebar.closed {
@@ -830,9 +815,7 @@
         flex-direction: column;
         gap: 12px;
         backdrop-filter: blur(15px);
-        transition:
-          transform 0.2s,
-          border-color 0.2s;
+        transition: transform 0.2s, border-color 0.2s;
       }
       .feature-card:hover {
         transform: translateY(-4px);
@@ -2039,11 +2022,11 @@
 
       async function initAI() {
         try {
-          // Define custom AppConfig pointing directly to your fine-tuned MLC repository
+          // Custom AppConfig pointing directly to your fine-tuned MLC repository with the trailing slash fix! 🚀
           const customAppConfig = {
             model_list: [
               {
-                model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC",
+                model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/",
                 model_id: "Rainbow-AI-Specialist",
                 model_lib: modelLibURLPrefix + modelVersion + "/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm"
               }
