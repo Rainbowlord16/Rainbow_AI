@@ -1625,7 +1625,7 @@
     </script>
 
     <script type="module">
-      import { CreateMLCEngine, prebuiltAppConfig, modelLibURLPrefix, modelVersion } from "https://esm.run/@mlc-ai/web-llm";
+      import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm";
 
       const statusDiv = document.getElementById("status");
       const userInput = document.getElementById("userInput");
@@ -2020,62 +2020,21 @@
         return bubble;
       }
 
-async function initAI() {
+      async function initAI() {
         try {
-          // Explicitly map your custom shards while locking onto a stable prebuilt WebAssembly library URL
+          // Override the weights of the official prebuilt gemma-2-2b-it model while reusing its working .wasm library! 🚀
           const customAppConfig = {
+            ...prebuiltAppConfig,
             model_list: [
               {
                 model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/resolve/main/",
-                model_id: "Rainbow-AI-Specialist-MLC",
-                // Use the stable pre-compiled webgpu wasm bundle path
-                model_lib: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_20/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm"
-              }
+                model_id: "gemma-2-2b-it-q4f16_1-MLC",
+              },
+              ...prebuiltAppConfig.model_list
             ]
           };
 
-          engine = await CreateMLCEngine("Rainbow-AI-Specialist-MLC", {
-            appConfig: customAppConfig,
-            initProgressCallback: (p) => {
-              statusDiv.textContent = p.text;
-              const statusEl = document.getElementById("statusLabel");
-              const fillEl = document.getElementById("progressFill");
-              const pctEl = document.getElementById("progressPercent");
-
-              if (statusEl) statusEl.textContent = p.text;
-              const val = Math.round((p.progress || 0) * 100);
-              if (!isNaN(val)) {
-                if (fillEl) fillEl.style.width = `${val}%`;
-                if (pctEl) pctEl.textContent = `${val}%`;
-                if (window.setLoaderStage) {
-                  if (val < 25) window.setLoaderStage(0);
-                  else if (val < 55) window.setLoaderStage(1);
-                  else if (val < 85) window.setLoaderStage(2);
-                  else window.setLoaderStage(3);
-                }
-              }
-            },
-          });
-          statusDiv.textContent = "● Trading Specialist Ready";
-          vramMonitor.textContent = "⚡ WebGPU: Active";
-          userInput.disabled = false;
-          sendBtn.disabled = false;
-
-          renderHistoryList();
-          if (chatSessions.length > 0) {
-            loadChat(chatSessions[0].id);
-          } else {
-            startNewChat();
-          }
-        } catch (error) {
-          statusDiv.textContent = "Engine Link Error";
-          statusDiv.style.color = "var(--danger)";
-          vramMonitor.textContent = "⚡ WebGPU: Error";
-          console.error(error);
-        }
-      }
-
-          engine = await CreateMLCEngine("Rainbow-AI-Specialist-MLC", {
+          engine = await CreateMLCEngine("gemma-2-2b-it-q4f16_1-MLC", {
             appConfig: customAppConfig,
             initProgressCallback: (p) => {
               statusDiv.textContent = p.text;
