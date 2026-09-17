@@ -2022,20 +2022,20 @@
 
       async function initAI() {
         try {
-          // Using Hugging Face 'resolve/main/' raw endpoint to prevent cache 404 blockages
+          // Explicitly define the custom model record pointing to your Hugging Face repository and standard gemma-2 wasm runtime
           const customAppConfig = {
             ...prebuiltAppConfig,
             model_list: [
               {
-                model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/resolve/main/",
-                model_id: "Rainbow-AI-Specialist",
+                model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC",
+                model_id: "Rainbow-AI-Specialist-MLC",
                 model_lib: modelLibURLPrefix + modelVersion + "/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm"
               },
               ...prebuiltAppConfig.model_list
             ]
           };
 
-          engine = await CreateMLCEngine("Rainbow-AI-Specialist", {
+          engine = await CreateMLCEngine("Rainbow-AI-Specialist-MLC", {
             appConfig: customAppConfig,
             initProgressCallback: (p) => {
               statusDiv.textContent = p.text;
