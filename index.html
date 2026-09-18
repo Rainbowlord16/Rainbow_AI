@@ -3,10 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rainbow AI Specialist Dashboard 🌈✨</title>
+    <title>Rainbow AI 🌈✨</title>
     <!-- Google Fonts: Google Sans & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
@@ -63,7 +62,7 @@
         width: 100%;
         height: 100vh;
         font-family: 'Google Sans', "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        font-weight: 300;
+        font-weight: 400;
         overflow: hidden;
         color: var(--text-main);
         background: var(--bg-base);
@@ -202,7 +201,7 @@
         border-radius: 8px;
         cursor: pointer;
         font-size: 14px;
-        font-family: "Inter", sans-serif;
+        font-family: "Google Sans", sans-serif;
       }
 
       .nav-tabs {
@@ -212,6 +211,7 @@
         padding: 4px;
         gap: 4px;
         border: 1px solid var(--border-color);
+        flex-wrap: wrap;
       }
 
       .nav-tab {
@@ -219,11 +219,11 @@
         background: transparent;
         border: none;
         color: var(--text-muted);
-        padding: 8px;
+        padding: 8px 4px;
         border-radius: 8px;
-        font-size: 12px;
-        font-weight: 400;
-        font-family: "Inter", sans-serif;
+        font-size: 11px;
+        font-weight: 500;
+        font-family: "Google Sans", sans-serif;
         cursor: pointer;
         text-align: center;
         transition: all 0.2s;
@@ -242,8 +242,8 @@
         border: none;
         padding: 12px;
         border-radius: 12px;
-        font-weight: 400;
-        font-family: "Inter", sans-serif;
+        font-weight: 500;
+        font-family: "Google Sans", sans-serif;
         font-size: 14px;
         cursor: pointer;
         text-align: center;
@@ -261,7 +261,7 @@
         padding: 8px 12px;
         color: var(--text-main);
         font-size: 13px;
-        font-family: "Inter", sans-serif;
+        font-family: "Google Sans", sans-serif;
         outline: none;
         width: 100%;
         cursor: pointer;
@@ -274,8 +274,8 @@
         padding: 8px 12px;
         color: var(--text-main);
         font-size: 13px;
-        font-family: "Inter", sans-serif;
-        font-weight: 300;
+        font-family: "Google Sans", sans-serif;
+        font-weight: 400;
         outline: none;
         width: 100%;
       }
@@ -306,7 +306,7 @@
         padding: 10px 12px;
         border-radius: 10px;
         font-size: 13px;
-        font-weight: 300;
+        font-weight: 400;
         color: var(--text-muted);
         cursor: pointer;
         display: flex;
@@ -408,7 +408,7 @@
 
       .panel-title {
         font-size: 15px;
-        font-weight: 400;
+        font-weight: 500;
       }
 
       .header-badges {
@@ -419,7 +419,7 @@
 
       .status-badge {
         font-size: 12px;
-        font-weight: 400;
+        font-weight: 500;
         color: var(--success);
         background: rgba(16, 185, 129, 0.15);
         padding: 4px 12px;
@@ -429,7 +429,7 @@
 
       .vram-monitor-badge {
         font-size: 11px;
-        font-weight: 400;
+        font-weight: 500;
         color: #38bdf8;
         background: rgba(56, 189, 248, 0.12);
         padding: 4px 10px;
@@ -471,7 +471,7 @@
         padding: 16px 20px;
         border-radius: 18px;
         font-size: 14px;
-        font-weight: 300;
+        font-weight: 400;
         line-height: 1.6;
         word-wrap: break-word;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
@@ -644,8 +644,8 @@
         background: transparent;
         border: none;
         color: var(--text-main);
-        font-family: "Inter", sans-serif;
-        font-weight: 300;
+        font-family: "Google Sans", sans-serif;
+        font-weight: 400;
         font-size: 14px;
         resize: none;
         height: 28px;
@@ -678,8 +678,8 @@
         padding: 6px 10px;
         border-radius: 8px;
         font-size: 12px;
-        font-weight: 400;
-        font-family: "Inter", sans-serif;
+        font-weight: 500;
+        font-family: "Google Sans", sans-serif;
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -698,8 +698,8 @@
         border: none;
         padding: 8px 16px;
         border-radius: 10px;
-        font-weight: 400;
-        font-family: "Inter", sans-serif;
+        font-weight: 500;
+        font-family: "Google Sans", sans-serif;
         font-size: 13px;
         cursor: pointer;
         transition: transform 0.1s;
@@ -710,6 +710,49 @@
       .send-action-btn:disabled {
         opacity: 0.4;
         cursor: not-allowed;
+      }
+
+      /* Prompts & Ideas Tab Styling */
+      .prompts-container {
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        overflow-y: auto;
+        max-width: 900px;
+        margin: 0 auto;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .prompt-category-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 16px;
+      }
+      .prompt-card {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        backdrop-filter: blur(15px);
+        cursor: pointer;
+        transition: transform 0.2s, border-color 0.2s;
+      }
+      .prompt-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(139, 92, 246, 0.4);
+      }
+      .prompt-card h4 {
+        font-size: 15px;
+        font-weight: 500;
+      }
+      .prompt-card p {
+        font-size: 13px;
+        color: var(--text-muted);
+        line-height: 1.4;
       }
 
       .spectra-container {
@@ -758,7 +801,7 @@
         align-items: center;
         justify-content: center;
         color: white;
-        font-weight: 400;
+        font-weight: 500;
         font-size: 13px;
       }
 
@@ -789,7 +832,7 @@
       }
       .nova-banner p {
         font-size: 13px;
-        font-weight: 300;
+        font-weight: 400;
         opacity: 0.95;
       }
 
@@ -828,7 +871,7 @@
       }
       .feature-title {
         font-size: 16px;
-        font-weight: 400;
+        font-weight: 500;
       }
 
       .badge-status {
@@ -852,7 +895,7 @@
 
       .feature-desc {
         font-size: 13px;
-        font-weight: 300;
+        font-weight: 400;
         color: var(--text-muted);
         line-height: 1.5;
       }
@@ -891,16 +934,11 @@
         </div>
 
         <div class="nav-tabs">
-          <button class="nav-tab active" onclick="switchView('chat')">
-            Chat
-          </button>
-          <button class="nav-tab" onclick="switchView('spectra')">
-            Spectra
-          </button>
+          <button class="nav-tab active" onclick="switchView('chat')">Chat</button>
+          <button class="nav-tab" onclick="switchView('prompts')">Prompts</button>
+          <button class="nav-tab" onclick="switchView('spectra')">Spectra</button>
           <button class="nav-tab" onclick="switchView('nova')">Nova</button>
-          <button class="nav-tab" onclick="switchView('features')">
-            Roadmap
-          </button>
+          <button class="nav-tab" onclick="switchView('features')">Roadmap</button>
         </div>
 
         <button class="new-chat-btn" onclick="startNewChat()">
@@ -920,9 +958,9 @@
           id="personaSelect"
           onchange="updatePersona()"
         >
-          <option value="coder">💻 Rainbow Coder</option>
-          <option value="poet">✨ Rainbow Poet</option>
-          <option value="general" selected>🌈 Rainbow Balanced</option>
+          <option value="coder">💻 Expert Coder & Dev</option>
+          <option value="poet">✨ Creative Writer & Poet</option>
+          <option value="general" selected>🌈 Balanced Assistant</option>
         </select>
 
         <input
@@ -961,7 +999,7 @@
                 />
               </button>
               <h3 class="panel-title" id="activeChatTitle">
-                Rainbow AI Trading Specialist Node
+                Rainbow AI Workspace
               </h3>
             </div>
             <div class="header-badges">
@@ -980,31 +1018,31 @@
                 class="tool-chip"
                 onclick="
                   fillPrompt(
-                    'Write a Python pandas trading strategy using moving average crossovers.',
+                    'Explain quantum computing concepts like I am a beginner.',
                   )
                 "
               >
-                📈 MA Crossover Strategy
+                🌌 Quantum Physics
               </button>
               <button
                 class="tool-chip"
                 onclick="
                   fillPrompt(
-                    'Write a Python script for calculating RSI and executing trades',
+                    'Write a clean, modular Python script for web scraping with BeautifulSoup.',
                   )
                 "
               >
-                📊 RSI Indicator Script
+                🕷️ Python Web Scraper
               </button>
               <button
                 class="tool-chip"
                 onclick="
                   fillPrompt(
-                    'Write a Python risk management function for stop-loss orders',
+                    'Compose a short story about a neon-lit city in the year 2150.',
                   )
                 "
               >
-                🛡️ Risk Management
+                🌆 Cyberpunk Story
               </button>
             </div>
 
@@ -1015,7 +1053,7 @@
               <textarea
                 id="userInput"
                 class="input-textarea"
-                placeholder="Ask your custom trading specialist for Python code..."
+                placeholder="Message Rainbow AI..."
                 disabled
               ></textarea>
               <div class="input-toolbar">
@@ -1047,6 +1085,62 @@
                 >
                   Send
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prompts & Ideas View Panel -->
+        <div class="view-panel" id="view-prompts">
+          <div class="panel-header">
+            <div class="header-left">
+              <button
+                class="sidebar-toggle-btn"
+                onclick="toggleSidebar()"
+                title="Toggle Sidebar"
+              >
+                <img
+                  src="RAINBOW_favicon.svg"
+                  alt="Toggle"
+                  style="
+                    width: 20px;
+                    height: 20px;
+                    display: block;
+                    border-radius: 4px;
+                  "
+                />
+              </button>
+              <h3 class="panel-title">Prompt Engineering & Idea Vault 💡</h3>
+            </div>
+            <div
+              class="status-badge"
+              style="
+                background: rgba(139, 92, 246, 0.15);
+                color: #a855f7;
+                border-color: rgba(139, 92, 246, 0.3);
+              "
+            >
+              Templates Active
+            </div>
+          </div>
+          <div class="prompts-container">
+            <div class="section-label">Quick-Start Inspiration Vault</div>
+            <div class="prompt-category-grid">
+              <div class="prompt-card" onclick="usePresetPrompt('Draft a comprehensive weekly project status report for my team including blockers and milestones.')">
+                <h4>📊 Project Status Report</h4>
+                <p>Generate clean corporate or team update templates instantly.</p>
+              </div>
+              <div class="prompt-card" onclick="usePresetPrompt('Refactor this JavaScript code to use clean modern ES6+ async/await syntax and add comments: [Paste Code]')">
+                <h4>⚡ Code Refactoring</h4>
+                <p>Optimize, modularize, and clean up software scripts.</p>
+              </div>
+              <div class="prompt-card" onclick="usePresetPrompt('Write a persuasive marketing email campaign promoting a new innovative productivity app.')">
+                <h4>🚀 Marketing Copy</h4>
+                <p>Craft high-conversion copy for campaigns and outreach.</p>
+              </div>
+              <div class="prompt-card" onclick="usePresetPrompt('Explain the architectural differences between SQL and NoSQL databases with real-world use cases.')">
+                <h4>🧠 System Architecture</h4>
+                <p>Deep-dive explanations on complex technical design patterns.</p>
               </div>
             </div>
           </div>
@@ -1091,7 +1185,7 @@
               <label
                 style="
                   font-size: 13px;
-                  font-weight: 400;
+                  font-weight: 500;
                   color: var(--text-muted);
                 "
                 >Describe what you want Spectra (SD 1.5) to generate:</label
@@ -1120,7 +1214,7 @@
                   style="
                     padding: 12px;
                     font-size: 12px;
-                    font-weight: 300;
+                    font-weight: 400;
                     color: var(--text-muted);
                   "
                 >
@@ -1131,7 +1225,7 @@
           </div>
         </div>
 
-        <!-- Nova Kids Assistant View Panel -->
+        <!-- Nova Learning Companion View Panel -->
         <div class="view-panel" id="view-nova">
           <div class="panel-header">
             <div class="header-left">
@@ -1412,6 +1506,17 @@
         event.currentTarget.classList.add("active");
       }
 
+      function usePresetPrompt(promptText) {
+        switchView('chat');
+        document.querySelectorAll('.nav-tab').forEach(t => {
+          if(t.textContent.includes('Chat')) t.classList.add('active');
+          else t.classList.remove('active');
+        });
+        const input = document.getElementById("userInput");
+        input.value = promptText;
+        input.focus();
+      }
+
       let recognition = null;
       let isRecording = false;
 
@@ -1489,7 +1594,7 @@
           const gallery = document.getElementById("spectraGallery");
           const card = document.createElement("div");
           card.className = "spectra-card";
-          card.innerHTML = `<div class="spectra-preview" style="background: linear-gradient(135deg, #${Math.floor(Math.random() * 16777215).toString(16)}, #${Math.floor(Math.random() * 16777215).toString(16)});">${prompt.substring(0, 18)}...</div><div style="padding: 12px; font-size: 12px; font-weight: 300; color: var(--text-muted);">Prompt: ${prompt}</div>`;
+          card.innerHTML = `<div class="spectra-preview" style="background: linear-gradient(135deg, #${Math.floor(Math.random() * 16777215).toString(16)}, #${Math.floor(Math.random() * 16777215).toString(16)});">${prompt.substring(0, 18)}...</div><div style="padding: 12px; font-size: 12px; font-weight: 400; color: var(--text-muted);">Prompt: ${prompt}</div>`;
           gallery.prepend(card);
           document.getElementById("spectraPrompt").value = "";
           status.textContent = "Pipeline Ready (SD 1.5)";
@@ -1622,6 +1727,89 @@
       };
     </script>
 
+    <!-- Restored Canvas Background Script -->
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const canvas = document.getElementById("neuralCanvas");
+        const ctx = canvas.getContext("2d");
+        let particlesArray = [];
+        let hueShift = 0;
+
+        function resizeCanvas() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+          constructor(index, total) {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2 + 1.2;
+            this.speedX = Math.random() * 0.5 - 0.25;
+            this.speedY = Math.random() * 0.5 - 0.25;
+            this.baseHue = (index / total) * 360;
+          }
+          update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+            if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+          }
+          draw(currentHue) {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            const nodeHue = (this.baseHue + currentHue) % 360;
+            const isLight = document.documentElement.getAttribute("data-theme") === "light";
+            const lightness = isLight ? "45%" : "60%";
+            const alpha = isLight ? "0.75" : "0.95";
+            ctx.fillStyle = `hsla(${nodeHue}, 90%, ${lightness}, ${alpha})`;
+            ctx.fill();
+          }
+        }
+
+        const particleCount = Math.floor(window.innerWidth / 22);
+        for (let i = 0; i < particleCount; i++) {
+          particlesArray.push(new Particle(i, particleCount));
+        }
+
+        function animateCanvas() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          hueShift += 0.15;
+
+          const isLight = document.documentElement.getAttribute("data-theme") === "light";
+          const lineLightness = isLight ? "45%" : "60%";
+
+          for (let i = 0; i < particlesArray.length; i++) {
+            particlesArray[i].update();
+            particlesArray[i].draw(hueShift);
+
+            for (let j = i + 1; j < particlesArray.length; j++) {
+              const dx = particlesArray[i].x - particlesArray[j].x;
+              const dy = particlesArray[i].y - particlesArray[j].y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+
+              if (distance < 140) {
+                const alpha = (1 - distance / 140) * (isLight ? 0.25 : 0.35);
+                const lineHue = (particlesArray[i].baseHue + hueShift) % 360;
+                ctx.beginPath();
+                ctx.strokeStyle = `hsla(${lineHue}, 90%, ${lineLightness}, ${alpha})`;
+                ctx.lineWidth = 0.9;
+                ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
+                ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
+                ctx.stroke();
+                ctx.closePath();
+              }
+            }
+          }
+          requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+      });
+    </script>
+
+    <!-- Pinned WebLLM Engine Module (v0.2.48 to avoid thread import crashes) -->
     <script type="module">
       import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
@@ -1641,10 +1829,10 @@
 
       const personas = {
         general:
-          "You are Rainbow AI, a precise local Python trading strategy, a fluent poet, pro-coder and quantitative analysis assistant built by Herish.",
+          "You are Rainbow AI, a friendly, highly versatile, and brilliant local assistant built by Herish.",
         coder:
-          "You are Rainbow Coder, an elite expert programmer and financial software architect specializing in Python trading strategies, other programing languages and quantitative algorithms.",
-        poet: "You are Rainbow Poet, a creative, eloquent storyteller who weaves prompts and poetry together with lyrical flair.",
+          "You are Rainbow Coder, an elite expert programmer and software architect specializing in writing clean, modular code across multiple languages.",
+        poet: "You are Rainbow Poet, a creative, eloquent storyteller who writes moving prose and poetry with artistic flair.",
       };
 
       function getSystemPrompt() {
@@ -1665,85 +1853,6 @@
         }
         saveToMemory();
       };
-
-      const canvas = document.getElementById("neuralCanvas");
-      const ctx = canvas.getContext("2d");
-      let particlesArray = [];
-      let hueShift = 0;
-
-      function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
-      window.addEventListener("resize", resizeCanvas);
-      resizeCanvas();
-
-      class Particle {
-        constructor(index, total) {
-          this.x = Math.random() * canvas.width;
-          this.y = Math.random() * canvas.height;
-          this.size = Math.random() * 2 + 1.2;
-          this.speedX = Math.random() * 0.5 - 0.25;
-          this.speedY = Math.random() * 0.5 - 0.25;
-          this.baseHue = (index / total) * 360;
-        }
-        update() {
-          this.x += this.speedX;
-          this.y += this.speedY;
-          if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-          if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-        }
-        draw(currentHue) {
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-          const nodeHue = (this.baseHue + currentHue) % 360;
-          const isLight =
-            document.documentElement.getAttribute("data-theme") === "light";
-          const lightness = isLight ? "45%" : "60%";
-          const alpha = isLight ? "0.75" : "0.95";
-          ctx.fillStyle = `hsla(${nodeHue}, 90%, ${lightness}, ${alpha})`;
-          ctx.fill();
-        }
-      }
-
-      const particleCount = Math.floor(window.innerWidth / 22);
-      for (let i = 0; i < particleCount; i++) {
-        particlesArray.push(new Particle(i, particleCount));
-      }
-
-      function animateCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        hueShift += 0.15;
-
-        const isLight =
-          document.documentElement.getAttribute("data-theme") === "light";
-        const lineLightness = isLight ? "45%" : "60%";
-
-        for (let i = 0; i < particlesArray.length; i++) {
-          particlesArray[i].update();
-          particlesArray[i].draw(hueShift);
-
-          for (let j = i + 1; j < particlesArray.length; j++) {
-            const dx = particlesArray[i].x - particlesArray[j].x;
-            const dy = particlesArray[i].y - particlesArray[j].y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance < 140) {
-              const alpha = (1 - distance / 140) * (isLight ? 0.25 : 0.35);
-              const lineHue = (particlesArray[i].baseHue + hueShift) % 360;
-              ctx.beginPath();
-              ctx.strokeStyle = `hsla(${lineHue}, 90%, ${lineLightness}, ${alpha})`;
-              ctx.lineWidth = 0.9;
-              ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
-              ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
-              ctx.stroke();
-              ctx.closePath();
-            }
-          }
-        }
-        requestAnimationFrame(animateCanvas);
-      }
-      animateCanvas();
 
       function saveToMemory() {
         let session = chatSessions.find((s) => s.id === currentSessionId);
@@ -1824,7 +1933,7 @@
         let exportText = "=== RAINBOW AI CONVERSATION EXPORT ===\n\n";
         currentMessages.forEach((msg) => {
           if (msg.role === "system") return;
-          const sender = msg.role === "user" ? "Herish" : "Rainbow";
+          const sender = msg.role === "user" ? "Herish" : "Rainbow AI";
           exportText += `${sender}:\n${msg.content}\n\n-----------------------------------\n\n`;
         });
 
@@ -1894,7 +2003,7 @@
 
         activeChatTitle.textContent = session
           ? session.title
-          : "Rainbow AI Trading Specialist Node";
+          : "Rainbow AI Workspace";
 
         chatbox.innerHTML = "";
         const visibleMessages = currentMessages.filter(
@@ -1903,7 +2012,7 @@
         if (visibleMessages.length === 0) {
           appendMessage(
             "ai",
-            "Hello! I am your custom fine-tuned Trading Specialist 📈. Ask me to write Python trading strategies, algorithms, or technical indicators!",
+            "Hello! I am Rainbow AI 🌈. How can I assist you today? Feel free to ask questions, write code, or explore ideas!",
           );
         } else {
           visibleMessages.forEach((msg) => {
@@ -1920,11 +2029,11 @@
       window.startNewChat = function () {
         currentSessionId = Date.now().toString();
         currentMessages = [getSystemPrompt()];
-        activeChatTitle.textContent = "Rainbow AI Trading Specialist Node";
+        activeChatTitle.textContent = "Rainbow AI Workspace";
         chatbox.innerHTML = "";
         appendMessage(
           "ai",
-          "Hello! I am your custom fine-tuned Trading Specialist 📈. Ask me to write Python trading strategies, algorithms, or technical indicators!",
+          "Hello! I am Rainbow AI 🌈. How can I assist you today? Feel free to ask questions, write code, or explore ideas!",
         );
         renderHistoryList();
       };
@@ -2020,29 +2129,28 @@
 
       async function initAI() {
         try {
-const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
-const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
+          const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
+          const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
 
-const customAppConfig = {
-  ...(prebuiltAppConfig || {}),
-  model_list: [
-    {
-      model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/resolve/main/",
-      model_id: "Rainbow-AI-Specialist-MLC",
-      model_lib: wasmUrl,
-      model_lib_id: wasmLibId,
-      vram_required_MB: 1800,
-      low_resource_required: true,
-      required_features: ["shader-f16"]
-    },
-    ...((prebuiltAppConfig && prebuiltAppConfig.model_list) || [])
-  ],
-  model_lib_map: {
-    ...((prebuiltAppConfig && prebuiltAppConfig.model_lib_map) || {}),
-    [wasmLibId]: wasmUrl,
-    "Rainbow-AI-Specialist-MLC": wasmUrl
-  }
-};
+          const customAppConfig = {
+            ...(prebuiltAppConfig || {}),
+            model_list: [
+              {
+                model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/resolve/main/",
+                model_id: "Rainbow-AI-Specialist-MLC",
+                model_lib: wasmUrl,
+                model_lib_id: wasmLibId,
+                vram_required_MB: 1800,
+                low_resource_required: true,
+                required_features: ["shader-f16"]
+              },
+              ...((prebuiltAppConfig && prebuiltAppConfig.model_list) || [])
+            ],
+            model_lib_map: {
+              ...((prebuiltAppConfig && prebuiltAppConfig.model_lib_map) || {}),
+              [wasmLibId]: wasmUrl,
+              "Rainbow-AI-Specialist-MLC": wasmUrl
+            }
           };
 
           engine = await CreateMLCEngine("Rainbow-AI-Specialist-MLC", {
@@ -2068,7 +2176,7 @@ const customAppConfig = {
             },
           });
 
-          statusDiv.textContent = "● Trading Specialist Ready";
+          statusDiv.textContent = "● Rainbow AI Ready";
           vramMonitor.textContent = "⚡ WebGPU: Active";
           userInput.disabled = false;
           sendBtn.disabled = false;
@@ -2095,7 +2203,7 @@ const customAppConfig = {
         userInput.value = "";
         sendBtn.disabled = true;
 
-        statusDiv.textContent = "Streaming Strategy...";
+        statusDiv.textContent = "Generating Response...";
         const startTime = performance.now();
         let tokenCount = 0;
 
@@ -2105,7 +2213,7 @@ const customAppConfig = {
           const chunks = await engine.chat.completions.create({
             messages: currentMessages,
             stream: true,
-            temperature: 0.3,
+            temperature: 0.6,
           });
 
           let responseText = "";
@@ -2132,7 +2240,7 @@ const customAppConfig = {
           console.error(err);
         }
 
-        statusDiv.textContent = "● Trading Specialist Ready";
+        statusDiv.textContent = "● Rainbow AI Ready";
         sendBtn.disabled = false;
         chatbox.scrollTop = chatbox.scrollHeight;
       };
