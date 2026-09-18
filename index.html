@@ -2020,16 +2020,16 @@
         return bubble;
       }
 
-      async function initAI() {
+async function initAI() {
         try {
-          // Explicitly map your custom model weights while pointing to a stable prebuilt WebAssembly library URL
+          // Use WebLLM's built-in dynamic variables to construct the correct .wasm library URL for your package version
           const customAppConfig = {
             ...prebuiltAppConfig,
             model_list: [
               {
                 model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/resolve/main/",
                 model_id: "gemma-2-2b-it-q4f16_1-MLC",
-                model_lib: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_20/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm"
+                model_lib: modelLibURLPrefix + modelVersion + "/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm"
               },
               ...prebuiltAppConfig.model_list
             ]
