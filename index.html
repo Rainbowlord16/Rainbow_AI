@@ -2132,8 +2132,6 @@ async function initAI() {
           const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
           const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
 
-          // Use the built-in model ID so asyncLoadTokenizer resolves all internal metadata,
-          // while overriding its weight endpoint to your custom Hugging Face repo.
           const customAppConfig = {
             ...(prebuiltAppConfig || {}),
             model_list: [
@@ -2144,7 +2142,11 @@ async function initAI() {
                 model_lib_id: wasmLibId,
                 vram_required_MB: 1800,
                 low_resource_required: true,
-                required_features: ["shader-f16"]
+                required_features: ["shader-f16"],
+                overrides: {
+                  tokenizer_files: ["tokenizer.json", "tokenizer_config.json"],
+                  conv_template: "gemma_instruction"
+                }
               },
               ...((prebuiltAppConfig && prebuiltAppConfig.model_list) || []).filter(
                 (m) => m.model_id !== "gemma-2-2b-it-q4f16_1-MLC"
@@ -2159,6 +2161,9 @@ async function initAI() {
 
           engine = await CreateMLCEngine("gemma-2-2b-it-q4f16_1-MLC", {
             appConfig: customAppConfig,
+            chatOpts: {
+              tokenizer_files: ["tokenizer.json", "tokenizer_config.json"]
+            },
             initProgressCallback: (p) => {
               statusDiv.textContent = p.text;
               const statusEl = document.getElementById("statusLabel");
