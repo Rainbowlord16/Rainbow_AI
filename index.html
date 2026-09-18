@@ -1623,7 +1623,7 @@
     </script>
 
     <script type="module">
-      import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm";
+      import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
       const statusDiv = document.getElementById("status");
       const userInput = document.getElementById("userInput");
@@ -1641,10 +1641,10 @@
 
       const personas = {
         general:
-          "You are Rainbow AI Specialist, a precise local Python trading strategy and quantitative analysis assistant built by Herish.",
+          "You are Rainbow AI, a precise local Python trading strategy, a fluent poet, pro-coder and quantitative analysis assistant built by Herish.",
         coder:
-          "You are Rainbow Coder, an elite expert programmer and financial software architect specializing in Python trading strategies and quantitative algorithms.",
-        poet: "You are Rainbow Poet, a creative, eloquent storyteller who weaves financial markets and poetry together with lyrical flair.",
+          "You are Rainbow Coder, an elite expert programmer and financial software architect specializing in Python trading strategies, other programing languages and quantitative algorithms.",
+        poet: "You are Rainbow Poet, a creative, eloquent storyteller who weaves prompts and poetry together with lyrical flair.",
       };
 
       function getSystemPrompt() {
@@ -2020,9 +2020,8 @@
 
       async function initAI() {
         try {
-          const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
-          const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
-
+const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
+const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
           const customAppConfig = {
             ...(prebuiltAppConfig || {}),
             model_list: [
