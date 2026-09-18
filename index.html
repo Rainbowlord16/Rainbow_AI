@@ -2020,9 +2020,9 @@
         return bubble;
       }
 
-async function initAI() {
+      async function initAI() {
         try {
-          // 1. Locate the official working Gemma 2 2B record from WebLLM's prebuilt list
+          // 1. Find the working base Gemma record from prebuiltAppConfig
           const baseRecord = prebuiltAppConfig.model_list.find(
             (m) => m.model_id.includes("gemma-2-2b")
           );
@@ -2031,7 +2031,7 @@ async function initAI() {
             throw new Error("Could not find base Gemma 2 prebuilt configuration.");
           }
 
-          // 2. Clone the record: Keep the official working wasm binary, swap the model weights to yours!
+          // 2. Clone the record to keep the valid wasm binary, pointing only the weights to your Hugging Face repo
           const customAppConfig = {
             ...prebuiltAppConfig,
             model_list: [
