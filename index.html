@@ -2132,7 +2132,7 @@ async function initAI() {
           const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
           const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
 
-          // Fully populated ModelRecord including tokenizer configuration files to satisfy asyncLoadTokenizer
+          // Clean configuration tailored precisely for Gemma 2's SentencePiece architecture
           const customAppConfig = {
             ...(prebuiltAppConfig || {}),
             model_list: [
@@ -2200,7 +2200,6 @@ async function initAI() {
           console.error(error);
         }
       }
-
       window.handleSend = async function () {
         const text = userInput.value.trim();
         if (!text || !engine) return;
