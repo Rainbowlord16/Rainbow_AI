@@ -6,7 +6,6 @@
     <title>Rainbow AI Specialist Dashboard 🌈✨</title>
     <!-- Google Fonts: Google Sans & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
@@ -1625,7 +1624,7 @@
     </script>
 
     <script type="module">
-      import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm";
+      import { CreateMLCEngine } from "https://esm.run/@mlc-ai/web-llm";
 
       const statusDiv = document.getElementById("status");
       const userInput = document.getElementById("userInput");
@@ -2022,29 +2021,20 @@
 
       async function initAI() {
         try {
-          // 1. Find the working base Gemma record from prebuiltAppConfig
-          const baseRecord = prebuiltAppConfig.model_list.find(
-            (m) => m.model_id.includes("gemma-2-2b")
-          );
-
-          if (!baseRecord) {
-            throw new Error("Could not find base Gemma 2 prebuilt configuration.");
-          }
-
-          // 2. Clone the record to keep the valid wasm binary, pointing only the weights to your Hugging Face repo
+          // Fully qualified custom ModelRecord object that fulfills all WebLLM requirements[cite: 1, 2]
           const customAppConfig = {
-            ...prebuiltAppConfig,
             model_list: [
               {
-                ...baseRecord,
-                model_id: "Rainbow-AI-Specialist-MLC",
                 model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/resolve/main/",
-              },
-              ...prebuiltAppConfig.model_list
+                model_id: "Rainbow-AI-Specialist-MLC",
+                model_lib: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm",
+                vram_required_MB: 1800,
+                low_resource_required: true,
+                required_features: ["shader-f16"]
+              }
             ]
           };
 
-          // 3. Initialize using your custom model ID
           engine = await CreateMLCEngine("Rainbow-AI-Specialist-MLC", {
             appConfig: customAppConfig,
             initProgressCallback: (p) => {
