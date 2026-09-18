@@ -2127,11 +2127,12 @@
         return bubble;
       }
 
-      async function initAI() {
+async function initAI() {
         try {
           const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
           const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
 
+          // Fully populated ModelRecord including tokenizer configuration files to satisfy asyncLoadTokenizer
           const customAppConfig = {
             ...(prebuiltAppConfig || {}),
             model_list: [
@@ -2142,7 +2143,12 @@
                 model_lib_id: wasmLibId,
                 vram_required_MB: 1800,
                 low_resource_required: true,
-                required_features: ["shader-f16"]
+                required_features: ["shader-f16"],
+                model_type: "gemma2",
+                tokenizer_files: [
+                  "tokenizer.json",
+                  "tokenizer_config.json"
+                ]
               },
               ...((prebuiltAppConfig && prebuiltAppConfig.model_list) || [])
             ],
