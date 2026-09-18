@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rainbow AI</title>
+    <title>Rainbow AI Specialist Dashboard 🌈✨</title>
     <!-- Google Fonts: Google Sans & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -1625,7 +1625,7 @@
     </script>
 
     <script type="module">
-      import { CreateMLCEngine, prebuiltAppConfig, modelLibURLPrefix, modelVersion } from "https://esm.run/@mlc-ai/web-llm";
+      import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm";
 
       const statusDiv = document.getElementById("status");
       const userInput = document.getElementById("userInput");
@@ -2019,16 +2019,19 @@
         }
         return bubble;
       }
-async function initAI() {
+
+      async function initAI() {
         try {
-          // Explicitly map the stable webgpu wasm bundle path directly to bypass dynamic version mismatch 404s
+          // Explicitly map your custom model weights while pointing to a stable prebuilt WebAssembly library URL
           const customAppConfig = {
+            ...prebuiltAppConfig,
             model_list: [
               {
                 model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/resolve/main/",
                 model_id: "gemma-2-2b-it-q4f16_1-MLC",
                 model_lib: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_20/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm"
-              }
+              },
+              ...prebuiltAppConfig.model_list
             ]
           };
 
@@ -2118,7 +2121,7 @@ async function initAI() {
           console.error(err);
         }
 
-        statusDiv.textContent = "● Rainbow Specialist Ready";
+        statusDiv.textContent = "● Trading Specialist Ready";
         sendBtn.disabled = false;
         chatbox.scrollTop = chatbox.scrollHeight;
       };
