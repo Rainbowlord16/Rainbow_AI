@@ -2132,34 +2132,32 @@ async function initAI() {
           const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
           const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
 
-          // Clean configuration tailored precisely for Gemma 2's SentencePiece architecture
+          // Use the built-in model ID so asyncLoadTokenizer resolves all internal metadata,
+          // while overriding its weight endpoint to your custom Hugging Face repo.
           const customAppConfig = {
             ...(prebuiltAppConfig || {}),
             model_list: [
               {
                 model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/resolve/main/",
-                model_id: "Rainbow-AI-Specialist-MLC",
+                model_id: "gemma-2-2b-it-q4f16_1-MLC",
                 model_lib: wasmUrl,
                 model_lib_id: wasmLibId,
                 vram_required_MB: 1800,
                 low_resource_required: true,
-                required_features: ["shader-f16"],
-                model_type: "gemma2",
-                tokenizer_files: [
-                  "tokenizer.json",
-                  "tokenizer_config.json"
-                ]
+                required_features: ["shader-f16"]
               },
-              ...((prebuiltAppConfig && prebuiltAppConfig.model_list) || [])
+              ...((prebuiltAppConfig && prebuiltAppConfig.model_list) || []).filter(
+                (m) => m.model_id !== "gemma-2-2b-it-q4f16_1-MLC"
+              )
             ],
             model_lib_map: {
               ...((prebuiltAppConfig && prebuiltAppConfig.model_lib_map) || {}),
               [wasmLibId]: wasmUrl,
-              "Rainbow-AI-Specialist-MLC": wasmUrl
+              "gemma-2-2b-it-q4f16_1-MLC": wasmUrl
             }
           };
 
-          engine = await CreateMLCEngine("Rainbow-AI-Specialist-MLC", {
+          engine = await CreateMLCEngine("gemma-2-2b-it-q4f16_1-MLC", {
             appConfig: customAppConfig,
             initProgressCallback: (p) => {
               statusDiv.textContent = p.text;
