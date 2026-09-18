@@ -2022,20 +2022,30 @@
 
 async function initAI() {
         try {
-          // Use WebLLM's built-in dynamic variables to construct the correct .wasm library URL for your package version
+          // 1. Locate the official working Gemma 2 2B record from WebLLM's prebuilt list
+          const baseRecord = prebuiltAppConfig.model_list.find(
+            (m) => m.model_id.includes("gemma-2-2b")
+          );
+
+          if (!baseRecord) {
+            throw new Error("Could not find base Gemma 2 prebuilt configuration.");
+          }
+
+          // 2. Clone the record: Keep the official working wasm binary, swap the model weights to yours!
           const customAppConfig = {
             ...prebuiltAppConfig,
             model_list: [
               {
+                ...baseRecord,
+                model_id: "Rainbow-AI-Specialist-MLC",
                 model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/resolve/main/",
-                model_id: "gemma-2-2b-it-q4f16_1-MLC",
-                model_lib: modelLibURLPrefix + modelVersion + "/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm"
               },
               ...prebuiltAppConfig.model_list
             ]
           };
 
-          engine = await CreateMLCEngine("gemma-2-2b-it-q4f16_1-MLC", {
+          // 3. Initialize using your custom model ID
+          engine = await CreateMLCEngine("Rainbow-AI-Specialist-MLC", {
             appConfig: customAppConfig,
             initProgressCallback: (p) => {
               statusDiv.textContent = p.text;
@@ -2057,6 +2067,7 @@ async function initAI() {
               }
             },
           });
+
           statusDiv.textContent = "● Trading Specialist Ready";
           vramMonitor.textContent = "⚡ WebGPU: Active";
           userInput.disabled = false;
