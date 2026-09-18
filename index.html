@@ -6,6 +6,7 @@
     <title>Rainbow AI Specialist Dashboard 🌈✨</title>
     <!-- Google Fonts: Google Sans & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
@@ -80,7 +81,6 @@
         pointer-events: none;
       }
 
-      /* --- Loading Feature Styles --- */
       #loadingOverlay {
         position: fixed;
         inset: 0;
@@ -861,7 +861,7 @@
   <body>
     <canvas id="neuralCanvas"></canvas>
 
-    <!-- Logo Bar Cycle Loading Feature Screen -->
+    <!-- Loading Feature Screen -->
     <div id="loadingOverlay">
       <div class="logo-viewport-box" id="logoBox"></div>
       <div class="loading-meta-info">
@@ -1412,7 +1412,6 @@
         event.currentTarget.classList.add("active");
       }
 
-      // Voice Input Speech-to-Text Integration
       let recognition = null;
       let isRecording = false;
 
@@ -1624,7 +1623,7 @@
     </script>
 
     <script type="module">
-      import { CreateMLCEngine } from "https://esm.run/@mlc-ai/web-llm";
+      import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm";
 
       const statusDiv = document.getElementById("status");
       const userInput = document.getElementById("userInput");
@@ -2021,18 +2020,28 @@
 
       async function initAI() {
         try {
-          // Fully qualified custom ModelRecord object that fulfills all WebLLM requirements[cite: 1, 2]
+          const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
+          const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
+
           const customAppConfig = {
+            ...(prebuiltAppConfig || {}),
             model_list: [
               {
                 model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/resolve/main/",
                 model_id: "Rainbow-AI-Specialist-MLC",
-                model_lib: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm",
+                model_lib: wasmUrl,
+                model_lib_id: wasmLibId,
                 vram_required_MB: 1800,
                 low_resource_required: true,
                 required_features: ["shader-f16"]
-              }
-            ]
+              },
+              ...((prebuiltAppConfig && prebuiltAppConfig.model_list) || [])
+            ],
+            model_lib_map: {
+              ...((prebuiltAppConfig && prebuiltAppConfig.model_lib_map) || {}),
+              [wasmLibId]: wasmUrl,
+              "Rainbow-AI-Specialist-MLC": wasmUrl
+            }
           };
 
           engine = await CreateMLCEngine("Rainbow-AI-Specialist-MLC", {
