@@ -2022,25 +2022,27 @@
         try {
 const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
 const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
-          const customAppConfig = {
-            ...(prebuiltAppConfig || {}),
-            model_list: [
-              {
-                model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/resolve/main/",
-                model_id: "Rainbow-AI-Specialist-MLC",
-                model_lib: wasmUrl,
-                model_lib_id: wasmLibId,
-                vram_required_MB: 1800,
-                low_resource_required: true,
-                required_features: ["shader-f16"]
-              },
-              ...((prebuiltAppConfig && prebuiltAppConfig.model_list) || [])
-            ],
-            model_lib_map: {
-              ...((prebuiltAppConfig && prebuiltAppConfig.model_lib_map) || {}),
-              [wasmLibId]: wasmUrl,
-              "Rainbow-AI-Specialist-MLC": wasmUrl
-            }
+
+const customAppConfig = {
+  ...(prebuiltAppConfig || {}),
+  model_list: [
+    {
+      model: "https://huggingface.co/RainbowLord/Rainbow-AI-Specialist-MLC/resolve/main/",
+      model_id: "Rainbow-AI-Specialist-MLC",
+      model_lib: wasmUrl,
+      model_lib_id: wasmLibId,
+      vram_required_MB: 1800,
+      low_resource_required: true,
+      required_features: ["shader-f16"]
+    },
+    ...((prebuiltAppConfig && prebuiltAppConfig.model_list) || [])
+  ],
+  model_lib_map: {
+    ...((prebuiltAppConfig && prebuiltAppConfig.model_lib_map) || {}),
+    [wasmLibId]: wasmUrl,
+    "Rainbow-AI-Specialist-MLC": wasmUrl
+  }
+};
           };
 
           engine = await CreateMLCEngine("Rainbow-AI-Specialist-MLC", {
