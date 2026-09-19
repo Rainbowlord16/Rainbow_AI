@@ -453,42 +453,14 @@
       setupParticles();
 
       // Main WebLLM & WebGPU Engine Initialization
+// Clean Engine Initialization using Built-in Prebuilt Model Config
       async function initAI() {
         try {
-          const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
-          const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
-          
-          // Verified official MLC weights repository endpoint
-          const repoBaseUrl = "https://huggingface.co/mlc-ai/gemma-2-2b-it-q4f16_1-MLC/resolve/main/";
+          const selectedModel = "gemma-2-2b-it-q4f16_1-MLC";
 
-          const customAppConfig = {
-            ...(prebuiltAppConfig || {}),
-            model_list: [
-              {
-                model_url: repoBaseUrl,
-                model: repoBaseUrl,
-                model_id: "gemma-2-2b-it-q4f16_1-MLC",
-                model_lib: wasmUrl,
-                model_lib_id: wasmLibId,
-                vram_required_MB: 1800,
-                low_resource_required: true,
-                required_features: ["shader-f16"],
-                conv_config: {
-                  conv_template: "gemma_instruction"
-                }
-              }
-            ],
-            model_lib_map: {
-              ...((prebuiltAppConfig && prebuiltAppConfig.model_lib_map) || {}),
-              [wasmLibId]: wasmUrl,
-              "gemma-2-2b-it-q4f16_1-MLC": wasmUrl
-            }
-          };
-
-          engine = await CreateMLCEngine("gemma-2-2b-it-q4f16_1-MLC", {
-            appConfig: customAppConfig,
-            initProgressCallback: (p) => {
-              statusDiv.textContent = p.text;
+          engine = await CreateMLCEngine(selectedModel, {
+            initProgressCallback: (report) => {
+              statusDiv.textContent = report.text;
             }
           });
 
@@ -508,7 +480,7 @@
           statusDiv.textContent = "Engine Link Error";
           engineDot.style.background = "var(--danger)";
           vramMonitor.textContent = "⚡ WebGPU: Error";
-          console.error(err);
+          console.error("Initialization error:", err);
         }
       }
 
