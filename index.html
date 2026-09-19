@@ -453,42 +453,65 @@
       setupParticles();
 
       // Main WebLLM & WebGPU Engine Initialization
-    import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
+      async function initAI() {
+        try {
+          const MODEL_ID = "gemma-2-2b-it-q4f16_1-MLC-1k";
+          const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
+          const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
+          const repoBaseUrl = "https://huggingface.co/mlc-ai/gemma-2-2b-it-q4f16_1-MLC/resolve/main/";
 
-const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
-const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
-const repoBaseUrl = "https://huggingface.co/mlc-ai/gemma-2-2b-it-q4f16_1-MLC/resolve/main/";
+          const appConfig = {
+            model_list: [
+              ...(prebuiltAppConfig?.model_list || []),
+              {
+                model_url: repoBaseUrl,
+                model_id: MODEL_ID,
+                model_lib: wasmUrl,
+                model_lib_id: wasmLibId,
+                vram_required_MB: 1800,
+                low_resource_required: true,
+                required_features: ["shader-f16"],
+                conv_config: {
+                  conv_template: "gemma_instruction"
+                }
+              }
+            ],
+            model_lib_map: {
+              ...(prebuiltAppConfig?.model_lib_map || {}),
+              [wasmLibId]: wasmUrl,
+              [MODEL_ID]: wasmUrl
+            }
+          };
 
-const appConfig = {
-  model_list: [
-    ...(prebuiltAppConfig?.model_list || []),
-    {
-      model_url: repoBaseUrl,
-      model_id: "gemma-2-2b-it-q4f16_1-MLC",
-      model_lib: wasmUrl,
-      vram_required_MB: 1800,
-      low_resource_required: true,
-      required_features: ["shader-f16"],
-      conv_config: {
-        conv_template: "gemma_instruction"
+          engine = await CreateMLCEngine(MODEL_ID, {
+            appConfig: appConfig,
+            initProgressCallback: (report) => {
+              if (typeof statusDiv !== "undefined" && statusDiv) {
+                statusDiv.textContent = report.text;
+              }
+            }
+          });
+
+          statusDiv.textContent = "● Rainbow AI Ready";
+          engineDot.style.background = "var(--success)";
+          vramMonitor.textContent = "⚡ WebGPU: Active (Gemma 2)";
+          userInput.disabled = false;
+          sendBtn.disabled = false;
+
+          renderHistory();
+          if (chatSessions.length > 0) {
+            loadSession(chatSessions[0].id);
+          } else {
+            createNewSession();
+          }
+        } catch (err) {
+          statusDiv.textContent = "Engine Link Error";
+          engineDot.style.background = "var(--danger)";
+          vramMonitor.textContent = "⚡ WebGPU: Error";
+          console.error("Initialization error:", err);
+        }
       }
-    }
-  ],
-  model_lib_map: {
-    ...(prebuiltAppConfig?.model_lib_map || {}),
-    [wasmLibId]: wasmUrl,
-    "gemma-2-2b-it-q4f16_1-MLC": wasmUrl
-  }
-};
 
-engine = await CreateMLCEngine("gemma-2-2b-it-q4f16_1-MLC", {
-  appConfig: appConfig,
-  initProgressCallback: (report) => {
-    if (typeof statusDiv !== "undefined" && statusDiv) {
-      statusDiv.textContent = report.text;
-    }
-  }
-});
       // Chat session state management
       function saveSessions() {
         localStorage.setItem("rainbow_sessions", JSON.stringify(chatSessions));
