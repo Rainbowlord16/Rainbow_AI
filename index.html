@@ -381,7 +381,7 @@
       </main>
     </div>
 
-    <!-- WebLLM Initialization -->
+    <!-- WebLLM Script -->
     <script type="module">
       import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
@@ -452,7 +452,7 @@
       }
       setupParticles();
 
-      // Main WebLLM & WebGPU Engine Initialization
+      // FIXED initAI FUNCTION
       async function initAI() {
         try {
           const MODEL_ID = "gemma-2-2b-it-q4f16_1-MLC-1k";
