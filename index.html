@@ -1811,7 +1811,7 @@
       });
     </script>
 
-    <!-- WebLLM Engine Module with Safe Initialization -->
+    <!-- WebLLM Engine Module with Safe Initialization & Dynamic Grounding -->
     <script type="module">
       import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
@@ -1837,7 +1837,7 @@
         poet: "You are Rainbow Poet, a creative, eloquent storyteller who writes moving prose and poetry with artistic flair.",
       };
 
-      // Temporal grounding with accurate current year and local time
+      // Temporal grounding with live local date and time
       function getSystemPrompt() {
         const select = document.getElementById("personaSelect");
         const val = select ? select.value : "general";
@@ -1856,6 +1856,57 @@
           role: "system",
           content: `${basePersona}\n\n[Temporal Grounding]: The real-time current date is ${dateString} and current local time is ${timeString}. Always treat this date and year as the absolute present truth.`
         };
+      }
+
+      // Universal language map for real-time third-party translation lookups
+      const LANGUAGE_CODES = {
+        telugu: "te", hindi: "hi", tamil: "ta", kannada: "kn", malayalam: "ml",
+        bengali: "bn", marathi: "mr", gujarati: "gu", punjabi: "pa", urdu: "ur",
+        spanish: "es", french: "fr", german: "de", italian: "it", japanese: "ja",
+        chinese: "zh", korean: "ko", russian: "ru", arabic: "ar", portuguese: "pt",
+        dutch: "nl", polish: "pl", turkish: "tr", swahili: "sw", greek: "el"
+      };
+
+      async function fetchUniversalLanguageGrounding(queryText) {
+        try {
+          const lower = queryText.toLowerCase();
+          let targetLang = null;
+          let targetLangCode = null;
+
+          for (const [lang, code] of Object.entries(LANGUAGE_CODES)) {
+            const regex = new RegExp(`\\b(${lang})\\b`, "i");
+            if (regex.test(lower)) {
+              targetLang = lang.charAt(0).toUpperCase() + lang.slice(1);
+              targetLangCode = code;
+              break;
+            }
+          }
+
+          if (!targetLangCode) return "";
+
+          let cleanPhrase = queryText
+            .replace(/translate\s+(this\s+)?(to|into|in)?\s+[a-z]+/gi, "")
+            .replace(/what\s+is\s+|in\s+[a-z]+|how\s+to\s+say\s+/gi, "")
+            .replace(/["'“”]/g, "")
+            .trim();
+
+          if (!cleanPhrase) return "";
+
+          const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(cleanPhrase)}&langpair=en|${targetLangCode}`;
+          const res = await fetch(url);
+          const data = await res.json();
+
+          if (data?.responseData?.translatedText) {
+            const translatedResult = data.responseData.translatedText;
+            return `\n[Verified External ${targetLang} Grounding]:
+Original Source: "${cleanPhrase}"
+Accurate ${targetLang} Translation/Lexicon: "${translatedResult}"
+Instruction: Use this exact authentic ${targetLang} vocabulary and sentence structure. Never phonetically transliterate English words into non-English scripts.\n`;
+          }
+        } catch (err) {
+          console.warn("Universal language grounding skipped:", err);
+        }
+        return "";
       }
 
       window.updatePersona = function () {
@@ -2113,9 +2164,7 @@
                 hljs.highlightElement(block);
               });
             }
-          } catch (err) {
-            // Non-fatal syntax highlighter catch
-          }
+          } catch (err) {}
         } else {
           bubble.textContent = text;
         }
@@ -2130,7 +2179,7 @@
         });
         footer.innerHTML = `<span>${timeStr}</span>`;
 
-        // Dynamic, non-stale copy button that always reads the latest text
+        // Copy handler dynamically reads the latest text from the dataset/bubble
         if (role === "ai") {
           const copyBtn = document.createElement("button");
           copyBtn.className = "icon-btn";
@@ -2198,7 +2247,6 @@
             }
           };
 
-          // Initialize WebGPU pipeline
           engine = await CreateMLCEngine(MODEL_ID, {
             appConfig: appConfig,
             chatOpts: {
@@ -2226,18 +2274,6 @@
           if (sendBtn) {
             sendBtn.disabled = false;
           }
-
-          // Safely initialize sessions without letting UI glitches break the status badge
-          try {
-            renderHistoryList();
-            if (chatSessions.length > 0) {
-              loadChat(chatSessions[0].id);
-            } else {
-              startNewChat();
-            }
-          } catch (uiSyncError) {
-            console.warn("UI history list rendered with notice:", uiSyncError);
-          }
         } catch (err) {
           if (statusDiv) {
             statusDiv.textContent = "Engine Link Error";
@@ -2259,6 +2295,15 @@
         userInput.value = "";
         sendBtn.disabled = true;
 
+        // Detect language translation requests and fetch authentic third-party vocabulary
+        const isLanguageQuery = /translate|meaning|how to say|in [a-z]+|to [a-z]+/i.test(text);
+        let liveLanguageGrounding = "";
+
+        if (isLanguageQuery) {
+          statusDiv.textContent = "Fetching Grounding...";
+          liveLanguageGrounding = await fetchUniversalLanguageGrounding(text);
+        }
+
         statusDiv.textContent = "Generating Response...";
         const startTime = performance.now();
         let tokenCount = 0;
@@ -2266,17 +2311,21 @@
         const aiBubble = appendMessage("ai", "Thinking...", false);
 
         try {
-          // Always ensure the latest temporal system prompt is present
+          const currentSys = getSystemPrompt();
+          if (liveLanguageGrounding) {
+            currentSys.content += liveLanguageGrounding;
+          }
+
           if (!currentMessages.some((m) => m.role === "system")) {
-            currentMessages.unshift(getSystemPrompt());
+            currentMessages.unshift(currentSys);
           } else {
-            currentMessages[0] = getSystemPrompt();
+            currentMessages[0] = currentSys;
           }
 
           const chunks = await engine.chat.completions.create({
             messages: currentMessages,
             stream: true,
-            temperature: 0.6,
+            temperature: 0.3,
           });
 
           let responseText = "";
@@ -2293,9 +2342,7 @@
                   hljs.highlightElement(block);
                 });
               }
-            } catch (highlightErr) {
-              // Non-blocking highlight fallback
-            }
+            } catch (highlightErr) {}
             if (chatbox) chatbox.scrollTop = chatbox.scrollHeight;
           }
 
@@ -2391,7 +2438,18 @@
         });
       }
 
+      // Launch Engine & Initial Workspace Session
       initAI();
+      try {
+        renderHistoryList();
+        if (chatSessions.length > 0) {
+          loadChat(chatSessions[0].id);
+        } else {
+          startNewChat();
+        }
+      } catch (uiInitErr) {
+        console.warn("Initial UI state setup notice:", uiInitErr);
+      }
     </script>
   </body>
 </html>
