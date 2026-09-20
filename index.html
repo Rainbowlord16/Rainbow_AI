@@ -1835,10 +1835,25 @@
         poet: "You are Rainbow Poet, a creative, eloquent storyteller who writes moving prose and poetry with artistic flair.",
       };
 
+      // Injects the live real-world browser date and time to prevent hallucinating 2023
       function getSystemPrompt() {
         const select = document.getElementById("personaSelect");
         const val = select ? select.value : "general";
-        return { role: "system", content: personas[val] || personas.general };
+        const basePersona = personas[val] || personas.general;
+        
+        const now = new Date();
+        const dateString = now.toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        const timeString = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+        return {
+          role: "system",
+          content: `${basePersona}\n\n[Temporal Grounding]: The real-time current date is ${dateString} and current local time is ${timeString}. Always treat this date and year as truth and acknowledge it directly.`
+        };
       }
 
       window.updatePersona = function () {
@@ -2078,6 +2093,7 @@
 
         const bubble = document.createElement("div");
         bubble.className = "message-bubble";
+        bubble.dataset.rawText = text;
 
         if (role === "ai") {
           bubble.innerHTML = processAIMessageHTML(text);
@@ -2098,17 +2114,21 @@
         });
         footer.innerHTML = `<span>${timeStr}</span>`;
 
+        // Fixed Copy Button: reads the dynamic raw text or innerText at click-time
         if (role === "ai") {
           const copyBtn = document.createElement("button");
           copyBtn.className = "icon-btn";
           copyBtn.textContent = "📋 Copy Full Response";
           copyBtn.onclick = () => {
-            navigator.clipboard.writeText(text);
-            copyBtn.textContent = "✨ Copied Full Text!";
-            setTimeout(
-              () => (copyBtn.textContent = "📋 Copy Full Response"),
-              2000,
-            );
+            const textToCopy = bubble.dataset.rawText || bubble.innerText.trim();
+            if (textToCopy && textToCopy !== "Thinking...") {
+              navigator.clipboard.writeText(textToCopy);
+              copyBtn.textContent = "✨ Copied Full Text!";
+              setTimeout(
+                () => (copyBtn.textContent = "📋 Copy Full Response"),
+                2000,
+              );
+            }
           };
           footer.appendChild(copyBtn);
         }
@@ -2127,7 +2147,7 @@
         return bubble;
       }
 
-// Main WebLLM & WebGPU Engine Initialization 
+      // Main WebLLM & WebGPU Engine Initialization 
       async function initAI() {
         try {
           const MODEL_ID = "gemma-2-2b-it-q4f16_1-MLC-1k";
@@ -2160,7 +2180,6 @@
             }
           };
 
-          // Explicitly supply chatOpts to stop the Rust tokenizer from reading tokenizer.json
           engine = await CreateMLCEngine(MODEL_ID, {
             appConfig: appConfig,
             chatOpts: {
@@ -2176,12 +2195,11 @@
           // Unlocking Interface Upon 100% Load
           if (typeof statusDiv !== "undefined" && statusDiv) {
             statusDiv.textContent = "● Rainbow AI Ready";
-          }
-          if (typeof engineDot !== "undefined" && engineDot) {
-            engineDot.style.background = "var(--success)";
+            statusDiv.style.color = "var(--success)";
+            statusDiv.style.borderColor = "rgba(16, 185, 129, 0.3)";
           }
           if (typeof vramMonitor !== "undefined" && vramMonitor) {
-            vramMonitor.textContent = "⚡ WebGPU: Active (Gemma 2)";
+            vramMonitor.textContent = "⚡ WebGPU: Ready";
           }
           if (typeof userInput !== "undefined" && userInput) {
             userInput.disabled = false;
@@ -2190,18 +2208,18 @@
             sendBtn.disabled = false;
           }
 
-          renderHistory();
+          // Properly hooked to this document's chat methods
+          renderHistoryList();
           if (chatSessions.length > 0) {
-            loadSession(chatSessions[0].id);
+            loadChat(chatSessions[0].id);
           } else {
-            createNewSession();
+            startNewChat();
           }
         } catch (err) {
           if (typeof statusDiv !== "undefined" && statusDiv) {
             statusDiv.textContent = "Engine Link Error";
-          }
-          if (typeof engineDot !== "undefined" && engineDot) {
-            engineDot.style.background = "var(--danger)";
+            statusDiv.style.color = "var(--danger)";
+            statusDiv.style.borderColor = "rgba(239, 68, 68, 0.3)";
           }
           if (typeof vramMonitor !== "undefined" && vramMonitor) {
             vramMonitor.textContent = "⚡ WebGPU: Error";
@@ -2209,6 +2227,7 @@
           console.error("Initialization error:", err);
         }
       }
+
       window.handleSend = async function () {
         const text = userInput.value.trim();
         if (!text || !engine) return;
@@ -2224,6 +2243,13 @@
         const aiBubble = appendMessage("ai", "Thinking...", false);
 
         try {
+          // Always ensure the latest temporal system prompt is present
+          if (!currentMessages.some((m) => m.role === "system")) {
+            currentMessages.unshift(getSystemPrompt());
+          } else {
+            currentMessages[0] = getSystemPrompt();
+          }
+
           const chunks = await engine.chat.completions.create({
             messages: currentMessages,
             stream: true,
@@ -2236,6 +2262,7 @@
             responseText += delta;
             tokenCount += delta.split(/\s+/).length;
 
+            aiBubble.dataset.rawText = responseText;
             aiBubble.innerHTML = processAIMessageHTML(responseText);
             aiBubble.querySelectorAll("pre code").forEach((block) => {
               hljs.highlightElement(block);
@@ -2251,6 +2278,7 @@
           saveToMemory();
         } catch (err) {
           aiBubble.textContent = "Execution context exception encountered.";
+          aiBubble.dataset.rawText = "Execution context exception encountered.";
           console.error(err);
         }
 
@@ -2289,12 +2317,15 @@
         novaContainer.scrollTop = novaContainer.scrollHeight;
 
         try {
+          const now = new Date();
+          const dateString = now.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
           const chunks = await engine.chat.completions.create({
             messages: [
               {
                 role: "system",
                 content:
-                  "You are Nova, a friendly, playful, and safe learning assistant. Keep answers encouraging, simple, and fun.",
+                  `You are Nova, a friendly, playful, and safe learning assistant. Today's date is ${dateString}. Keep answers encouraging, simple, and fun.`,
               },
               { role: "user", content: text },
             ],
