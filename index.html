@@ -2147,9 +2147,7 @@
                 vram_required_MB: 1800,
                 low_resource_required: true,
                 required_features: ["shader-f16"],
-                tokenizer_files: [
-                  "tokenizer.model"
-                ],
+                tokenizer_files: ["tokenizer.model"],
                 conv_config: {
                   conv_template: "gemma_instruction"
                 }
@@ -2162,8 +2160,12 @@
             }
           };
 
+          // Explicitly supply chatOpts to stop the Rust tokenizer from reading tokenizer.json
           engine = await CreateMLCEngine(MODEL_ID, {
             appConfig: appConfig,
+            chatOpts: {
+              tokenizer_files: ["tokenizer.model"]
+            },
             initProgressCallback: (report) => {
               if (typeof statusDiv !== "undefined" && statusDiv) {
                 statusDiv.textContent = report.text;
