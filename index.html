@@ -1503,7 +1503,9 @@
           .forEach((t) => t.classList.remove("active"));
 
         document.getElementById("view-" + viewName).classList.add("active");
-        event.currentTarget.classList.add("active");
+        if (window.event && window.event.currentTarget) {
+          window.event.currentTarget.classList.add("active");
+        }
       }
 
       function usePresetPrompt(promptText) {
@@ -1727,7 +1729,7 @@
       };
     </script>
 
-    <!-- Restored Canvas Background Script -->
+    <!-- Canvas Background Script -->
     <script>
       window.addEventListener("DOMContentLoaded", () => {
         const canvas = document.getElementById("neuralCanvas");
@@ -1809,7 +1811,7 @@
       });
     </script>
 
-    <!-- Pinned WebLLM Engine Module (v0.2.48 to avoid thread import crashes) -->
+    <!-- WebLLM Engine Module with Safe Initialization -->
     <script type="module">
       import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
@@ -1835,7 +1837,7 @@
         poet: "You are Rainbow Poet, a creative, eloquent storyteller who writes moving prose and poetry with artistic flair.",
       };
 
-      // Injects the live real-world browser date and time to prevent hallucinating 2023
+      // Temporal grounding with accurate current year and local time
       function getSystemPrompt() {
         const select = document.getElementById("personaSelect");
         const val = select ? select.value : "general";
@@ -1852,7 +1854,7 @@
 
         return {
           role: "system",
-          content: `${basePersona}\n\n[Temporal Grounding]: The real-time current date is ${dateString} and current local time is ${timeString}. Always treat this date and year as truth and acknowledge it directly.`
+          content: `${basePersona}\n\n[Temporal Grounding]: The real-time current date is ${dateString} and current local time is ${timeString}. Always treat this date and year as the absolute present truth.`
         };
       }
 
@@ -2008,44 +2010,52 @@
       };
 
       function loadChat(sessionId) {
-        currentSessionId = sessionId;
-        const session = chatSessions.find((s) => s.id === sessionId);
-        currentMessages = session ? [...session.messages] : [];
+        try {
+          currentSessionId = sessionId;
+          const session = chatSessions.find((s) => s.id === sessionId);
+          currentMessages = session ? [...session.messages] : [];
 
-        if (!currentMessages.some((m) => m.role === "system")) {
-          currentMessages.unshift(getSystemPrompt());
-        }
+          if (!currentMessages.some((m) => m.role === "system")) {
+            currentMessages.unshift(getSystemPrompt());
+          }
 
-        activeChatTitle.textContent = session
-          ? session.title
-          : "Rainbow AI Workspace";
+          if (activeChatTitle) {
+            activeChatTitle.textContent = session
+              ? session.title
+              : "Rainbow AI Workspace";
+          }
 
-        chatbox.innerHTML = "";
-        const visibleMessages = currentMessages.filter(
-          (m) => m.role !== "system",
-        );
-        if (visibleMessages.length === 0) {
-          appendMessage(
-            "ai",
-            "Hello! I am Rainbow AI 🌈. How can I assist you today? Feel free to ask questions, write code, or explore ideas!",
-          );
-        } else {
-          visibleMessages.forEach((msg) => {
-            appendMessage(
-              msg.role === "assistant" ? "ai" : msg.role,
-              msg.content,
-              false,
+          if (chatbox) {
+            chatbox.innerHTML = "";
+            const visibleMessages = currentMessages.filter(
+              (m) => m.role !== "system",
             );
-          });
+            if (visibleMessages.length === 0) {
+              appendMessage(
+                "ai",
+                "Hello! I am Rainbow AI 🌈. How can I assist you today? Feel free to ask questions, write code, or explore ideas!",
+              );
+            } else {
+              visibleMessages.forEach((msg) => {
+                appendMessage(
+                  msg.role === "assistant" ? "ai" : msg.role,
+                  msg.content,
+                  false,
+                );
+              });
+            }
+          }
+          renderHistoryList();
+        } catch (e) {
+          console.warn("Non-fatal UI state sync warning:", e);
         }
-        renderHistoryList();
       }
 
       window.startNewChat = function () {
         currentSessionId = Date.now().toString();
         currentMessages = [getSystemPrompt()];
-        activeChatTitle.textContent = "Rainbow AI Workspace";
-        chatbox.innerHTML = "";
+        if (activeChatTitle) activeChatTitle.textContent = "Rainbow AI Workspace";
+        if (chatbox) chatbox.innerHTML = "";
         appendMessage(
           "ai",
           "Hello! I am Rainbow AI 🌈. How can I assist you today? Feel free to ask questions, write code, or explore ideas!",
@@ -2054,7 +2064,7 @@
       };
 
       function processAIMessageHTML(text) {
-        let html = marked.parse(text);
+        let html = typeof marked !== "undefined" ? marked.parse(text) : text;
 
         html = html.replace(
           /<pre><code\b([^>]*)>([\s\S]*?)<\/code><\/pre>/gi,
@@ -2097,9 +2107,15 @@
 
         if (role === "ai") {
           bubble.innerHTML = processAIMessageHTML(text);
-          bubble.querySelectorAll("pre code").forEach((block) => {
-            hljs.highlightElement(block);
-          });
+          try {
+            if (typeof hljs !== "undefined") {
+              bubble.querySelectorAll("pre code").forEach((block) => {
+                hljs.highlightElement(block);
+              });
+            }
+          } catch (err) {
+            // Non-fatal syntax highlighter catch
+          }
         } else {
           bubble.textContent = text;
         }
@@ -2114,14 +2130,14 @@
         });
         footer.innerHTML = `<span>${timeStr}</span>`;
 
-        // Fixed Copy Button: reads the dynamic raw text or innerText at click-time
+        // Dynamic, non-stale copy button that always reads the latest text
         if (role === "ai") {
           const copyBtn = document.createElement("button");
           copyBtn.className = "icon-btn";
           copyBtn.textContent = "📋 Copy Full Response";
           copyBtn.onclick = () => {
             const textToCopy = bubble.dataset.rawText || bubble.innerText.trim();
-            if (textToCopy && textToCopy !== "Thinking...") {
+            if (textToCopy && textToCopy !== "Thinking..." && textToCopy !== "...") {
               navigator.clipboard.writeText(textToCopy);
               copyBtn.textContent = "✨ Copied Full Text!";
               setTimeout(
@@ -2134,8 +2150,10 @@
         }
 
         row.appendChild(footer);
-        chatbox.appendChild(row);
-        chatbox.scrollTop = chatbox.scrollHeight;
+        if (chatbox) {
+          chatbox.appendChild(row);
+          chatbox.scrollTop = chatbox.scrollHeight;
+        }
 
         if (save && role !== "system") {
           currentMessages.push({
@@ -2147,7 +2165,7 @@
         return bubble;
       }
 
-      // Main WebLLM & WebGPU Engine Initialization 
+      // Safe WebGPU Engine Initialization
       async function initAI() {
         try {
           const MODEL_ID = "gemma-2-2b-it-q4f16_1-MLC-1k";
@@ -2180,48 +2198,53 @@
             }
           };
 
+          // Initialize WebGPU pipeline
           engine = await CreateMLCEngine(MODEL_ID, {
             appConfig: appConfig,
             chatOpts: {
               tokenizer_files: ["tokenizer.model"]
             },
             initProgressCallback: (report) => {
-              if (typeof statusDiv !== "undefined" && statusDiv) {
+              if (statusDiv) {
                 statusDiv.textContent = report.text;
               }
             }
           });
 
           // Unlocking Interface Upon 100% Load
-          if (typeof statusDiv !== "undefined" && statusDiv) {
+          if (statusDiv) {
             statusDiv.textContent = "● Rainbow AI Ready";
             statusDiv.style.color = "var(--success)";
             statusDiv.style.borderColor = "rgba(16, 185, 129, 0.3)";
           }
-          if (typeof vramMonitor !== "undefined" && vramMonitor) {
+          if (vramMonitor) {
             vramMonitor.textContent = "⚡ WebGPU: Ready";
           }
-          if (typeof userInput !== "undefined" && userInput) {
+          if (userInput) {
             userInput.disabled = false;
           }
-          if (typeof sendBtn !== "undefined" && sendBtn) {
+          if (sendBtn) {
             sendBtn.disabled = false;
           }
 
-          // Properly hooked to this document's chat methods
-          renderHistoryList();
-          if (chatSessions.length > 0) {
-            loadChat(chatSessions[0].id);
-          } else {
-            startNewChat();
+          // Safely initialize sessions without letting UI glitches break the status badge
+          try {
+            renderHistoryList();
+            if (chatSessions.length > 0) {
+              loadChat(chatSessions[0].id);
+            } else {
+              startNewChat();
+            }
+          } catch (uiSyncError) {
+            console.warn("UI history list rendered with notice:", uiSyncError);
           }
         } catch (err) {
-          if (typeof statusDiv !== "undefined" && statusDiv) {
+          if (statusDiv) {
             statusDiv.textContent = "Engine Link Error";
             statusDiv.style.color = "var(--danger)";
             statusDiv.style.borderColor = "rgba(239, 68, 68, 0.3)";
           }
-          if (typeof vramMonitor !== "undefined" && vramMonitor) {
+          if (vramMonitor) {
             vramMonitor.textContent = "⚡ WebGPU: Error";
           }
           console.error("Initialization error:", err);
@@ -2264,15 +2287,21 @@
 
             aiBubble.dataset.rawText = responseText;
             aiBubble.innerHTML = processAIMessageHTML(responseText);
-            aiBubble.querySelectorAll("pre code").forEach((block) => {
-              hljs.highlightElement(block);
-            });
-            chatbox.scrollTop = chatbox.scrollHeight;
+            try {
+              if (typeof hljs !== "undefined") {
+                aiBubble.querySelectorAll("pre code").forEach((block) => {
+                  hljs.highlightElement(block);
+                });
+              }
+            } catch (highlightErr) {
+              // Non-blocking highlight fallback
+            }
+            if (chatbox) chatbox.scrollTop = chatbox.scrollHeight;
           }
 
           const durationSec = (performance.now() - startTime) / 1000;
-          const tps = (tokenCount / durationSec).toFixed(1);
-          vramMonitor.textContent = `⚡ WebGPU: ~${tps} tok/s`;
+          const tps = (tokenCount / Math.max(durationSec, 0.1)).toFixed(1);
+          if (vramMonitor) vramMonitor.textContent = `⚡ WebGPU: ~${tps} tok/s`;
 
           currentMessages.push({ role: "assistant", content: responseText });
           saveToMemory();
@@ -2284,7 +2313,7 @@
 
         statusDiv.textContent = "● Rainbow AI Ready";
         sendBtn.disabled = false;
-        chatbox.scrollTop = chatbox.scrollHeight;
+        if (chatbox) chatbox.scrollTop = chatbox.scrollHeight;
       };
 
       window.handleNovaSend = async function () {
