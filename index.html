@@ -1811,7 +1811,7 @@
       });
     </script>
 
-    <!-- WebLLM Engine Module with Safe Initialization & Dynamic Grounding -->
+    <!-- WebLLM Engine Module with Safe Initialization & Bidirectional Grounding -->
     <script type="module">
       import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
@@ -1837,7 +1837,7 @@
         poet: "You are Rainbow Poet, a creative, eloquent storyteller who writes moving prose and poetry with artistic flair.",
       };
 
-      // Temporal grounding with live local date and time
+      // Temporal grounding with accurate current year and local time
       function getSystemPrompt() {
         const select = document.getElementById("personaSelect");
         const val = select ? select.value : "general";
@@ -1858,7 +1858,7 @@
         };
       }
 
-      // Universal language map for real-time third-party translation lookups
+      // Universal language map (ISO 639-1)
       const LANGUAGE_CODES = {
         telugu: "te", hindi: "hi", tamil: "ta", kannada: "kn", malayalam: "ml",
         bengali: "bn", marathi: "mr", gujarati: "gu", punjabi: "pa", urdu: "ur",
@@ -1867,41 +1867,75 @@
         dutch: "nl", polish: "pl", turkish: "tr", swahili: "sw", greek: "el"
       };
 
+      // Script detection ranges for bidirectional translations
+      const SCRIPT_RANGES = {
+        te: /[\u0C00-\u0C7F]/, // Telugu
+        hi: /[\u0900-\u097F]/, // Hindi / Devanagari
+        ta: /[\u0B80-\u0BFF]/, // Tamil
+        kn: /[\u0C80-\u0CFF]/, // Kannada
+        ml: /[\u0D00-\u0D7F]/, // Malayalam
+        bn: /[\u0980-\u09FF]/, // Bengali
+        ja: /[\u3040-\u30FF\u4E00-\u9FAF]/, // Japanese
+        zh: /[\u4E00-\u9FFF]/, // Chinese
+        ar: /[\u0600-\u06FF]/  // Arabic
+      };
+
       async function fetchUniversalLanguageGrounding(queryText) {
         try {
           const lower = queryText.toLowerCase();
-          let targetLang = null;
-          let targetLangCode = null;
 
-          for (const [lang, code] of Object.entries(LANGUAGE_CODES)) {
-            const regex = new RegExp(`\\b(${lang})\\b`, "i");
-            if (regex.test(lower)) {
-              targetLang = lang.charAt(0).toUpperCase() + lang.slice(1);
-              targetLangCode = code;
+          // 1. Detect if the input already contains non-English scripts
+          let detectedSourceLang = null;
+          for (const [code, regex] of Object.entries(SCRIPT_RANGES)) {
+            if (regex.test(queryText)) {
+              detectedSourceLang = code;
               break;
             }
           }
 
-          if (!targetLangCode) return "";
+          let sourceLang = "en";
+          let targetLang = "en";
+          let targetLangName = "English";
 
+          if (detectedSourceLang) {
+            // Source is foreign script -> target is English
+            sourceLang = detectedSourceLang;
+            targetLang = "en";
+            targetLangName = "English";
+          } else {
+            // Source is English -> find target language in prompt
+            for (const [lang, code] of Object.entries(LANGUAGE_CODES)) {
+              const regex = new RegExp(`\\b(${lang})\\b`, "i");
+              if (regex.test(lower)) {
+                targetLang = code;
+                targetLangName = lang.charAt(0).toUpperCase() + lang.slice(1);
+                break;
+              }
+            }
+          }
+
+          if (sourceLang === "en" && targetLang === "en") return "";
+
+          // 2. Clean out translation commands to isolate the pure content
           let cleanPhrase = queryText
             .replace(/translate\s+(this\s+)?(to|into|in)?\s+[a-z]+/gi, "")
-            .replace(/what\s+is\s+|in\s+[a-z]+|how\s+to\s+say\s+/gi, "")
+            .replace(/what\s+does\s+|mean\s+in\s+english|in\s+english|translates\s+to|how\s+to\s+say/gi, "")
             .replace(/["'“”]/g, "")
             .trim();
 
           if (!cleanPhrase) return "";
 
-          const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(cleanPhrase)}&langpair=en|${targetLangCode}`;
+          // 3. Dynamic bidirectional web fetch
+          const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(cleanPhrase)}&langpair=${sourceLang}|${targetLang}`;
           const res = await fetch(url);
           const data = await res.json();
 
           if (data?.responseData?.translatedText) {
             const translatedResult = data.responseData.translatedText;
-            return `\n[Verified External ${targetLang} Grounding]:
-Original Source: "${cleanPhrase}"
-Accurate ${targetLang} Translation/Lexicon: "${translatedResult}"
-Instruction: Use this exact authentic ${targetLang} vocabulary and sentence structure. Never phonetically transliterate English words into non-English scripts.\n`;
+            return `\n[Verified External Translation Grounding]:
+Source Phrase (${sourceLang}): "${cleanPhrase}"
+Accurate Translation (${targetLangName}): "${translatedResult}"
+Instruction: Use this exact authentic translation as your ground truth. Explain the grammar breakdown and meaning clearly. Never phonetically transliterate English words into non-English scripts.\n`;
           }
         } catch (err) {
           console.warn("Universal language grounding skipped:", err);
@@ -2179,7 +2213,7 @@ Instruction: Use this exact authentic ${targetLang} vocabulary and sentence stru
         });
         footer.innerHTML = `<span>${timeStr}</span>`;
 
-        // Copy handler dynamically reads the latest text from the dataset/bubble
+        // Dynamic copy button that reads the live dataset or rendered text on demand
         if (role === "ai") {
           const copyBtn = document.createElement("button");
           copyBtn.className = "icon-btn";
@@ -2247,6 +2281,7 @@ Instruction: Use this exact authentic ${targetLang} vocabulary and sentence stru
             }
           };
 
+          // Initialize WebGPU pipeline
           engine = await CreateMLCEngine(MODEL_ID, {
             appConfig: appConfig,
             chatOpts: {
@@ -2295,8 +2330,9 @@ Instruction: Use this exact authentic ${targetLang} vocabulary and sentence stru
         userInput.value = "";
         sendBtn.disabled = true;
 
-        // Detect language translation requests and fetch authentic third-party vocabulary
-        const isLanguageQuery = /translate|meaning|how to say|in [a-z]+|to [a-z]+/i.test(text);
+        // Detect language queries (either direction) or non-English script entries
+        const isForeignScript = Object.values(SCRIPT_RANGES).some((regex) => regex.test(text));
+        const isLanguageQuery = /translate|meaning|how to say|in [a-z]+|to [a-z]+/i.test(text) || isForeignScript;
         let liveLanguageGrounding = "";
 
         if (isLanguageQuery) {
@@ -2438,7 +2474,7 @@ Instruction: Use this exact authentic ${targetLang} vocabulary and sentence stru
         });
       }
 
-      // Launch Engine & Initial Workspace Session
+      // Launch Engine & Workspace Session safely
       initAI();
       try {
         renderHistoryList();
