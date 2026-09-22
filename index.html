@@ -2404,7 +2404,6 @@ Instruction: Use this verified authentic translation as your ground truth. Expla
             return;
           }
 
-          // Detect language queries or non-English script entries
           const isForeignScript = Object.values(SCRIPT_RANGES).some((regex) => regex.test(text));
           const isLanguageQuery = /translate|meaning|how to say|in [a-z]+|to [a-z]+/i.test(text) || isForeignScript;
           let liveLanguageGrounding = "";
@@ -2420,7 +2419,7 @@ Instruction: Use this verified authentic translation as your ground truth. Expla
               currentSys.content += liveLanguageGrounding;
             }
 
-            // CRITICAL: Safe history slicing to prevent WebGPU context overflows
+            // Safe history slicing to prevent WebGPU context overflows
             const trimmedHistory = currentMessages
               .filter((m) => m.role !== "system")
               .slice(-6);
@@ -2467,56 +2466,64 @@ Instruction: Use this verified authentic translation as your ground truth. Expla
           // ENGINE 2: Rainbow-AI-Beta-Model (Groq Cloud)
           // ==========================================
           try {
-            const currentSys = getSystemPrompt();
-            const payload = [
-              currentSys,
-              ...currentMessages.filter((m) => m.role !== "system"),
-              { role: "user", content: text }
+            if (!groqApiKey || !groqApiKey.startsWith("gsk_")) {
+              throw new Error("Missing or invalid Groq API key. Please re-select Beta model and enter a valid key from console.groq.com.");
+            }
+
+            const cleanHistory = currentMessages
+              .filter((m) => m.content && (m.role === "user" || m.role === "assistant"))
+              .map((m) => ({ role: m.role, content: String(m.content) }));
+
+            const payloadMessages = [
+              { role: "system", content: getSystemPrompt().content },
+              ...cleanHistory
             ];
 
             const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
               method: "POST",
               headers: {
-                "Authorization": `Bearer ${groqApiKey}`,
+                "Authorization": `Bearer ${groqApiKey.trim()}`,
                 "Content-Type": "application/json"
               },
               body: JSON.stringify({
                 model: "llama-3.3-70b-versatile",
-                messages: payload,
+                messages: payloadMessages,
                 stream: true,
-                temperature: 0.4
+                temperature: 0.5
               })
             });
 
             if (!response.ok) {
               if (response.status === 429) {
-                throw new Error("⚠️ RATE LIMIT EXCEEDED (429): You have sent too many requests or hit the daily quota. Please wait a moment or switch back to Rainbow-AI-Specialist-MLC!");
+                throw new Error("⚠️ RATE LIMIT EXCEEDED (429): Free quota limit reached. Please wait a moment or switch back to Rainbow-AI-Specialist-MLC!");
               } else if (response.status === 401) {
                 localStorage.removeItem("rainbow_groq_key");
                 groqApiKey = "";
-                throw new Error("Invalid Groq API key. Please refresh and provide a valid token from console.groq.com.");
+                throw new Error("Invalid Groq API key (401). Key has been reset; please switch models and enter a new key from console.groq.com.");
               } else {
-                throw new Error(`Cloud API returned status ${response.status}`);
+                const errorData = await response.text();
+                console.error("Groq Error Response:", errorData);
+                throw new Error(`Cloud API returned status ${response.status}: ${response.statusText}`);
               }
             }
 
             const reader = response.body.getReader();
-            const decoder = new TextDecoder();
+            const decoder = new TextDecoder("utf-8");
             let responseText = "";
 
             while (true) {
               const { done, value } = await reader.read();
               if (done) break;
 
-              const chunk = decoder.decode(value);
-              const lines = chunk.split("\n").filter((l) => l.startsWith("data: "));
+              const chunk = decoder.decode(value, { stream: true });
+              const lines = chunk.split("\n").filter((l) => l.trim().startsWith("data: "));
 
               for (const line of lines) {
                 const dataStr = line.replace(/^data:\s*/, "").trim();
                 if (dataStr === "[DONE]") break;
                 try {
                   const json = JSON.parse(dataStr);
-                  const delta = json.choices[0]?.delta?.content || "";
+                  const delta = json.choices?.[0]?.delta?.content || "";
                   responseText += delta;
                   tokenCount++;
 
@@ -2528,7 +2535,7 @@ Instruction: Use this verified authentic translation as your ground truth. Expla
                         hljs.highlightElement(block);
                       });
                     }
-                  } catch (highlightErr) {}
+                  } catch (hErr) {}
                   if (chatbox) chatbox.scrollTop = chatbox.scrollHeight;
                 } catch (parseErr) {}
               }
