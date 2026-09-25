@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
+    <!-- Puter.js: Free Neural AI Text-to-Speech API (Multi-language & Expressive Tones, Zero Key required) -->
+    <script src="https://js.puter.com/v2/"></script>
+
     <link rel="icon" type="image/svg+xml" href="RAINBOW_favicon.svg" />
     <style>
       :root {
@@ -155,7 +158,7 @@
         display: flex;
         flex-direction: column;
         padding: 20px;
-        gap: 14px;
+        gap: 12px;
         flex-shrink: 0;
         z-index: 3;
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease, padding 0.3s ease;
@@ -239,7 +242,7 @@
         background: linear-gradient(135deg, #3b82f6, #8b5cf6);
         color: white;
         border: none;
-        padding: 11px;
+        padding: 10px;
         border-radius: 12px;
         font-weight: 500;
         font-family: "Google Sans", sans-serif;
@@ -256,11 +259,11 @@
         transform: scale(0.98);
       }
 
-      .persona-select {
+      .persona-select, .voice-select {
         background: var(--panel-bg);
         border: 1px solid var(--border-color);
         border-radius: 10px;
-        padding: 8px 12px;
+        padding: 7px 10px;
         color: var(--text-main);
         font-size: 12px;
         font-family: "Google Sans", sans-serif;
@@ -987,6 +990,13 @@
         letter-spacing: 0.5px;
         text-transform: uppercase;
       }
+      .nova-controls-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
       .nova-handsfree-toggle {
         display: flex;
         align-items: center;
@@ -1164,6 +1174,21 @@
           <option value="poet">Creative Storyteller</option>
         </select>
 
+        <div class="section-label">Neural TTS Language & Tone (Puter.js API)</div>
+        <select class="voice-select" id="voiceSelect" onchange="updateGlobalVoice(this.value)">
+          <option value="en-US:Joanna:neural">🇺🇸 English - Joanna (Natural Neural)</option>
+          <option value="en-US:Matthew:neural">🇺🇸 English - Matthew (Deep & Calm)</option>
+          <option value="en-IN:Kajal:neural">🇮🇳 English (India) - Kajal (Warm)</option>
+          <option value="hi-IN:Aditi:standard">🇮🇳 Hindi - Aditi (Fluent)</option>
+          <option value="te-IN:Shruti:standard">🇮🇳 Telugu / Indic Multilingual</option>
+          <option value="ja-JP:Takumi:neural">🇯🇵 Japanese - Takumi (Anime/Clear)</option>
+          <option value="es-ES:Lucia:neural">🇪🇸 Spanish - Lucia (Energetic)</option>
+          <option value="fr-FR:Lea:neural">🇫🇷 French - Lea (Expressive)</option>
+          <option value="de-DE:Vicki:neural">🇩🇪 German - Vicki (Crisp)</option>
+          <option value="zh-CN:Zhiyu:standard">🇨🇳 Chinese - Zhiyu (Standard)</option>
+          <option value="ko-KR:Seoyeon:neural">🇰🇷 Korean - Seoyeon (Melodic)</option>
+        </select>
+
         <input
           type="text"
           class="search-box"
@@ -1200,9 +1225,7 @@
           <div class="chat-messages" id="chatbox"></div>
 
           <div class="chat-input-area">
-            <div class="quick-chips-container" id="quickChipsBar">
-              <!-- Dynamically populated chips -->
-            </div>
+            <div class="quick-chips-container" id="quickChipsBar"></div>
 
             <div class="input-box-wrapper" id="dropZoneWrapper">
               <div class="dropzone-overlay" id="dropzoneOverlay">
@@ -1258,9 +1281,7 @@
           </div>
           <div class="prompts-container">
             <div class="section-label">Dynamically Curated Inspiration Cards</div>
-            <div class="prompt-category-grid" id="promptsGrid">
-              <!-- Dynamically populated 50 cards -->
-            </div>
+            <div class="prompt-category-grid" id="promptsGrid"></div>
           </div>
         </div>
 
@@ -1317,7 +1338,7 @@
               <h3 class="panel-title">Nova • Emotive Voice Companion</h3>
             </div>
             <div class="status-badge" style="background: rgba(244, 63, 94, 0.15); color: #f43f5e; border-color: rgba(244, 63, 94, 0.3);">
-              Speech-to-Speech Active
+              Neural API Active
             </div>
           </div>
 
@@ -1356,10 +1377,12 @@
 
               <div class="nova-state-label" id="novaStateLabel">Idle • Ready to chat</div>
 
-              <label class="nova-handsfree-toggle">
-                <input type="checkbox" id="novaAutoListenToggle" checked />
-                <span>Hands-Free Auto-Listen Loop</span>
-              </label>
+              <div class="nova-controls-row">
+                <label class="nova-handsfree-toggle">
+                  <input type="checkbox" id="novaAutoListenToggle" checked />
+                  <span>Hands-Free Auto-Listen Loop</span>
+                </label>
+              </div>
             </div>
 
             <div class="nova-chatbox" id="novaChatbox">
@@ -1403,25 +1426,25 @@
               </button>
               <h3 class="panel-title">Ecosystem Roadmap & Architecture</h3>
             </div>
-            <div class="status-badge">Version 2.3 Active</div>
+            <div class="status-badge">Version 2.4 Active</div>
           </div>
           <div class="features-grid">
             <div class="feature-card">
               <div class="feature-header">
-                <div class="feature-title">Live Canvas Sandbox</div>
-                <span class="badge-status active-mod">Live in v2.3</span>
+                <div class="feature-title">Neural Free TTS API (Puter.js)</div>
+                <span class="badge-status active-mod">Live in v2.4</span>
               </div>
               <div class="feature-desc">
-                Interactive modal iframe environment executing Canvas 2D, WebGL games, and retro shaders with live console streaming.
+                Integrated zero-key neural speech API supporting multiple languages (English, Hindi, Telugu, Japanese, Spanish, etc.) and expressive voice tones.
               </div>
             </div>
             <div class="feature-card">
               <div class="feature-header">
-                <div class="feature-title">Emoji-Free Speech Synthesizer</div>
-                <span class="badge-status active-mod">Live in v2.3</span>
+                <div class="feature-title">Live Canvas Sandbox</div>
+                <span class="badge-status active-mod">Live in v2.4</span>
               </div>
               <div class="feature-desc">
-                Deep Unicode symbol stripping ensures voice companions never vocalize raw emoji descriptions aloud.
+                Interactive modal iframe environment executing Canvas 2D, WebGL games, and retro shaders with live console streaming.
               </div>
             </div>
             <div class="feature-card">
@@ -1575,1176 +1598,8 @@
         input.focus();
       }
 
-      // Universal Emoji Stripper for Native Speech Synthesizer
+      // Universal Emoji Stripper for Speech Synthesizers
       window.cleanTextForSpeech = function (text) {
         if (!text) return "";
         return text
-          .replace(/```[\s\S]*?```/g, "Code block omitted.") // strip raw code blocks
-          .replace(/`([^`]+)`/g, "$1") // inline code backticks
-          .replace(/[*#_~>]/g, "") // markdown formatting
-          // Strips standard, extended pictographic, skin tones, and variation selectors
-          .replace(/[\u{1F300}-\u{1FAFF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{200D}]/gu, "")
-          .replace(/\s+/g, " ")
-          .trim();
-      };
-
-      // Voice Input for Main Chat
-      let recognition = null;
-      let isRecording = false;
-
-      window.toggleVoiceInput = function () {
-        const micBtn = document.getElementById("micBtn");
-        const input = document.getElementById("userInput");
-
-        if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
-          alert("Speech recognition is not supported in this browser. Please use Chrome or Edge!");
-          return;
-        }
-
-        if (isRecording) {
-          if (recognition) recognition.stop();
-          return;
-        }
-
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = true;
-        recognition.lang = "en-US";
-
-        recognition.onstart = () => {
-          isRecording = true;
-          micBtn.style.background = "rgba(239, 68, 68, 0.3)";
-          micBtn.style.color = "#ef4444";
-          micBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg> Listening...`;
-        };
-
-        recognition.onresult = (event) => {
-          let transcript = "";
-          for (let i = event.resultIndex; i < event.results.length; ++i) {
-            transcript += event.results[i][0].transcript;
-          }
-          input.value = transcript;
-        };
-
-        recognition.onerror = () => stopMicState();
-        recognition.onend = () => stopMicState();
-        recognition.start();
-      };
-
-      function stopMicState() {
-        isRecording = false;
-        const micBtn = document.getElementById("micBtn");
-        if (micBtn) {
-          micBtn.style.background = "";
-          micBtn.style.color = "";
-          micBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg> Voice Input`;
-        }
-      }
-
-      // Main Chat Text-To-Speech (With Emoji Removal)
-      let currentMainUtterance = null;
-      window.speakMainChatMessage = function (text, btn) {
-        if (!("speechSynthesis" in window)) return;
-
-        if (window.speechSynthesis.speaking) {
-          window.speechSynthesis.cancel();
-          document.querySelectorAll(".speak-msg-btn").forEach((b) => {
-            b.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> Speak`;
-          });
-          return;
-        }
-
-        const cleanSpeech = cleanTextForSpeech(text);
-        if (!cleanSpeech) return;
-
-        currentMainUtterance = new SpeechSynthesisUtterance(cleanSpeech);
-        currentMainUtterance.rate = 1.0;
-        currentMainUtterance.pitch = 1.05;
-
-        btn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"></rect></svg> Stop`;
-        btn.style.color = "#ef4444";
-
-        currentMainUtterance.onend = () => {
-          btn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> Speak`;
-          btn.style.color = "";
-        };
-
-        currentMainUtterance.onerror = () => {
-          btn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> Speak`;
-          btn.style.color = "";
-        };
-
-        window.speechSynthesis.speak(currentMainUtterance);
-      };
-
-      // Spectra Art Generator
-      function generateSpectraImage() {
-        const prompt = document.getElementById("spectraPrompt").value.trim();
-        if (!prompt) return;
-
-        const status = document.getElementById("spectraStatus");
-        status.textContent = "Rendering Creative Asset...";
-
-        setTimeout(() => {
-          const gallery = document.getElementById("spectraGallery");
-          const card = document.createElement("div");
-          card.className = "spectra-card";
-          card.innerHTML = `<div class="spectra-preview" style="background: linear-gradient(135deg, #${Math.floor(Math.random() * 16777215).toString(16)}, #${Math.floor(Math.random() * 16777215).toString(16)});">${prompt.substring(0, 20)}...</div><div style="padding: 12px; font-size: 12px; font-weight: 400; color: var(--text-muted);">Prompt: ${prompt}</div>`;
-          gallery.prepend(card);
-          document.getElementById("spectraPrompt").value = "";
-          status.textContent = "Pipeline Ready (SD 1.5)";
-        }, 800);
-      }
-
-      window.fillPrompt = function (text) {
-        const input = document.getElementById("userInput");
-        input.value = text;
-        input.focus();
-      };
-
-      // 50 Generative Inspiration Prompts Seed Bank
-      const PROMPT_INSPIRATION_POOL = [
-        { t: "Retro Arcade Pong", p: "Build a playable retro Pong arcade game in a single HTML5 canvas with requestAnimationFrame and keyboard controls.", c: "Games" },
-        { t: "Brick Breaker Mini-Game", p: "Create a Breakout brick breaker game on HTML5 canvas with ball reflections, score tracking, and lives.", c: "Games" },
-        { t: "Snake Classic Game", p: "Generate a clean, modular JavaScript Snake game rendered on an HTML5 canvas with score and restart logic.", c: "Games" },
-        { t: "Particle Physics Engine", p: "Code a colorful interactive particle simulator with mouse click attraction and velocity damping.", c: "Simulation" },
-        { t: "Badminton Tactical Simulator", p: "Simulate a 2D top-down badminton rally trajectory engine showing smash angles and drop shot physics.", c: "Sports" },
-        { t: "Neon Cyberpunk Shader", p: "Write an animated mathematical neon sine-wave shader simulation on HTML5 Canvas.", c: "Creative" },
-        { t: "Manga Action Scene Script", p: "Draft a dynamic 5-panel manga action storyboard featuring speed lines, intense dialogue, and sound effects.", c: "Manga" },
-        { t: "Quantum Superposition Guide", p: "Explain quantum superposition and entanglement using intuitive physical analogies for a beginner.", c: "Science" },
-        { t: "Web Scraping Automation", p: "Write a clean, modular Python script using BeautifulSoup and requests with retry handling and headers.", c: "Dev" },
-        { t: "Matrix Digital Rain Effect", p: "Create the classic falling green Matrix code rain animation inside a canvas element.", c: "Creative" },
-        { t: "Badminton Smash Mechanics", p: "Break down the biomechanics of a powerful badminton jump smash: forearm pronation, kinetic chain, and timing.", c: "Sports" },
-        { t: "Fast Fourier Transform Visualizer", p: "Build an audio-frequency waveform visualizer simulation on Canvas with smooth rainbow gradient bars.", c: "Simulation" },
-        { t: "Manga Character Concept Sheet", p: "Create a comprehensive character profile for a shonen manga protagonist, including abilities, flaws, and backstory.", c: "Manga" },
-        { t: "REST vs GraphQL Architecture", p: "Compare RESTful APIs and GraphQL architecture with clear data-fetching examples and network trade-offs.", c: "Dev" },
-        { t: "Interactive 3D Wireframe Cube", p: "Implement a rotating 3D wireframe cube rendered from scratch on a 2D canvas with matrix projection.", c: "Simulation" },
-        { t: "Badminton Footwork Drill Routine", p: "Design a high-intensity 6-corner badminton shadow footwork drill regimen to improve court agility and reaction time.", c: "Sports" },
-        { t: "Flappy Bird Arcade Clone", p: "Write an interactive Flappy Bird clone with gravity physics, jumping mechanics, and pipe collision detection.", c: "Games" },
-        { t: "Manga Dynamic Speedline Canvas", p: "Generate an interactive canvas drawing radial anime speedlines converging on the user's mouse position.", c: "Manga" },
-        { t: "Neural Network from Scratch", p: "Write a minimal forward and backpropagation neural network in clean modern JavaScript with loss tracking.", c: "Dev" },
-        { t: "Space Asteroids Shooter", p: "Code a vector-style Asteroids shooter game with inertia rotation, laser firing, and rock splitting.", c: "Games" },
-        { t: "Relativity & Time Dilation", p: "Explain Einstein's special theory of relativity and time dilation with practical spaceship velocity examples.", c: "Science" },
-        { t: "Cyberpunk Narrative Story", p: "Compose an atmospheric short story about an android detective searching for memories in a neon-lit metropolis.", c: "Creative" },
-        { t: "Badminton Doubles Strategy", p: "Outline winning badminton doubles tactics: attack-defense formations, rotational coverage, and service returns.", c: "Sports" },
-        { t: "Binary Search Tree Visualizer", p: "Build a recursive binary search tree visualizer with node insertion and animated tree traversal.", c: "Dev" },
-        { t: "Manga Shonen Rival Dynamic", p: "Write a compelling rivalry dialogue scene between two contrasting martial artists before a championship match.", c: "Manga" },
-        { t: "Cellular Automata Game of Life", p: "Create Conway's Game of Life simulation with interactive cell drawing and play/pause controls.", c: "Simulation" },
-        { t: "SQL Index Optimization", p: "Explain how B-Tree database indexing works under the hood and how to optimize slow SQL query plans.", c: "Dev" },
-        { t: "Interactive Audio Synthesizer", p: "Create a playable keyboard synth using the browser Web Audio API with oscillator frequency modulation.", c: "Creative" },
-        { t: "Badminton Trick Shots Tutorial", p: "Describe the execution technique for the deceptive badminton reverse slice drop shot and crosscourt flick.", c: "Sports" },
-        { t: "Fractal Tree Generator", p: "Write a recursive fractal branching tree generator that sways dynamically with mouse movement.", c: "Simulation" },
-        { t: "Manga Mecha Battle Blueprint", p: "Design an epic mech duel script detailing pilot psychological tension, cockpit HUD readouts, and scale.", c: "Manga" },
-        { t: "Microservices vs Monoliths", p: "Detail an architectural comparison of microservices vs monolithic applications with scaling considerations.", c: "Dev" },
-        { t: "Raymarching Sphere Shader", p: "Write a lightweight Canvas 2D raymarching sphere renderer with dynamic lighting and diffuse shadows.", c: "Simulation" },
-        { t: "Badminton Grip Fundamentals", p: "Explain the anatomical differences and shot applications between the forehand, backhand, and bevel grips.", c: "Sports" },
-        { t: "Dijkstra Pathfinding Visualizer", p: "Implement a 2D grid pathfinding algorithm visualization showcasing Dijkstra's algorithm exploration.", c: "Dev" },
-        { t: "Manga Panel Composition Masterclass", p: "Explain the visual flow and eye-tracking principles behind professional Japanese manga layout design.", c: "Manga" },
-        { t: "Space Invaders Mini-Game", p: "Build a retro Space Invaders arcade clone with moving alien grids, defensive bunkers, and missile firing.", c: "Games" },
-        { t: "Sorting Algorithm Race", p: "Visualize Bubble Sort vs Quick Sort side-by-side with animated bar heights and swap counters on Canvas.", c: "Simulation" },
-        { t: "Cosmological Black Holes", p: "Explain event horizons, Hawking radiation, and spaghettification with vivid theoretical physics descriptions.", c: "Science" },
-        { t: "Clean Code Refactoring Guide", p: "Demonstrate practical SOLID principles by refactoring a convoluted JavaScript function into clean modules.", c: "Dev" },
-        { t: "Badminton String Tension Science", p: "Analyze how racquet string tension (lbs) affects the sweet spot, control, repulsion power, and arm durability.", c: "Sports" },
-        { t: "Manga Panel Ink & Shading Art", p: "Describe traditional and digital screentone and cross-hatching techniques for creating dramatic manga mood.", c: "Manga" },
-        { t: "Solar System Gravity Simulator", p: "Create an n-body gravitational orbit simulator with planets orbiting a central star on HTML5 Canvas.", c: "Simulation" },
-        { t: "Modern CSS Grid Mastery", p: "Provide an executive cheat sheet and code examples for complex responsive CSS Grid layouts.", c: "Dev" },
-        { t: "Badminton Aerodynamics", p: "Explain the aerodynamic deceleration curve of a feathered shuttlecock vs synthetic nylon shuttles.", c: "Sports" },
-        { t: "Sci-Fi Cybernetic Essay", p: "Write an essay examining the ethical and philosophical implications of transhumanist neural augmentations.", c: "Creative" },
-        { t: "Manga Climactic Monologue", p: "Draft an emotional climax scene where a mentor passes down their ultimate martial technique to their student.", c: "Manga" },
-        { t: "Color Palette Harmonizer", p: "Build an interactive HSL color harmony generator producing complementary, triad, and monochromatic schemes.", c: "Dev" },
-        { t: "Gravity Ragdoll Physics", p: "Implement a connected stickman verlet ragdoll physics simulation that responds to mouse dragging.", c: "Simulation" },
-        { t: "Badminton Deceptive Serves", p: "Deconstruct the high-level technique of deceptive low service flicking in professional badminton singles.", c: "Sports" }
-      ];
-
-      function populateInspirationCards() {
-        const grid = document.getElementById("promptsGrid");
-        const quickChips = document.getElementById("quickChipsBar");
-        if (!grid) return;
-
-        // Shuffle pool every load
-        const shuffled = [...PROMPT_INSPIRATION_POOL].sort(() => 0.5 - Math.random());
-        grid.innerHTML = "";
-        quickChips.innerHTML = "";
-
-        // First 3 for Quick Chips
-        shuffled.slice(0, 3).forEach((item) => {
-          const chip = document.createElement("button");
-          chip.className = "tool-chip";
-          chip.textContent = item.t;
-          chip.onclick = () => fillPrompt(item.p);
-          quickChips.appendChild(chip);
-        });
-
-        // 50 Cards in Prompts Vault
-        shuffled.slice(0, 50).forEach((item) => {
-          const card = document.createElement("div");
-          card.className = "prompt-card";
-          card.innerHTML = `
-            <h4>
-              <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-              ${item.t}
-            </h4>
-            <p>${item.p}</p>
-          `;
-          card.onclick = () => usePresetPrompt(item.p);
-          grid.appendChild(card);
-        });
-      }
-
-      window.addEventListener("DOMContentLoaded", populateInspirationCards);
-
-      // ========================================================
-      // INTERACTIVE CANVAS SANDBOX RUNNER
-      // ========================================================
-      window.__codeStore = {};
-      let activeSnippetCode = "";
-
-      window.runCodeSnippet = function (codeId) {
-        const rawCode = window.__codeStore[codeId];
-        if (!rawCode) return;
-        activeSnippetCode = rawCode;
-
-        const modal = document.getElementById("canvasSandboxModal");
-        const drawer = document.getElementById("sandboxConsoleDrawer");
-        drawer.textContent = `> Launching snippet (${codeId})...\n`;
-        modal.classList.add("active");
-
-        executeSandboxIframe(rawCode);
-      };
-
-      function executeSandboxIframe(code) {
-        const iframe = document.getElementById("sandboxIframe");
-        const isFullHTML = /<!doctype html>|<html|<canvas|<body/i.test(code);
-
-        let htmlPayload = "";
-        if (isFullHTML) {
-          htmlPayload = `
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <style>
-                  body { margin: 0; background: #000; color: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
-                  canvas { display: block; max-width: 100vw; max-height: 100vh; }
-                </style>
-              </head>
-              <body>
-                ${code}
-                <script>
-                  window.onerror = function(msg, url, line) { parent.postMessage({ type: 'error', data: msg + ' (Line ' + line + ')' }, '*'); };
-                  const _log = console.log;
-                  console.log = function(...args) { parent.postMessage({ type: 'log', data: args.join(' ') }, '*'); _log.apply(console, args); };
-                <\/script>
-              </body>
-            </html>
-          `;
-        } else {
-          htmlPayload = `
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <style>
-                  body { margin: 0; background: #000000; color: #fff; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; }
-                  canvas { border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 0 30px rgba(139,92,246,0.3); }
-                </style>
-              </head>
-              <body>
-                <canvas id="gameCanvas" width="600" height="400"></canvas>
-                <script>
-                  window.onerror = function(msg, url, line) { parent.postMessage({ type: 'error', data: msg + ' (Line ' + line + ')' }, '*'); };
-                  const _log = console.log;
-                  console.log = function(...args) { parent.postMessage({ type: 'log', data: args.join(' ') }, '*'); _log.apply(console, args); };
-                  try {
-                    const canvas = document.getElementById('gameCanvas');
-                    const ctx = canvas.getContext('2d');
-                    ${code}
-                  } catch (err) {
-                    parent.postMessage({ type: 'error', data: err.message }, '*');
-                  }
-                <\/script>
-              </body>
-            </html>
-          `;
-        }
-
-        iframe.srcdoc = htmlPayload;
-      }
-
-      window.addEventListener("message", (e) => {
-        const drawer = document.getElementById("sandboxConsoleDrawer");
-        if (e.data && e.data.type === "log") {
-          drawer.textContent += `[Log] ${e.data.data}\n`;
-          drawer.scrollTop = drawer.scrollHeight;
-        } else if (e.data && e.data.type === "error") {
-          drawer.textContent += `[Runtime Error] ⚠️ ${e.data.data}\n`;
-          drawer.scrollTop = drawer.scrollHeight;
-        }
-      });
-
-      window.reloadSandbox = function () {
-        if (activeSnippetCode) executeSandboxIframe(activeSnippetCode);
-      };
-
-      window.toggleSandboxFullscreen = function () {
-        const win = document.getElementById("sandboxWindow");
-        win.classList.toggle("fullscreen");
-      };
-
-      window.closeSandbox = function () {
-        const modal = document.getElementById("canvasSandboxModal");
-        const iframe = document.getElementById("sandboxIframe");
-        iframe.srcdoc = "";
-        modal.classList.remove("active");
-      };
-
-      window.copySnippet = function (codeId, btn) {
-        const code = window.__codeStore[codeId];
-        if (!code) return;
-
-        navigator.clipboard.writeText(code);
-        const originalText = btn.textContent;
-        btn.textContent = "Copied!";
-        btn.style.background = "rgba(16, 185, 129, 0.2)";
-        btn.style.color = "#10b981";
-        setTimeout(() => {
-          btn.textContent = originalText;
-          btn.style.background = "rgba(255, 255, 255, 0.1)";
-          btn.style.color = "#cbd5e1";
-        }, 2000);
-      };
-
-      // File Drag & Drop Handlers
-      const dropZoneWrapper = document.getElementById("dropZoneWrapper");
-      ["dragenter", "dragover"].forEach((evt) => {
-        dropZoneWrapper.addEventListener(evt, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          dropZoneWrapper.classList.add("dragover");
-        }, false);
-      });
-      ["dragleave", "drop"].forEach((evt) => {
-        dropZoneWrapper.addEventListener(evt, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          dropZoneWrapper.classList.remove("dragover");
-        }, false);
-      });
-      dropZoneWrapper.addEventListener("drop", (e) => {
-        const files = e.dataTransfer.files;
-        if (files && files.length > 0) handleFileImport(files[0]);
-      }, false);
-
-      window.handleFileImport = function (file) {
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const content = e.target.result;
-          const input = document.getElementById("userInput");
-          input.value = `Here is the contents of my imported file (${file.name}):\n\n\`\`\`\n${content}\n\`\`\`\n\nPlease review and analyze this code.`;
-          input.focus();
-        };
-        reader.readAsText(file);
-      };
-    </script>
-
-    <!-- Canvas Background Particles -->
-    <script>
-      window.addEventListener("DOMContentLoaded", () => {
-        const canvas = document.getElementById("neuralCanvas");
-        const ctx = canvas.getContext("2d");
-        let particlesArray = [];
-        let hueShift = 0;
-
-        function resizeCanvas() {
-          canvas.width = window.innerWidth;
-          canvas.height = window.innerHeight;
-        }
-        window.addEventListener("resize", resizeCanvas);
-        resizeCanvas();
-
-        class Particle {
-          constructor(index, total) {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 2 + 1.2;
-            this.speedX = Math.random() * 0.5 - 0.25;
-            this.speedY = Math.random() * 0.5 - 0.25;
-            this.baseHue = (index / total) * 360;
-          }
-          update() {
-            this.x += this.speedX;
-            this.y += this.speedY;
-            if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-            if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-          }
-          draw(currentHue) {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            const nodeHue = (this.baseHue + currentHue) % 360;
-            const isLight = document.documentElement.getAttribute("data-theme") === "light";
-            const lightness = isLight ? "45%" : "60%";
-            const alpha = isLight ? "0.75" : "0.95";
-            ctx.fillStyle = `hsla(${nodeHue}, 90%, ${lightness}, ${alpha})`;
-            ctx.fill();
-          }
-        }
-
-        const particleCount = Math.floor(window.innerWidth / 22);
-        for (let i = 0; i < particleCount; i++) {
-          particlesArray.push(new Particle(i, particleCount));
-        }
-
-        function animateCanvas() {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          hueShift += 0.15;
-
-          const isLight = document.documentElement.getAttribute("data-theme") === "light";
-          const lineLightness = isLight ? "45%" : "60%";
-
-          for (let i = 0; i < particlesArray.length; i++) {
-            particlesArray[i].update();
-            particlesArray[i].draw(hueShift);
-
-            for (let j = i + 1; j < particlesArray.length; j++) {
-              const dx = particlesArray[i].x - particlesArray[j].x;
-              const dy = particlesArray[i].y - particlesArray[j].y;
-              const distance = Math.sqrt(dx * dx + dy * dy);
-
-              if (distance < 140) {
-                const alpha = (1 - distance / 140) * (isLight ? 0.25 : 0.35);
-                const lineHue = (particlesArray[i].baseHue + hueShift) % 360;
-                ctx.beginPath();
-                ctx.strokeStyle = `hsla(${lineHue}, 90%, ${lineLightness}, ${alpha})`;
-                ctx.lineWidth = 0.9;
-                ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
-                ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
-                ctx.stroke();
-                ctx.closePath();
-              }
-            }
-          }
-          requestAnimationFrame(animateCanvas);
-        }
-        animateCanvas();
-      });
-    </script>
-
-    <!-- Core Local AI Engine (Specialist MLC Gemma 2 2B) & Nova Emotive Speech Engine -->
-    <script type="module">
-      import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
-
-      const statusDiv = document.getElementById("status");
-      const userInput = document.getElementById("userInput");
-      const sendBtn = document.getElementById("sendBtn");
-      const sendBtnLabel = document.getElementById("sendBtnLabel");
-      const sendBtnIcon = document.getElementById("sendBtnIcon");
-      const chatbox = document.getElementById("chatbox");
-      const historyList = document.getElementById("historyList");
-      const activeChatTitle = document.getElementById("activeChatTitle");
-      const vramMonitor = document.getElementById("vramMonitor");
-
-      let webgpuEngine = null;
-      let isGenerating = false;
-      let abortGenerationFlag = false;
-
-      let chatSessions = JSON.parse(localStorage.getItem("rainbow_ecosystem_chats")) || [];
-      let currentSessionId = null;
-      let currentMessages = [];
-
-      const personas = {
-        general: "You are Rainbow AI, a friendly, highly versatile, and brilliant assistant built by Herish.",
-        coder: "You are Rainbow Coder, an elite software architect and game developer. When writing code, provide clean, runnable mini-games or canvas apps that can run in an interactive sandbox.",
-        poet: "You are Rainbow Poet, a creative and eloquent storyteller who writes expressive prose.",
-      };
-
-      function getSystemPrompt() {
-        const select = document.getElementById("personaSelect");
-        const val = select ? select.value : "general";
-        const basePersona = personas[val] || personas.general;
-        const now = new Date();
-        const dateString = now.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-        const timeString = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-        return {
-          role: "system",
-          content: `${basePersona}\n\n[Temporal Grounding]: Real-time current date is ${dateString}, ${timeString}. Ground responses in this present.`
-        };
-      }
-
-      window.updatePersona = function () {
-        const sys = getSystemPrompt();
-        if (currentMessages.length > 0 && currentMessages[0].role === "system") {
-          currentMessages[0] = sys;
-        } else {
-          currentMessages.unshift(sys);
-        }
-        saveToMemory();
-      };
-
-      function saveToMemory() {
-        let session = chatSessions.find((s) => s.id === currentSessionId);
-        if (!session) {
-          session = { id: currentSessionId, title: "New Conversation", messages: [] };
-          chatSessions.unshift(session);
-        }
-        session.messages = currentMessages;
-        localStorage.setItem("rainbow_ecosystem_chats", JSON.stringify(chatSessions));
-        renderHistoryList();
-      }
-
-      // AI-Driven Chat Title Generator
-      async function generateAITitleForChat(sessionId, userPrompt) {
-        if (!webgpuEngine) return;
-        const session = chatSessions.find((s) => s.id === sessionId);
-        if (!session || session.title !== "New Conversation") return;
-
-        try {
-          const titleResponse = await webgpuEngine.chat.completions.create({
-            messages: [
-              { role: "system", content: "You are a concise summarizer. Respond with ONLY 3 to 4 words summarizing the topic of the user's prompt. Do not use quotes, punctuation, or emojis." },
-              { role: "user", content: userPrompt }
-            ],
-            stream: false,
-            temperature: 0.2,
-            max_tokens: 10
-          });
-
-          let generatedTitle = titleResponse.choices[0]?.message?.content?.trim();
-          if (generatedTitle) {
-            generatedTitle = generatedTitle.replace(/["'.]/g, "").trim();
-            session.title = generatedTitle;
-            localStorage.setItem("rainbow_ecosystem_chats", JSON.stringify(chatSessions));
-            renderHistoryList();
-            if (sessionId === currentSessionId) {
-              activeChatTitle.textContent = session.title;
-            }
-          }
-        } catch (e) {
-          console.warn("AI title generation fallback:", e);
-        }
-      }
-
-      window.deleteChat = function (sessionId, event) {
-        event.stopPropagation();
-        chatSessions = chatSessions.filter((s) => s.id !== sessionId);
-        localStorage.setItem("rainbow_ecosystem_chats", JSON.stringify(chatSessions));
-
-        if (sessionId === currentSessionId) {
-          if (chatSessions.length > 0) loadChat(chatSessions[0].id);
-          else startNewChat();
-        } else {
-          renderHistoryList();
-        }
-      };
-
-      window.renameChat = function (sessionId, event) {
-        event.stopPropagation();
-        const session = chatSessions.find((s) => s.id === sessionId);
-        if (!session) return;
-        const newTitle = prompt("Enter title for this conversation:", session.title);
-        if (newTitle) {
-          session.title = newTitle.trim();
-          localStorage.setItem("rainbow_ecosystem_chats", JSON.stringify(chatSessions));
-          renderHistoryList();
-          if (sessionId === currentSessionId) activeChatTitle.textContent = session.title;
-        }
-      };
-
-      window.exportCurrentChat = function () {
-        if (!currentMessages || currentMessages.length <= 1) {
-          alert("There is no active conversation to export yet!");
-          return;
-        }
-
-        let exportText = "=== RAINBOW AI CONVERSATION EXPORT ===\n\n";
-        currentMessages.forEach((msg) => {
-          if (msg.role === "system") return;
-          const sender = msg.role === "user" ? "Herish" : "Rainbow AI";
-          exportText += `${sender}:\n${msg.content}\n\n-----------------------------------\n\n`;
-        });
-
-        const blob = new Blob([exportText], { type: "text/plain;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `Rainbow_Chat_${Date.now()}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      };
-
-      function renderHistoryList(filterQuery = "") {
-        historyList.innerHTML = "";
-        const filtered = chatSessions.filter((s) => s.title.toLowerCase().includes(filterQuery.toLowerCase()));
-
-        filtered.forEach((session) => {
-          const item = document.createElement("div");
-          item.className = `history-item ${session.id === currentSessionId ? "active" : ""}`;
-
-          const titleSpan = document.createElement("span");
-          titleSpan.textContent = session.title;
-          item.appendChild(titleSpan);
-
-          const actionsDiv = document.createElement("div");
-          actionsDiv.className = "history-actions";
-
-          const renameBtn = document.createElement("button");
-          renameBtn.className = "icon-btn";
-          renameBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
-          renameBtn.title = "Rename Conversation";
-          renameBtn.addEventListener("click", (e) => renameChat(session.id, e));
-
-          const deleteBtn = document.createElement("button");
-          deleteBtn.className = "icon-btn delete";
-          deleteBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-          deleteBtn.title = "Delete Conversation";
-          deleteBtn.addEventListener("click", (e) => deleteChat(session.id, e));
-
-          actionsDiv.appendChild(renameBtn);
-          actionsDiv.appendChild(deleteBtn);
-          item.appendChild(actionsDiv);
-
-          item.addEventListener("click", () => loadChat(session.id));
-          historyList.appendChild(item);
-        });
-      }
-
-      window.filterHistory = function (query) {
-        renderHistoryList(query);
-      };
-
-      function loadChat(sessionId) {
-        try {
-          currentSessionId = sessionId;
-          const session = chatSessions.find((s) => s.id === sessionId);
-          currentMessages = session ? [...session.messages] : [];
-
-          if (!currentMessages.some((m) => m.role === "system")) {
-            currentMessages.unshift(getSystemPrompt());
-          }
-
-          if (activeChatTitle) {
-            activeChatTitle.textContent = session ? session.title : "Rainbow AI Workspace";
-          }
-
-          if (chatbox) {
-            chatbox.innerHTML = "";
-            const visibleMessages = currentMessages.filter((m) => m.role !== "system");
-            if (visibleMessages.length === 0) {
-              appendMessage("ai", "Hello! I am Rainbow AI 🌈. How can I assist you today? Feel free to ask questions, write code, or build playable games!");
-            } else {
-              visibleMessages.forEach((msg) => {
-                appendMessage(msg.role === "assistant" ? "ai" : msg.role, msg.content, false);
-              });
-            }
-          }
-          renderHistoryList();
-        } catch (e) {
-          console.warn("UI state sync notice:", e);
-        }
-      }
-
-      window.startNewChat = function () {
-        currentSessionId = Date.now().toString();
-        currentMessages = [getSystemPrompt()];
-        if (activeChatTitle) activeChatTitle.textContent = "Rainbow AI Workspace";
-        if (chatbox) chatbox.innerHTML = "";
-        appendMessage("ai", "Hello! I am Rainbow AI 🌈. How can I assist you today? Ask questions, explore code, or launch the interactive Canvas Sandbox!");
-        renderHistoryList();
-      };
-
-      function processAIMessageHTML(text) {
-        let html = typeof marked !== "undefined" ? marked.parse(text) : text;
-
-        html = html.replace(
-          /<pre><code\b([^>]*)>([\s\S]*?)<\/code><\/pre>/gi,
-          (match, attrs, codeContent) => {
-            const tempDiv = document.createElement("div");
-            tempDiv.innerHTML = codeContent;
-            const rawCode = tempDiv.textContent;
-
-            const codeId = "code_" + Math.random().toString(36).substring(2, 9);
-            window.__codeStore[codeId] = rawCode;
-
-            return `<div class="code-block-wrapper">
-                <div class="code-toolbar">
-                    <button class="code-action-btn run" onclick="runCodeSnippet('${codeId}')">
-                      <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                      Run Sandbox
-                    </button>
-                    <button class="code-action-btn" onclick="copySnippet('${codeId}', this)">
-                      <svg class="svg-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                      Copy
-                    </button>
-                </div>
-                <pre><code${attrs}>${codeContent}</code></pre>
-            </div>`;
-          }
-        );
-
-        return html;
-      }
-
-      function appendMessage(role, text, save = true) {
-        const row = document.createElement("div");
-        row.className = `message-row ${role}`;
-
-        const bubble = document.createElement("div");
-        bubble.className = "message-bubble";
-        bubble.dataset.rawText = text;
-
-        if (role === "ai") {
-          bubble.innerHTML = processAIMessageHTML(text);
-          try {
-            if (typeof hljs !== "undefined") {
-              bubble.querySelectorAll("pre code").forEach((block) => hljs.highlightElement(block));
-            }
-          } catch (err) {}
-        } else {
-          bubble.textContent = text;
-        }
-
-        row.appendChild(bubble);
-
-        const footer = document.createElement("div");
-        footer.className = "message-footer";
-        const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-        footer.innerHTML = `<span>${timeStr}</span>`;
-
-        if (role === "ai") {
-          // Speak Button with custom SVG
-          const speakBtn = document.createElement("button");
-          speakBtn.className = "icon-btn speak-msg-btn";
-          speakBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> Speak`;
-          speakBtn.onclick = () => {
-            const textToSpeak = bubble.dataset.rawText || bubble.innerText.trim();
-            speakMainChatMessage(textToSpeak, speakBtn);
-          };
-          footer.appendChild(speakBtn);
-
-          // Copy Button with custom SVG
-          const copyBtn = document.createElement("button");
-          copyBtn.className = "icon-btn";
-          copyBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy`;
-          copyBtn.onclick = () => {
-            const textToCopy = bubble.dataset.rawText || bubble.innerText.trim();
-            if (textToCopy && textToCopy !== "Thinking...") {
-              navigator.clipboard.writeText(textToCopy);
-              copyBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!`;
-              setTimeout(() => {
-                copyBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy`;
-              }, 2000);
-            }
-          };
-          footer.appendChild(copyBtn);
-        }
-
-        row.appendChild(footer);
-        if (chatbox) {
-          chatbox.appendChild(row);
-          chatbox.scrollTop = chatbox.scrollHeight;
-        }
-
-        if (save && role !== "system") {
-          currentMessages.push({ role: role === "user" ? "user" : "assistant", content: text });
-          saveToMemory();
-        }
-        return bubble;
-      }
-
-      // Safe WebGPU Engine Initialization (Rainbow-AI-Specialist-MLC • Max 5,500 Tokens Context)
-      async function initAI() {
-        try {
-          const MODEL_ID = "gemma-2-2b-it-q4f16_1-MLC-1k";
-          const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
-          const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
-          const repoBaseUrl = "https://huggingface.co/mlc-ai/gemma-2-2b-it-q4f16_1-MLC/resolve/main/";
-
-          const appConfig = {
-            model_list: [
-              ...(prebuiltAppConfig?.model_list || []),
-              {
-                model: repoBaseUrl,
-                model_url: repoBaseUrl,
-                model_id: MODEL_ID,
-                model_lib: wasmUrl,
-                model_lib_id: wasmLibId,
-                vram_required_MB: 1950,
-                low_resource_required: true,
-                required_features: ["shader-f16"],
-                tokenizer_files: ["tokenizer.model"],
-                conv_config: { conv_template: "gemma_instruction" }
-              }
-            ],
-            model_lib_map: {
-              ...(prebuiltAppConfig?.model_lib_map || {}),
-              [wasmLibId]: wasmUrl,
-              [MODEL_ID]: wasmUrl
-            }
-          };
-
-          webgpuEngine = await CreateMLCEngine(MODEL_ID, {
-            appConfig: appConfig,
-            chatOpts: { 
-              tokenizer_files: ["tokenizer.model"],
-              context_window_size: 5500 // Expanded to 5,500 tokens
-            },
-            initProgressCallback: (report) => {
-              if (statusDiv) statusDiv.textContent = report.text;
-            }
-          });
-
-          if (statusDiv) {
-            statusDiv.textContent = "● Rainbow Specialist Ready";
-            statusDiv.style.color = "var(--success)";
-          }
-          if (vramMonitor) vramMonitor.textContent = "⚡ WebGPU: Ready (5.5k ctx)";
-          if (userInput) userInput.disabled = false;
-          if (sendBtn) sendBtn.disabled = false;
-        } catch (err) {
-          if (statusDiv) {
-            statusDiv.textContent = "Engine Link Error";
-            statusDiv.style.color = "var(--danger)";
-          }
-          if (vramMonitor) vramMonitor.textContent = "⚡ WebGPU: Error";
-          console.error("Initialization error:", err);
-        }
-      }
-
-      // Dynamic Send / Stop Button Manager
-      window.handleSendOrStop = function () {
-        if (isGenerating) {
-          abortGenerationFlag = true;
-          if (window.speechSynthesis) window.speechSynthesis.cancel();
-          return;
-        }
-        handleSend();
-      };
-
-      function setSendButtonState(generating) {
-        isGenerating = generating;
-        if (generating) {
-          sendBtn.classList.add("stop-btn");
-          sendBtnIcon.innerHTML = `<rect x="6" y="6" width="12" height="12"></rect>`;
-          sendBtnLabel.textContent = "Stop";
-        } else {
-          sendBtn.classList.remove("stop-btn");
-          sendBtnIcon.innerHTML = `<line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>`;
-          sendBtnLabel.textContent = "Send";
-        }
-      }
-
-      // Unified Message Send Handler with Stop Trigger & Auto Title
-      window.handleSend = async function () {
-        const text = userInput.value.trim();
-        if (!text) return;
-
-        appendMessage("user", text);
-        userInput.value = "";
-        setSendButtonState(true);
-        abortGenerationFlag = false;
-
-        statusDiv.textContent = "Generating Response...";
-        const startTime = performance.now();
-        let tokenCount = 0;
-
-        const aiBubble = appendMessage("ai", "Thinking...", false);
-
-        if (!webgpuEngine) {
-          aiBubble.textContent = "WebGPU Engine is initializing. Please wait a moment...";
-          setSendButtonState(false);
-          return;
-        }
-
-        try {
-          const currentSys = getSystemPrompt();
-          const trimmedHistory = currentMessages.filter((m) => m.role !== "system").slice(-8);
-          const payloadMessages = [currentSys, ...trimmedHistory];
-
-          const chunks = await webgpuEngine.chat.completions.create({
-            messages: payloadMessages,
-            stream: true,
-            temperature: 0.3,
-            max_tokens: 5500 // Up to 5,500 tokens
-          });
-
-          let responseText = "";
-          for await (const chunk of chunks) {
-            if (abortGenerationFlag) {
-              responseText += " [Generation Stopped]";
-              break;
-            }
-            const delta = chunk.choices[0]?.delta?.content || "";
-            responseText += delta;
-            tokenCount += delta.split(/\s+/).length;
-
-            aiBubble.dataset.rawText = responseText;
-            aiBubble.innerHTML = processAIMessageHTML(responseText);
-            try {
-              if (typeof hljs !== "undefined") {
-                aiBubble.querySelectorAll("pre code").forEach((block) => hljs.highlightElement(block));
-              }
-            } catch (hErr) {}
-            if (chatbox) chatbox.scrollTop = chatbox.scrollHeight;
-          }
-
-          const durationSec = (performance.now() - startTime) / 1000;
-          const tps = (tokenCount / Math.max(durationSec, 0.1)).toFixed(1);
-          if (vramMonitor) vramMonitor.textContent = `⚡ WebGPU: ~${tps} tok/s`;
-
-          currentMessages.push({ role: "assistant", content: responseText });
-          saveToMemory();
-
-          // Auto-generate topic title if it's a new chat
-          generateAITitleForChat(currentSessionId, text);
-        } catch (err) {
-          aiBubble.textContent = "Execution context overflow. Buffer trimmed.";
-          aiBubble.dataset.rawText = aiBubble.textContent;
-          console.error(err);
-        }
-
-        statusDiv.textContent = "● Rainbow Specialist Ready";
-        setSendButtonState(false);
-        if (chatbox) chatbox.scrollTop = chatbox.scrollHeight;
-      };
-
-      // ========================================================
-      // NOVA EMOTIVE SPEECH-TO-SPEECH ENGINE
-      // ========================================================
-      let novaVoiceRecognition = null;
-      let isNovaListening = false;
-      let isNovaGenerating = false;
-      let abortNovaFlag = false;
-
-      function setNovaMood(mood) {
-        const card = document.getElementById("novaStageCard");
-        const label = document.getElementById("novaStateLabel");
-        const mouth = document.getElementById("novaMouth");
-
-        card.classList.remove("listening", "speaking");
-
-        if (mood === "listening") {
-          card.classList.add("listening");
-          label.textContent = "Listening to you... 👂";
-          label.style.color = "#38bdf8";
-          mouth.setAttribute("d", "M 44 60 Q 50 63 56 60");
-        } else if (mood === "speaking") {
-          card.classList.add("speaking");
-          label.textContent = "Nova is Speaking... 🎙️";
-          label.style.color = "#ec4899";
-          mouth.setAttribute("d", "M 40 58 Q 50 72 60 58");
-        } else if (mood === "thinking") {
-          label.textContent = "Thinking... ✨";
-          label.style.color = "#fbbf24";
-          mouth.setAttribute("d", "M 42 62 Q 50 62 58 62");
-        } else {
-          label.textContent = "Idle • Ready to chat";
-          label.style.color = "#f43f5e";
-          mouth.setAttribute("d", "M 42 58 Q 50 65 58 58");
-        }
-      }
-
-      window.stopNovaSpeech = function () {
-        if (window.speechSynthesis) window.speechSynthesis.cancel();
-        if (novaVoiceRecognition) novaVoiceRecognition.stop();
-        abortNovaFlag = true;
-        setNovaMood("idle");
-        document.getElementById("novaStopBtn").style.display = "none";
-        setNovaSendButtonState(false);
-      };
-
-      function setNovaSendButtonState(speaking) {
-        isNovaGenerating = speaking;
-        const btn = document.getElementById("novaSendActionBtn");
-        const label = document.getElementById("novaSendActionLabel");
-        const stopBtn = document.getElementById("novaStopBtn");
-
-        if (speaking) {
-          btn.classList.add("stop-btn");
-          label.textContent = "Stop";
-          stopBtn.style.display = "inline-flex";
-        } else {
-          btn.classList.remove("stop-btn");
-          label.textContent = "Speak to Nova";
-          stopBtn.style.display = "none";
-        }
-      }
-
-      window.handleNovaSendOrStop = function () {
-        if (isNovaGenerating || window.speechSynthesis.speaking) {
-          stopNovaSpeech();
-          return;
-        }
-        handleNovaSend();
-      };
-
-      function speakNovaResponse(text) {
-        if (!("speechSynthesis" in window)) return;
-        window.speechSynthesis.cancel();
-
-        // Strip all emojis & code blocks before vocalizing
-        const cleanSpeech = cleanTextForSpeech(text);
-        if (!cleanSpeech) {
-          setNovaMood("idle");
-          setNovaSendButtonState(false);
-          return;
-        }
-
-        const utterance = new SpeechSynthesisUtterance(cleanSpeech);
-        utterance.rate = 1.05;
-        utterance.pitch = 1.25;
-
-        utterance.onstart = () => {
-          setNovaMood("speaking");
-          setNovaSendButtonState(true);
-        };
-
-        utterance.onend = () => {
-          setNovaMood("idle");
-          setNovaSendButtonState(false);
-          const autoListen = document.getElementById("novaAutoListenToggle");
-          if (autoListen && autoListen.checked) {
-            setTimeout(() => startNovaListening(), 400);
-          }
-        };
-
-        utterance.onerror = () => {
-          setNovaMood("idle");
-          setNovaSendButtonState(false);
-        };
-
-        window.speechSynthesis.speak(utterance);
-      }
-
-      function startNovaListening() {
-        if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) return;
-
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        novaVoiceRecognition = new SpeechRecognition();
-        novaVoiceRecognition.continuous = false;
-        novaVoiceRecognition.interimResults = false;
-        novaVoiceRecognition.lang = "en-US";
-
-        novaVoiceRecognition.onstart = () => {
-          isNovaListening = true;
-          setNovaMood("listening");
-        };
-
-        novaVoiceRecognition.onresult = (event) => {
-          const spokenText = event.results[0][0].transcript;
-          if (spokenText) {
-            document.getElementById("novaInput").value = spokenText;
-            window.handleNovaSend();
-          }
-        };
-
-        novaVoiceRecognition.onerror = () => {
-          isNovaListening = false;
-          setNovaMood("idle");
-        };
-
-        novaVoiceRecognition.onend = () => {
-          isNovaListening = false;
-          setNovaMood("idle");
-        };
-
-        novaVoiceRecognition.start();
-      }
-
-      window.toggleNovaVoiceLoop = function () {
-        if (isNovaListening) {
-          if (novaVoiceRecognition) novaVoiceRecognition.stop();
-          isNovaListening = false;
-          setNovaMood("idle");
-        } else {
-          startNovaListening();
-        }
-      };
-
-      window.handleNovaSend = async function () {
-        const input = document.getElementById("novaInput");
-        const text = input.value.trim();
-        if (!text) return;
-
-        if (!webgpuEngine) {
-          alert("Please wait for the local WebGPU engine to finish loading!");
-          return;
-        }
-
-        const novaContainer = document.getElementById("novaChatbox");
-        const userMsg = document.createElement("div");
-        userMsg.className = "bubble user-msg";
-        userMsg.textContent = text;
-        novaContainer.appendChild(userMsg);
-        input.value = "";
-
-        const novaMsg = document.createElement("div");
-        novaMsg.className = "bubble nova-msg";
-        novaMsg.textContent = "Nova is thinking... ✨";
-        novaContainer.appendChild(novaMsg);
-        novaContainer.scrollTop = novaContainer.scrollHeight;
-
-        setNovaMood("thinking");
-        setNovaSendButtonState(true);
-        abortNovaFlag = false;
-
-        try {
-          const novaSys = `You are Nova, an expressive, playful, and cheerful child-friendly learning companion. Speak warmly and briefly (2-3 concise sentences) with excitement.`;
-          const chunks = await webgpuEngine.chat.completions.create({
-            messages: [
-              { role: "system", content: novaSys },
-              { role: "user", content: text },
-            ],
-            stream: true,
-            temperature: 0.6,
-            max_tokens: 300
-          });
-
-          let responseText = "";
-          for await (const chunk of chunks) {
-            if (abortNovaFlag) break;
-            responseText += chunk.choices[0]?.delta?.content || "";
-            novaMsg.textContent = responseText;
-            novaContainer.scrollTop = novaContainer.scrollHeight;
-          }
-
-          if (!abortNovaFlag) {
-            speakNovaResponse(responseText);
-          } else {
-            setNovaMood("idle");
-            setNovaSendButtonState(false);
-          }
-        } catch (err) {
-          novaMsg.textContent = "Oops! Nova got stuck for a second. Ask me again!";
-          setNovaMood("idle");
-          setNovaSendButtonState(false);
-          console.error(err);
-        }
-      };
-
-      userInput.addEventListener("keydown", function (event) {
-        if (event.key === "Enter" && !event.shiftKey) {
-          event.preventDefault();
-          handleSendOrStop();
-        }
-      });
-
-      const novaInputEl = document.getElementById("novaInput");
-      if (novaInputEl) {
-        novaInputEl.addEventListener("keydown", function (event) {
-          if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault();
-            handleNovaSendOrStop();
-          }
-        });
-      }
-
-      // Initialize System
-      initAI();
-      renderHistoryList();
-      if (chatSessions.length > 0) loadChat(chatSessions[0].id);
-      else startNewChat();
-    </script>
-  </body>
-</html>
+          .replace(/```[\s\S]*?
