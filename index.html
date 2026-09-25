@@ -194,8 +194,13 @@
         padding: 6px 10px;
         border-radius: 8px;
         cursor: pointer;
-        font-size: 14px;
-        font-family: "Google Sans", sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+      }
+      .theme-btn:hover {
+        background: rgba(139, 92, 246, 0.2);
       }
 
       .nav-tabs {
@@ -240,7 +245,10 @@
         font-family: "Google Sans", sans-serif;
         font-size: 13px;
         cursor: pointer;
-        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
         box-shadow: 0 4px 15px var(--accent-glow);
         transition: transform 0.1s;
       }
@@ -336,8 +344,13 @@
         color: var(--text-muted);
         cursor: pointer;
         font-size: 12px;
-        padding: 2px 4px;
-        border-radius: 4px;
+        padding: 4px 6px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        transition: all 0.2s;
       }
       .icon-btn:hover {
         color: var(--text-main);
@@ -393,7 +406,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 16px;
         transition: background 0.2s;
       }
       .sidebar-toggle-btn:hover {
@@ -535,6 +547,9 @@
         padding: 3px 8px;
         border-radius: 6px;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
         transition: all 0.2s;
       }
       .code-action-btn:hover {
@@ -562,17 +577,20 @@
       }
 
       .chat-input-area {
-        padding: 20px 30px 30px 30px;
+        padding: 10px 30px 14px 30px;
         max-width: 900px;
         width: 100%;
         margin: 0 auto;
         box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
       }
 
       .quick-chips-container {
         display: flex;
         gap: 8px;
-        margin-bottom: 10px;
+        margin-bottom: 4px;
         overflow-x: auto;
         padding-bottom: 4px;
       }
@@ -684,19 +702,44 @@
         font-family: "Google Sans", sans-serif;
         font-size: 13px;
         cursor: pointer;
-        transition: transform 0.1s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
       }
       .send-action-btn:active {
         transform: scale(0.96);
+      }
+      .send-action-btn.stop-btn {
+        background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
       }
       .send-action-btn:disabled {
         opacity: 0.4;
         cursor: not-allowed;
       }
 
-      /* ========================================================
-         CANVAS INTERACTIVE SANDBOX MODAL (Gemini Canvas Mode)
-         ======================================================== */
+      .app-disclaimer {
+        text-align: center;
+        font-size: 11px;
+        color: var(--text-muted);
+        letter-spacing: 0.2px;
+      }
+
+      /* SVG Icon Sizing */
+      .svg-icon {
+        width: 15px;
+        height: 15px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      /* Canvas Interactive Sandbox */
       #canvasSandboxModal {
         position: fixed;
         inset: 0;
@@ -794,7 +837,7 @@
         white-space: pre-wrap;
       }
 
-      /* Prompts & Ideas Tab Styling */
+      /* Prompts Tab */
       .prompts-container {
         padding: 30px;
         display: flex;
@@ -830,6 +873,9 @@
       .prompt-card h4 {
         font-size: 15px;
         font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
       }
       .prompt-card p {
         font-size: 13px;
@@ -885,9 +931,7 @@
         font-size: 13px;
       }
 
-      /* ========================================================
-         NOVA ANIMATED EMOTIVE VOICE COMPANION
-         ======================================================== */
+      /* Nova Companion Layout */
       .nova-companion-layout {
         padding: 30px;
         display: flex;
@@ -1044,13 +1088,23 @@
       <div class="sandbox-window" id="sandboxWindow">
         <div class="sandbox-topbar">
           <div class="sandbox-title-wrap">
-            <span>🕹️ Rainbow Canvas Sandbox</span>
+            <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            <span>Rainbow Canvas Sandbox</span>
             <span id="sandboxSnippetLabel" style="font-size: 11px; color: var(--text-muted);">Runtime: Active</span>
           </div>
           <div class="sandbox-actions">
-            <button class="sandbox-btn" onclick="reloadSandbox()" title="Rerun Snippet">🔄 Reload</button>
-            <button class="sandbox-btn" onclick="toggleSandboxFullscreen()" title="Expand Fullscreen">⛶ Fullscreen</button>
-            <button class="sandbox-btn close" onclick="closeSandbox()" title="Exit Sandbox">✕ Close</button>
+            <button class="sandbox-btn" onclick="reloadSandbox()" title="Rerun Snippet">
+              <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+              Reload
+            </button>
+            <button class="sandbox-btn" onclick="toggleSandboxFullscreen()" title="Expand Fullscreen">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+              Fullscreen
+            </button>
+            <button class="sandbox-btn close" onclick="closeSandbox()" title="Exit Sandbox">
+              <svg class="svg-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              Close
+            </button>
           </div>
         </div>
         <iframe id="sandboxIframe" class="sandbox-viewport" sandbox="allow-scripts allow-modals"></iframe>
@@ -1078,7 +1132,7 @@
         <div class="sidebar-header">
           <div class="logo-area">Rainbow AI 🌈</div>
           <button class="theme-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">
-            ☀️
+            <svg class="svg-icon" id="themeIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
           </button>
         </div>
 
@@ -1091,21 +1145,23 @@
         </div>
 
         <button class="new-chat-btn" onclick="startNewChat()">
-          + New Conversation
+          <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          New Conversation
         </button>
         <button
           class="new-chat-btn"
           onclick="exportCurrentChat()"
           style="background: linear-gradient(135deg, #10b981, #3b82f6)"
         >
-          📥 Export Chat (.txt)
+          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Export Chat (.txt)
         </button>
 
         <div class="section-label">AI Persona</div>
         <select class="persona-select" id="personaSelect" onchange="updatePersona()">
-          <option value="general" selected>🌈 Balanced Assistant</option>
-          <option value="coder">💻 Expert Coder & Game Dev</option>
-          <option value="poet">✨ Creative Storyteller</option>
+          <option value="general" selected>Balanced Assistant</option>
+          <option value="coder">Expert Coder & Game Dev</option>
+          <option value="poet">Creative Storyteller</option>
         </select>
 
         <input
@@ -1144,21 +1200,13 @@
           <div class="chat-messages" id="chatbox"></div>
 
           <div class="chat-input-area">
-            <div class="quick-chips-container">
-              <button class="tool-chip" onclick="fillPrompt('Build a playable retro arcade Pong mini-game using an HTML5 Canvas and requestAnimationFrame in a single code block.')">
-                🕹️ Retro Pong Game
-              </button>
-              <button class="tool-chip" onclick="fillPrompt('Create a colorful interactive particle explosion physics simulator with mouse click attraction on Canvas.')">
-                ✨ Particle Physics Canvas
-              </button>
-              <button class="tool-chip" onclick="fillPrompt('Explain quantum computing concepts like I am a beginner.')">
-                🌌 Quantum Physics
-              </button>
+            <div class="quick-chips-container" id="quickChipsBar">
+              <!-- Dynamically populated chips -->
             </div>
 
             <div class="input-box-wrapper" id="dropZoneWrapper">
               <div class="dropzone-overlay" id="dropzoneOverlay">
-                📄 Drop .md, .txt or code file here to load!
+                Drop .md, .txt or code file here to load!
               </div>
               <textarea
                 id="userInput"
@@ -1169,7 +1217,8 @@
               <div class="input-toolbar">
                 <div class="multimodal-tools">
                   <label class="tool-chip" style="cursor: pointer">
-                    📁 Import File
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                    Import File
                     <input
                       type="file"
                       id="fileImportInput"
@@ -1179,15 +1228,18 @@
                     />
                   </label>
                   <button class="tool-chip" id="micBtn" onclick="toggleVoiceInput()" title="Speech to Text">
-                    🎙️ Voice Input
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                    Voice Input
                   </button>
-                  <span style="font-size: 11px; color: var(--text-muted); margin-left: 6px;">Engine: Specialist (WebGPU Local)</span>
+                  <span style="font-size: 11px; color: var(--text-muted); margin-left: 6px;">Engine: Specialist (WebGPU Local • 5,500 tkns)</span>
                 </div>
-                <button class="send-action-btn" id="sendBtn" onclick="handleSend()" disabled>
-                  Send
+                <button class="send-action-btn" id="sendBtn" onclick="handleSendOrStop()" disabled>
+                  <svg class="svg-icon" id="sendBtnIcon" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                  <span id="sendBtnLabel">Send</span>
                 </button>
               </div>
             </div>
+            <div class="app-disclaimer">Rainbow is AI and can make mistakes.</div>
           </div>
         </div>
 
@@ -1198,31 +1250,16 @@
               <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
                 <img src="RAINBOW_favicon.svg" alt="Toggle" style="width: 20px; height: 20px; display: block; border-radius: 4px;" />
               </button>
-              <h3 class="panel-title">Prompt Engineering & Idea Vault 💡</h3>
+              <h3 class="panel-title">Prompt Engineering & Idea Vault (50 Live Generative Ideas)</h3>
             </div>
             <div class="status-badge" style="background: rgba(139, 92, 246, 0.15); color: #a855f7; border-color: rgba(139, 92, 246, 0.3);">
-              Templates Active
+              Active Vault
             </div>
           </div>
           <div class="prompts-container">
-            <div class="section-label">Quick-Start Inspiration Vault</div>
-            <div class="prompt-category-grid">
-              <div class="prompt-card" onclick="usePresetPrompt('Create a playable Breakout brick breaker game on HTML5 canvas with score tracking.')">
-                <h4>🕹️ Canvas Breakout Game</h4>
-                <p>Generate a complete playable arcade brick breaker directly in the sandbox.</p>
-              </div>
-              <div class="prompt-card" onclick="usePresetPrompt('Refactor this JavaScript code to use clean modern ES6+ async/await syntax and add comments: [Paste Code]')">
-                <h4>⚡ Code Refactoring</h4>
-                <p>Optimize, modularize, and clean up software scripts.</p>
-              </div>
-              <div class="prompt-card" onclick="usePresetPrompt('Draft a comprehensive weekly project status report for my team including blockers and milestones.')">
-                <h4>📊 Project Status Report</h4>
-                <p>Generate clean corporate or team update templates instantly.</p>
-              </div>
-              <div class="prompt-card" onclick="usePresetPrompt('Explain the architectural differences between SQL and NoSQL databases with real-world use cases.')">
-                <h4>🧠 System Architecture</h4>
-                <p>Deep-dive explanations on complex technical design patterns.</p>
-              </div>
+            <div class="section-label">Dynamically Curated Inspiration Cards</div>
+            <div class="prompt-category-grid" id="promptsGrid">
+              <!-- Dynamically populated 50 cards -->
             </div>
           </div>
         </div>
@@ -1237,7 +1274,7 @@
               <h3 class="panel-title">Spectra • Creative Art Studio</h3>
             </div>
             <div class="status-badge" id="spectraStatus" style="background: rgba(236, 72, 153, 0.15); color: #ec4899; border-color: rgba(236, 72, 153, 0.3);">
-              Pipeline Ready (SD 1.5)
+              Pipeline Ready
             </div>
           </div>
           <div class="spectra-container">
@@ -1277,7 +1314,7 @@
               <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
                 <img src="RAINBOW_favicon.svg" alt="Toggle" style="width: 20px; height: 20px; display: block; border-radius: 4px;" />
               </button>
-              <h3 class="panel-title">Nova • Emotive Voice Companion 🎙️</h3>
+              <h3 class="panel-title">Nova • Emotive Voice Companion</h3>
             </div>
             <div class="status-badge" style="background: rgba(244, 63, 94, 0.15); color: #f43f5e; border-color: rgba(244, 63, 94, 0.3);">
               Speech-to-Speech Active
@@ -1326,7 +1363,7 @@
             </div>
 
             <div class="nova-chatbox" id="novaChatbox">
-              <div class="bubble nova-msg">Hi friend! I'm Nova! 👋 Talk to me or type a message below, and I'll speak right back to you!</div>
+              <div class="bubble nova-msg">Hi friend! I'm Nova! Ask me anything or talk to me out loud!</div>
             </div>
 
             <div class="input-box-wrapper" style="width: 100%;">
@@ -1339,17 +1376,21 @@
               <div class="input-toolbar">
                 <div class="multimodal-tools">
                   <button class="tool-chip" id="novaMicBtn" onclick="toggleNovaVoiceLoop()">
-                    🎙️ Voice Converse
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                    Voice Converse
                   </button>
-                  <button class="tool-chip" onclick="document.getElementById('novaInput').value = 'Tell me an exciting space adventure story!'; handleNovaSend();">
-                    🚀 Space Story
+                  <button class="tool-chip" id="novaStopBtn" onclick="stopNovaSpeech()" style="display: none; background: rgba(239, 68, 68, 0.2); color: #ef4444;">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"></rect></svg>
+                    Stop Speaking
                   </button>
                 </div>
-                <button class="send-action-btn" onclick="handleNovaSend()">
-                  Speak to Nova
+                <button class="send-action-btn" id="novaSendActionBtn" onclick="handleNovaSendOrStop()">
+                  <svg class="svg-icon" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                  <span id="novaSendActionLabel">Speak to Nova</span>
                 </button>
               </div>
             </div>
+            <div class="app-disclaimer">Rainbow is AI and can make mistakes.</div>
           </div>
         </div>
 
@@ -1362,13 +1403,13 @@
               </button>
               <h3 class="panel-title">Ecosystem Roadmap & Architecture</h3>
             </div>
-            <div class="status-badge">Version 2.2 Active</div>
+            <div class="status-badge">Version 2.3 Active</div>
           </div>
           <div class="features-grid">
             <div class="feature-card">
               <div class="feature-header">
                 <div class="feature-title">Live Canvas Sandbox</div>
-                <span class="badge-status active-mod">Live in v2.2</span>
+                <span class="badge-status active-mod">Live in v2.3</span>
               </div>
               <div class="feature-desc">
                 Interactive modal iframe environment executing Canvas 2D, WebGL games, and retro shaders with live console streaming.
@@ -1376,20 +1417,20 @@
             </div>
             <div class="feature-card">
               <div class="feature-header">
-                <div class="feature-title">Nova Emotive Voice</div>
-                <span class="badge-status active-mod">Live in v2.2</span>
+                <div class="feature-title">Emoji-Free Speech Synthesizer</div>
+                <span class="badge-status active-mod">Live in v2.3</span>
               </div>
               <div class="feature-desc">
-                Full speech-to-speech companion with animated SVG facial dynamics synced with native browser speech synthesis.
+                Deep Unicode symbol stripping ensures voice companions never vocalize raw emoji descriptions aloud.
               </div>
             </div>
             <div class="feature-card">
               <div class="feature-header">
-                <div class="feature-title">WebGPU Specialist (MLC)</div>
+                <div class="feature-title">WebGPU Specialist (5,500 Tokens)</div>
                 <span class="badge-status active-mod">100% Local</span>
               </div>
               <div class="feature-desc">
-                Private, zero-API-cost inference powered entirely by local WebGPU shaders and Gemma 2B tensors[cite: 1, 3].
+                Zero-API-cost inference powered entirely by local WebGPU shaders and Gemma 2B tensors with automatic AI-generated title tagging.
               </div>
             </div>
           </div>
@@ -1498,13 +1539,13 @@
     <script>
       function toggleTheme() {
         const html = document.documentElement;
-        const btn = document.getElementById("themeToggleBtn");
+        const themeIcon = document.getElementById("themeIcon");
         if (html.getAttribute("data-theme") === "dark") {
           html.setAttribute("data-theme", "light");
-          btn.textContent = "🌙";
+          themeIcon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
         } else {
           html.setAttribute("data-theme", "dark");
-          btn.textContent = "☀️";
+          themeIcon.innerHTML = `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;
         }
       }
 
@@ -1534,6 +1575,19 @@
         input.focus();
       }
 
+      // Universal Emoji Stripper for Native Speech Synthesizer
+      window.cleanTextForSpeech = function (text) {
+        if (!text) return "";
+        return text
+          .replace(/```[\s\S]*?```/g, "Code block omitted.") // strip raw code blocks
+          .replace(/`([^`]+)`/g, "$1") // inline code backticks
+          .replace(/[*#_~>]/g, "") // markdown formatting
+          // Strips standard, extended pictographic, skin tones, and variation selectors
+          .replace(/[\u{1F300}-\u{1FAFF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{200D}]/gu, "")
+          .replace(/\s+/g, " ")
+          .trim();
+      };
+
       // Voice Input for Main Chat
       let recognition = null;
       let isRecording = false;
@@ -1562,7 +1616,7 @@
           isRecording = true;
           micBtn.style.background = "rgba(239, 68, 68, 0.3)";
           micBtn.style.color = "#ef4444";
-          micBtn.textContent = "🛑 Listening...";
+          micBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg> Listening...`;
         };
 
         recognition.onresult = (event) => {
@@ -1584,9 +1638,45 @@
         if (micBtn) {
           micBtn.style.background = "";
           micBtn.style.color = "";
-          micBtn.textContent = "🎙️ Voice Input";
+          micBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg> Voice Input`;
         }
       }
+
+      // Main Chat Text-To-Speech (With Emoji Removal)
+      let currentMainUtterance = null;
+      window.speakMainChatMessage = function (text, btn) {
+        if (!("speechSynthesis" in window)) return;
+
+        if (window.speechSynthesis.speaking) {
+          window.speechSynthesis.cancel();
+          document.querySelectorAll(".speak-msg-btn").forEach((b) => {
+            b.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> Speak`;
+          });
+          return;
+        }
+
+        const cleanSpeech = cleanTextForSpeech(text);
+        if (!cleanSpeech) return;
+
+        currentMainUtterance = new SpeechSynthesisUtterance(cleanSpeech);
+        currentMainUtterance.rate = 1.0;
+        currentMainUtterance.pitch = 1.05;
+
+        btn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"></rect></svg> Stop`;
+        btn.style.color = "#ef4444";
+
+        currentMainUtterance.onend = () => {
+          btn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> Speak`;
+          btn.style.color = "";
+        };
+
+        currentMainUtterance.onerror = () => {
+          btn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> Speak`;
+          btn.style.color = "";
+        };
+
+        window.speechSynthesis.speak(currentMainUtterance);
+      };
 
       // Spectra Art Generator
       function generateSpectraImage() {
@@ -1613,6 +1703,97 @@
         input.focus();
       };
 
+      // 50 Generative Inspiration Prompts Seed Bank
+      const PROMPT_INSPIRATION_POOL = [
+        { t: "Retro Arcade Pong", p: "Build a playable retro Pong arcade game in a single HTML5 canvas with requestAnimationFrame and keyboard controls.", c: "Games" },
+        { t: "Brick Breaker Mini-Game", p: "Create a Breakout brick breaker game on HTML5 canvas with ball reflections, score tracking, and lives.", c: "Games" },
+        { t: "Snake Classic Game", p: "Generate a clean, modular JavaScript Snake game rendered on an HTML5 canvas with score and restart logic.", c: "Games" },
+        { t: "Particle Physics Engine", p: "Code a colorful interactive particle simulator with mouse click attraction and velocity damping.", c: "Simulation" },
+        { t: "Badminton Tactical Simulator", p: "Simulate a 2D top-down badminton rally trajectory engine showing smash angles and drop shot physics.", c: "Sports" },
+        { t: "Neon Cyberpunk Shader", p: "Write an animated mathematical neon sine-wave shader simulation on HTML5 Canvas.", c: "Creative" },
+        { t: "Manga Action Scene Script", p: "Draft a dynamic 5-panel manga action storyboard featuring speed lines, intense dialogue, and sound effects.", c: "Manga" },
+        { t: "Quantum Superposition Guide", p: "Explain quantum superposition and entanglement using intuitive physical analogies for a beginner.", c: "Science" },
+        { t: "Web Scraping Automation", p: "Write a clean, modular Python script using BeautifulSoup and requests with retry handling and headers.", c: "Dev" },
+        { t: "Matrix Digital Rain Effect", p: "Create the classic falling green Matrix code rain animation inside a canvas element.", c: "Creative" },
+        { t: "Badminton Smash Mechanics", p: "Break down the biomechanics of a powerful badminton jump smash: forearm pronation, kinetic chain, and timing.", c: "Sports" },
+        { t: "Fast Fourier Transform Visualizer", p: "Build an audio-frequency waveform visualizer simulation on Canvas with smooth rainbow gradient bars.", c: "Simulation" },
+        { t: "Manga Character Concept Sheet", p: "Create a comprehensive character profile for a shonen manga protagonist, including abilities, flaws, and backstory.", c: "Manga" },
+        { t: "REST vs GraphQL Architecture", p: "Compare RESTful APIs and GraphQL architecture with clear data-fetching examples and network trade-offs.", c: "Dev" },
+        { t: "Interactive 3D Wireframe Cube", p: "Implement a rotating 3D wireframe cube rendered from scratch on a 2D canvas with matrix projection.", c: "Simulation" },
+        { t: "Badminton Footwork Drill Routine", p: "Design a high-intensity 6-corner badminton shadow footwork drill regimen to improve court agility and reaction time.", c: "Sports" },
+        { t: "Flappy Bird Arcade Clone", p: "Write an interactive Flappy Bird clone with gravity physics, jumping mechanics, and pipe collision detection.", c: "Games" },
+        { t: "Manga Dynamic Speedline Canvas", p: "Generate an interactive canvas drawing radial anime speedlines converging on the user's mouse position.", c: "Manga" },
+        { t: "Neural Network from Scratch", p: "Write a minimal forward and backpropagation neural network in clean modern JavaScript with loss tracking.", c: "Dev" },
+        { t: "Space Asteroids Shooter", p: "Code a vector-style Asteroids shooter game with inertia rotation, laser firing, and rock splitting.", c: "Games" },
+        { t: "Relativity & Time Dilation", p: "Explain Einstein's special theory of relativity and time dilation with practical spaceship velocity examples.", c: "Science" },
+        { t: "Cyberpunk Narrative Story", p: "Compose an atmospheric short story about an android detective searching for memories in a neon-lit metropolis.", c: "Creative" },
+        { t: "Badminton Doubles Strategy", p: "Outline winning badminton doubles tactics: attack-defense formations, rotational coverage, and service returns.", c: "Sports" },
+        { t: "Binary Search Tree Visualizer", p: "Build a recursive binary search tree visualizer with node insertion and animated tree traversal.", c: "Dev" },
+        { t: "Manga Shonen Rival Dynamic", p: "Write a compelling rivalry dialogue scene between two contrasting martial artists before a championship match.", c: "Manga" },
+        { t: "Cellular Automata Game of Life", p: "Create Conway's Game of Life simulation with interactive cell drawing and play/pause controls.", c: "Simulation" },
+        { t: "SQL Index Optimization", p: "Explain how B-Tree database indexing works under the hood and how to optimize slow SQL query plans.", c: "Dev" },
+        { t: "Interactive Audio Synthesizer", p: "Create a playable keyboard synth using the browser Web Audio API with oscillator frequency modulation.", c: "Creative" },
+        { t: "Badminton Trick Shots Tutorial", p: "Describe the execution technique for the deceptive badminton reverse slice drop shot and crosscourt flick.", c: "Sports" },
+        { t: "Fractal Tree Generator", p: "Write a recursive fractal branching tree generator that sways dynamically with mouse movement.", c: "Simulation" },
+        { t: "Manga Mecha Battle Blueprint", p: "Design an epic mech duel script detailing pilot psychological tension, cockpit HUD readouts, and scale.", c: "Manga" },
+        { t: "Microservices vs Monoliths", p: "Detail an architectural comparison of microservices vs monolithic applications with scaling considerations.", c: "Dev" },
+        { t: "Raymarching Sphere Shader", p: "Write a lightweight Canvas 2D raymarching sphere renderer with dynamic lighting and diffuse shadows.", c: "Simulation" },
+        { t: "Badminton Grip Fundamentals", p: "Explain the anatomical differences and shot applications between the forehand, backhand, and bevel grips.", c: "Sports" },
+        { t: "Dijkstra Pathfinding Visualizer", p: "Implement a 2D grid pathfinding algorithm visualization showcasing Dijkstra's algorithm exploration.", c: "Dev" },
+        { t: "Manga Panel Composition Masterclass", p: "Explain the visual flow and eye-tracking principles behind professional Japanese manga layout design.", c: "Manga" },
+        { t: "Space Invaders Mini-Game", p: "Build a retro Space Invaders arcade clone with moving alien grids, defensive bunkers, and missile firing.", c: "Games" },
+        { t: "Sorting Algorithm Race", p: "Visualize Bubble Sort vs Quick Sort side-by-side with animated bar heights and swap counters on Canvas.", c: "Simulation" },
+        { t: "Cosmological Black Holes", p: "Explain event horizons, Hawking radiation, and spaghettification with vivid theoretical physics descriptions.", c: "Science" },
+        { t: "Clean Code Refactoring Guide", p: "Demonstrate practical SOLID principles by refactoring a convoluted JavaScript function into clean modules.", c: "Dev" },
+        { t: "Badminton String Tension Science", p: "Analyze how racquet string tension (lbs) affects the sweet spot, control, repulsion power, and arm durability.", c: "Sports" },
+        { t: "Manga Panel Ink & Shading Art", p: "Describe traditional and digital screentone and cross-hatching techniques for creating dramatic manga mood.", c: "Manga" },
+        { t: "Solar System Gravity Simulator", p: "Create an n-body gravitational orbit simulator with planets orbiting a central star on HTML5 Canvas.", c: "Simulation" },
+        { t: "Modern CSS Grid Mastery", p: "Provide an executive cheat sheet and code examples for complex responsive CSS Grid layouts.", c: "Dev" },
+        { t: "Badminton Aerodynamics", p: "Explain the aerodynamic deceleration curve of a feathered shuttlecock vs synthetic nylon shuttles.", c: "Sports" },
+        { t: "Sci-Fi Cybernetic Essay", p: "Write an essay examining the ethical and philosophical implications of transhumanist neural augmentations.", c: "Creative" },
+        { t: "Manga Climactic Monologue", p: "Draft an emotional climax scene where a mentor passes down their ultimate martial technique to their student.", c: "Manga" },
+        { t: "Color Palette Harmonizer", p: "Build an interactive HSL color harmony generator producing complementary, triad, and monochromatic schemes.", c: "Dev" },
+        { t: "Gravity Ragdoll Physics", p: "Implement a connected stickman verlet ragdoll physics simulation that responds to mouse dragging.", c: "Simulation" },
+        { t: "Badminton Deceptive Serves", p: "Deconstruct the high-level technique of deceptive low service flicking in professional badminton singles.", c: "Sports" }
+      ];
+
+      function populateInspirationCards() {
+        const grid = document.getElementById("promptsGrid");
+        const quickChips = document.getElementById("quickChipsBar");
+        if (!grid) return;
+
+        // Shuffle pool every load
+        const shuffled = [...PROMPT_INSPIRATION_POOL].sort(() => 0.5 - Math.random());
+        grid.innerHTML = "";
+        quickChips.innerHTML = "";
+
+        // First 3 for Quick Chips
+        shuffled.slice(0, 3).forEach((item) => {
+          const chip = document.createElement("button");
+          chip.className = "tool-chip";
+          chip.textContent = item.t;
+          chip.onclick = () => fillPrompt(item.p);
+          quickChips.appendChild(chip);
+        });
+
+        // 50 Cards in Prompts Vault
+        shuffled.slice(0, 50).forEach((item) => {
+          const card = document.createElement("div");
+          card.className = "prompt-card";
+          card.innerHTML = `
+            <h4>
+              <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              ${item.t}
+            </h4>
+            <p>${item.p}</p>
+          `;
+          card.onclick = () => usePresetPrompt(item.p);
+          grid.appendChild(card);
+        });
+      }
+
+      window.addEventListener("DOMContentLoaded", populateInspirationCards);
+
       // ========================================================
       // INTERACTIVE CANVAS SANDBOX RUNNER
       // ========================================================
@@ -1634,12 +1815,9 @@
 
       function executeSandboxIframe(code) {
         const iframe = document.getElementById("sandboxIframe");
-        const drawer = document.getElementById("sandboxConsoleDrawer");
-
-        // Format HTML or Wrap Javascript into playable canvas container
-        let htmlPayload = "";
         const isFullHTML = /<!doctype html>|<html|<canvas|<body/i.test(code);
 
+        let htmlPayload = "";
         if (isFullHTML) {
           htmlPayload = `
             <!DOCTYPE html>
@@ -1725,7 +1903,7 @@
 
         navigator.clipboard.writeText(code);
         const originalText = btn.textContent;
-        btn.textContent = "✨ Copied!";
+        btn.textContent = "Copied!";
         btn.style.background = "rgba(16, 185, 129, 0.2)";
         btn.style.color = "#10b981";
         setTimeout(() => {
@@ -1806,7 +1984,7 @@
             const isLight = document.documentElement.getAttribute("data-theme") === "light";
             const lightness = isLight ? "45%" : "60%";
             const alpha = isLight ? "0.75" : "0.95";
-            ctx.fillStyle = `hsla(${nodeHue}, 90%, ${lightness},${alpha})`;
+            ctx.fillStyle = `hsla(${nodeHue}, 90%, ${lightness}, ${alpha})`;
             ctx.fill();
           }
         }
@@ -1836,7 +2014,7 @@
                 const alpha = (1 - distance / 140) * (isLight ? 0.25 : 0.35);
                 const lineHue = (particlesArray[i].baseHue + hueShift) % 360;
                 ctx.beginPath();
-                ctx.strokeStyle = `hsla(${lineHue}, 90%, ${lineLightness},${alpha})`;
+                ctx.strokeStyle = `hsla(${lineHue}, 90%, ${lineLightness}, ${alpha})`;
                 ctx.lineWidth = 0.9;
                 ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
                 ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
@@ -1858,12 +2036,17 @@
       const statusDiv = document.getElementById("status");
       const userInput = document.getElementById("userInput");
       const sendBtn = document.getElementById("sendBtn");
+      const sendBtnLabel = document.getElementById("sendBtnLabel");
+      const sendBtnIcon = document.getElementById("sendBtnIcon");
       const chatbox = document.getElementById("chatbox");
       const historyList = document.getElementById("historyList");
       const activeChatTitle = document.getElementById("activeChatTitle");
       const vramMonitor = document.getElementById("vramMonitor");
 
       let webgpuEngine = null;
+      let isGenerating = false;
+      let abortGenerationFlag = false;
+
       let chatSessions = JSON.parse(localStorage.getItem("rainbow_ecosystem_chats")) || [];
       let currentSessionId = null;
       let currentMessages = [];
@@ -1884,7 +2067,7 @@
 
         return {
           role: "system",
-          content: `${basePersona}\n\n[Temporal Grounding]: Real-time current date is ${dateString},${timeString}. Ground responses in this present.`
+          content: `${basePersona}\n\n[Temporal Grounding]: Real-time current date is ${dateString}, ${timeString}. Ground responses in this present.`
         };
       }
 
@@ -1904,18 +2087,41 @@
           session = { id: currentSessionId, title: "New Conversation", messages: [] };
           chatSessions.unshift(session);
         }
-
-        if (currentMessages.length > 0 && session.title === "New Conversation") {
-          const firstUserMsg = currentMessages.find((m) => m.role === "user");
-          if (firstUserMsg) {
-            const rawText = firstUserMsg.content;
-            session.title = rawText.length > 25 ? rawText.substring(0, 25) + "..." : rawText;
-          }
-        }
-
         session.messages = currentMessages;
         localStorage.setItem("rainbow_ecosystem_chats", JSON.stringify(chatSessions));
         renderHistoryList();
+      }
+
+      // AI-Driven Chat Title Generator
+      async function generateAITitleForChat(sessionId, userPrompt) {
+        if (!webgpuEngine) return;
+        const session = chatSessions.find((s) => s.id === sessionId);
+        if (!session || session.title !== "New Conversation") return;
+
+        try {
+          const titleResponse = await webgpuEngine.chat.completions.create({
+            messages: [
+              { role: "system", content: "You are a concise summarizer. Respond with ONLY 3 to 4 words summarizing the topic of the user's prompt. Do not use quotes, punctuation, or emojis." },
+              { role: "user", content: userPrompt }
+            ],
+            stream: false,
+            temperature: 0.2,
+            max_tokens: 10
+          });
+
+          let generatedTitle = titleResponse.choices[0]?.message?.content?.trim();
+          if (generatedTitle) {
+            generatedTitle = generatedTitle.replace(/["'.]/g, "").trim();
+            session.title = generatedTitle;
+            localStorage.setItem("rainbow_ecosystem_chats", JSON.stringify(chatSessions));
+            renderHistoryList();
+            if (sessionId === currentSessionId) {
+              activeChatTitle.textContent = session.title;
+            }
+          }
+        } catch (e) {
+          console.warn("AI title generation fallback:", e);
+        }
       }
 
       window.deleteChat = function (sessionId, event) {
@@ -1935,7 +2141,7 @@
         event.stopPropagation();
         const session = chatSessions.find((s) => s.id === sessionId);
         if (!session) return;
-        const newTitle = prompt("Enter new title for conversation:", session.title);
+        const newTitle = prompt("Enter title for this conversation:", session.title);
         if (newTitle) {
           session.title = newTitle.trim();
           localStorage.setItem("rainbow_ecosystem_chats", JSON.stringify(chatSessions));
@@ -1985,14 +2191,14 @@
 
           const renameBtn = document.createElement("button");
           renameBtn.className = "icon-btn";
-          renameBtn.textContent = "✏️";
-          renameBtn.title = "Rename";
+          renameBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+          renameBtn.title = "Rename Conversation";
           renameBtn.addEventListener("click", (e) => renameChat(session.id, e));
 
           const deleteBtn = document.createElement("button");
           deleteBtn.className = "icon-btn delete";
-          deleteBtn.textContent = "✕";
-          deleteBtn.title = "Delete";
+          deleteBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+          deleteBtn.title = "Delete Conversation";
           deleteBtn.addEventListener("click", (e) => deleteChat(session.id, e));
 
           actionsDiv.appendChild(renameBtn);
@@ -2063,8 +2269,14 @@
 
             return `<div class="code-block-wrapper">
                 <div class="code-toolbar">
-                    <button class="code-action-btn run" onclick="runCodeSnippet('${codeId}')">▶ Run Sandbox</button>
-                    <button class="code-action-btn" onclick="copySnippet('${codeId}', this)">📋 Copy</button>
+                    <button class="code-action-btn run" onclick="runCodeSnippet('${codeId}')">
+                      <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                      Run Sandbox
+                    </button>
+                    <button class="code-action-btn" onclick="copySnippet('${codeId}', this)">
+                      <svg class="svg-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                      Copy
+                    </button>
                 </div>
                 <pre><code${attrs}>${codeContent}</code></pre>
             </div>`;
@@ -2101,15 +2313,28 @@
         footer.innerHTML = `<span>${timeStr}</span>`;
 
         if (role === "ai") {
+          // Speak Button with custom SVG
+          const speakBtn = document.createElement("button");
+          speakBtn.className = "icon-btn speak-msg-btn";
+          speakBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> Speak`;
+          speakBtn.onclick = () => {
+            const textToSpeak = bubble.dataset.rawText || bubble.innerText.trim();
+            speakMainChatMessage(textToSpeak, speakBtn);
+          };
+          footer.appendChild(speakBtn);
+
+          // Copy Button with custom SVG
           const copyBtn = document.createElement("button");
           copyBtn.className = "icon-btn";
-          copyBtn.textContent = "📋 Copy Full Response";
+          copyBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy`;
           copyBtn.onclick = () => {
             const textToCopy = bubble.dataset.rawText || bubble.innerText.trim();
             if (textToCopy && textToCopy !== "Thinking...") {
               navigator.clipboard.writeText(textToCopy);
-              copyBtn.textContent = "✨ Copied Full Text!";
-              setTimeout(() => (copyBtn.textContent = "📋 Copy Full Response"), 2000);
+              copyBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!`;
+              setTimeout(() => {
+                copyBtn.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy`;
+              }, 2000);
             }
           };
           footer.appendChild(copyBtn);
@@ -2128,7 +2353,7 @@
         return bubble;
       }
 
-      // Safe WebGPU Engine Initialization (Rainbow-AI-Specialist-MLC)
+      // Safe WebGPU Engine Initialization (Rainbow-AI-Specialist-MLC • Max 5,500 Tokens Context)
       async function initAI() {
         try {
           const MODEL_ID = "gemma-2-2b-it-q4f16_1-MLC-1k";
@@ -2145,7 +2370,7 @@
                 model_id: MODEL_ID,
                 model_lib: wasmUrl,
                 model_lib_id: wasmLibId,
-                vram_required_MB: 1800,
+                vram_required_MB: 1950,
                 low_resource_required: true,
                 required_features: ["shader-f16"],
                 tokenizer_files: ["tokenizer.model"],
@@ -2161,7 +2386,10 @@
 
           webgpuEngine = await CreateMLCEngine(MODEL_ID, {
             appConfig: appConfig,
-            chatOpts: { tokenizer_files: ["tokenizer.model"] },
+            chatOpts: { 
+              tokenizer_files: ["tokenizer.model"],
+              context_window_size: 5500 // Expanded to 5,500 tokens
+            },
             initProgressCallback: (report) => {
               if (statusDiv) statusDiv.textContent = report.text;
             }
@@ -2171,7 +2399,7 @@
             statusDiv.textContent = "● Rainbow Specialist Ready";
             statusDiv.style.color = "var(--success)";
           }
-          if (vramMonitor) vramMonitor.textContent = "⚡ WebGPU: Ready";
+          if (vramMonitor) vramMonitor.textContent = "⚡ WebGPU: Ready (5.5k ctx)";
           if (userInput) userInput.disabled = false;
           if (sendBtn) sendBtn.disabled = false;
         } catch (err) {
@@ -2184,14 +2412,38 @@
         }
       }
 
-      // Unified Message Send Handler
+      // Dynamic Send / Stop Button Manager
+      window.handleSendOrStop = function () {
+        if (isGenerating) {
+          abortGenerationFlag = true;
+          if (window.speechSynthesis) window.speechSynthesis.cancel();
+          return;
+        }
+        handleSend();
+      };
+
+      function setSendButtonState(generating) {
+        isGenerating = generating;
+        if (generating) {
+          sendBtn.classList.add("stop-btn");
+          sendBtnIcon.innerHTML = `<rect x="6" y="6" width="12" height="12"></rect>`;
+          sendBtnLabel.textContent = "Stop";
+        } else {
+          sendBtn.classList.remove("stop-btn");
+          sendBtnIcon.innerHTML = `<line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>`;
+          sendBtnLabel.textContent = "Send";
+        }
+      }
+
+      // Unified Message Send Handler with Stop Trigger & Auto Title
       window.handleSend = async function () {
         const text = userInput.value.trim();
         if (!text) return;
 
         appendMessage("user", text);
         userInput.value = "";
-        sendBtn.disabled = true;
+        setSendButtonState(true);
+        abortGenerationFlag = false;
 
         statusDiv.textContent = "Generating Response...";
         const startTime = performance.now();
@@ -2201,23 +2453,28 @@
 
         if (!webgpuEngine) {
           aiBubble.textContent = "WebGPU Engine is initializing. Please wait a moment...";
-          sendBtn.disabled = false;
+          setSendButtonState(false);
           return;
         }
 
         try {
           const currentSys = getSystemPrompt();
-          const trimmedHistory = currentMessages.filter((m) => m.role !== "system").slice(-6);
+          const trimmedHistory = currentMessages.filter((m) => m.role !== "system").slice(-8);
           const payloadMessages = [currentSys, ...trimmedHistory];
 
           const chunks = await webgpuEngine.chat.completions.create({
             messages: payloadMessages,
             stream: true,
             temperature: 0.3,
+            max_tokens: 5500 // Up to 5,500 tokens
           });
 
           let responseText = "";
           for await (const chunk of chunks) {
+            if (abortGenerationFlag) {
+              responseText += " [Generation Stopped]";
+              break;
+            }
             const delta = chunk.choices[0]?.delta?.content || "";
             responseText += delta;
             tokenCount += delta.split(/\s+/).length;
@@ -2238,6 +2495,9 @@
 
           currentMessages.push({ role: "assistant", content: responseText });
           saveToMemory();
+
+          // Auto-generate topic title if it's a new chat
+          generateAITitleForChat(currentSessionId, text);
         } catch (err) {
           aiBubble.textContent = "Execution context overflow. Buffer trimmed.";
           aiBubble.dataset.rawText = aiBubble.textContent;
@@ -2245,7 +2505,7 @@
         }
 
         statusDiv.textContent = "● Rainbow Specialist Ready";
-        sendBtn.disabled = false;
+        setSendButtonState(false);
         if (chatbox) chatbox.scrollTop = chatbox.scrollHeight;
       };
 
@@ -2254,6 +2514,8 @@
       // ========================================================
       let novaVoiceRecognition = null;
       let isNovaListening = false;
+      let isNovaGenerating = false;
+      let abortNovaFlag = false;
 
       function setNovaMood(mood) {
         const card = document.getElementById("novaStageCard");
@@ -2283,24 +2545,74 @@
         }
       }
 
+      window.stopNovaSpeech = function () {
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        if (novaVoiceRecognition) novaVoiceRecognition.stop();
+        abortNovaFlag = true;
+        setNovaMood("idle");
+        document.getElementById("novaStopBtn").style.display = "none";
+        setNovaSendButtonState(false);
+      };
+
+      function setNovaSendButtonState(speaking) {
+        isNovaGenerating = speaking;
+        const btn = document.getElementById("novaSendActionBtn");
+        const label = document.getElementById("novaSendActionLabel");
+        const stopBtn = document.getElementById("novaStopBtn");
+
+        if (speaking) {
+          btn.classList.add("stop-btn");
+          label.textContent = "Stop";
+          stopBtn.style.display = "inline-flex";
+        } else {
+          btn.classList.remove("stop-btn");
+          label.textContent = "Speak to Nova";
+          stopBtn.style.display = "none";
+        }
+      }
+
+      window.handleNovaSendOrStop = function () {
+        if (isNovaGenerating || window.speechSynthesis.speaking) {
+          stopNovaSpeech();
+          return;
+        }
+        handleNovaSend();
+      };
+
       function speakNovaResponse(text) {
         if (!("speechSynthesis" in window)) return;
         window.speechSynthesis.cancel();
 
-        const cleanText = text.replace(/[*#`_~]/g, "").trim();
-        const utterance = new SpeechSynthesisUtterance(cleanText);
-        utterance.rate = 1.05;
-        utterance.pitch = 1.25; // Cheerful tone
+        // Strip all emojis & code blocks before vocalizing
+        const cleanSpeech = cleanTextForSpeech(text);
+        if (!cleanSpeech) {
+          setNovaMood("idle");
+          setNovaSendButtonState(false);
+          return;
+        }
 
-        utterance.onstart = () => setNovaMood("speaking");
+        const utterance = new SpeechSynthesisUtterance(cleanSpeech);
+        utterance.rate = 1.05;
+        utterance.pitch = 1.25;
+
+        utterance.onstart = () => {
+          setNovaMood("speaking");
+          setNovaSendButtonState(true);
+        };
+
         utterance.onend = () => {
           setNovaMood("idle");
+          setNovaSendButtonState(false);
           const autoListen = document.getElementById("novaAutoListenToggle");
           if (autoListen && autoListen.checked) {
             setTimeout(() => startNovaListening(), 400);
           }
         };
-        utterance.onerror = () => setNovaMood("idle");
+
+        utterance.onerror = () => {
+          setNovaMood("idle");
+          setNovaSendButtonState(false);
+        };
 
         window.speechSynthesis.speak(utterance);
       }
@@ -2374,9 +2686,11 @@
         novaContainer.scrollTop = novaContainer.scrollHeight;
 
         setNovaMood("thinking");
+        setNovaSendButtonState(true);
+        abortNovaFlag = false;
 
         try {
-          const novaSys = `You are Nova, an expressive, playful, and cheerful child-friendly learning companion. Speak warmly, briefly (2-3 concise sentences), with enthusiasm.`;
+          const novaSys = `You are Nova, an expressive, playful, and cheerful child-friendly learning companion. Speak warmly and briefly (2-3 concise sentences) with excitement.`;
           const chunks = await webgpuEngine.chat.completions.create({
             messages: [
               { role: "system", content: novaSys },
@@ -2384,19 +2698,27 @@
             ],
             stream: true,
             temperature: 0.6,
+            max_tokens: 300
           });
 
           let responseText = "";
           for await (const chunk of chunks) {
+            if (abortNovaFlag) break;
             responseText += chunk.choices[0]?.delta?.content || "";
             novaMsg.textContent = responseText;
             novaContainer.scrollTop = novaContainer.scrollHeight;
           }
 
-          speakNovaResponse(responseText);
+          if (!abortNovaFlag) {
+            speakNovaResponse(responseText);
+          } else {
+            setNovaMood("idle");
+            setNovaSendButtonState(false);
+          }
         } catch (err) {
           novaMsg.textContent = "Oops! Nova got stuck for a second. Ask me again!";
           setNovaMood("idle");
+          setNovaSendButtonState(false);
           console.error(err);
         }
       };
@@ -2404,7 +2726,7 @@
       userInput.addEventListener("keydown", function (event) {
         if (event.key === "Enter" && !event.shiftKey) {
           event.preventDefault();
-          handleSend();
+          handleSendOrStop();
         }
       });
 
@@ -2413,7 +2735,7 @@
         novaInputEl.addEventListener("keydown", function (event) {
           if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
-            handleNovaSend();
+            handleNovaSendOrStop();
           }
         });
       }
