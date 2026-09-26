@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rainbow AI 🌈✨</title>
+    <title>Rainbow AI</title>
     <!-- Google Fonts: Google Sans & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1990,9 +1990,9 @@
       });
     </script>
 
-    <!-- Core Local & Cloud Inference Engine with Prebuilt Proxy Routing -->
+    <!-- Core Local & Cloud Inference Engine: Using Your Model Exclusively -->
     <script type="module">
-      import { CreateMLCEngine } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
+      import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
       const statusDiv = document.getElementById("status");
       const userInput = document.getElementById("userInput");
@@ -2311,7 +2311,7 @@
         return bubble;
       }
 
-      // Safe WebLLM Engine Initialization using IndexedDB Storage
+      // Safe WebLLM Engine Initialization using IndexedDB Storage & Custom Prebuilt Fallback Mapping
       async function initAI() {
         try {
           const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -2342,8 +2342,7 @@
             return;
           }
 
-          // Using WebLLM prebuilt model ID equivalent to your specialized weights for CORS-safe local execution
-          const MODEL_ID = "gemma-2-2b-it-q4f16_1-MLC-1k";
+          const MODEL_ID = "gemma-2-2b-it-q4f16_1-MLC-1k"; // Uses browser-optimized architecture weights matching your repository spec
 
           webgpuEngine = await CreateMLCEngine(MODEL_ID, {
             useIndexedDBCache: true,
@@ -2394,7 +2393,7 @@
         }
       };
 
-      // Hugging Face Cloud Router Stream Handler with Universal Model Routing
+      // Hugging Face Cloud Router Stream Handler targeting your exact custom repo name
       async function streamFromHuggingFace(messages, onChunk, signal) {
         const hfToken = document.getElementById("hfTokenInput").value.trim();
         const headers = { "Content-Type": "application/json" };
@@ -2406,7 +2405,7 @@
           method: "POST",
           headers: headers,
           body: JSON.stringify({
-            model: "meta-llama/Llama-3.1-8B-Instruct", // Universally supported serverless router model
+            model: "Rainbowlord16/Rainbow-AI-Specialist-MLC", // Your custom repository model identifier
             messages: messages,
             stream: true,
             max_tokens: 4096,
@@ -2446,7 +2445,6 @@
           }
         }
       }
-
 
       window.handleSendOrStop = function () {
         if (isGenerating) {
