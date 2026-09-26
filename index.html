@@ -444,6 +444,11 @@
         display: flex;
         align-items: center;
         gap: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .vram-monitor-badge:hover {
+        background: rgba(56, 189, 248, 0.25);
       }
 
       .chat-messages {
@@ -1164,7 +1169,7 @@
           <option value="poet">Creative Storyteller</option>
         </select>
 
-        <div class="section-label">HF Token (Optional for API)</div>
+        <div class="section-label">HF Token (Optional for Internet Mode)</div>
         <input type="password" class="search-box" id="hfTokenInput" placeholder="hf_xxxxxxxxxxxxxxxxxxx" style="font-family: monospace;" />
 
         <input
@@ -1195,7 +1200,7 @@
               <h3 class="panel-title" id="activeChatTitle">Rainbow AI Workspace</h3>
             </div>
             <div class="header-badges">
-              <div class="vram-monitor-badge" id="vramMonitor">⚡ WebGPU: Ready</div>
+              <div class="vram-monitor-badge" id="vramMonitor" onclick="toggleEngineMode()" title="Click to toggle Local vs Internet Mode">⚡ WebGPU: Ready</div>
               <div id="status" class="status-badge">Syncing Nodes...</div>
             </div>
           </div>
@@ -1976,9 +1981,9 @@
       });
     </script>
 
-    <!-- Core Local & Hugging Face Fallback Inference Engine -->
+    <!-- Core Local & Hugging Face Inference Engine with Manual Mode Toggle -->
     <script type="module">
-      import { CreateMLCEngine } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
+      import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
       const statusDiv = document.getElementById("status");
       const userInput = document.getElementById("userInput");
@@ -2040,7 +2045,6 @@
         renderHistoryList();
       }
 
-      // AI-Driven Chat Title Generator
       async function generateAITitleForChat(sessionId, userPrompt) {
         if (!webgpuEngine && window.activeEngineMode === "WEBGPU") return;
         const session = chatSessions.find((s) => s.id === sessionId);
@@ -2301,7 +2305,7 @@
         return bubble;
       }
 
-      // Safe WebGPU Engine Initialization with Hardware Pre-flight Check & Auto-Fallback
+      // Initialize WebLLM Engine (Your Custom Model: Rainbowlord16/Rainbow-AI-Specialist-MLC)
       async function initAI() {
         try {
           const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -2322,19 +2326,41 @@
           if (!hasSufficientGPU) {
             window.activeEngineMode = "HF_API";
             if (statusDiv) {
-              statusDiv.textContent = "● HF Cloud Fallback Active";
+              statusDiv.textContent = "● Internet Mode Active";
               statusDiv.style.color = "var(--success)";
             }
-            if (vramMonitor) vramMonitor.textContent = "☁️ Mode: HF API Gateway";
+            if (vramMonitor) vramMonitor.textContent = "☁️ Mode: HF API (Internet)";
             if (userInput) userInput.disabled = false;
             if (sendBtn) sendBtn.disabled = false;
             window.dismissLoader();
             return;
           }
 
-          const MODEL_ID = "gemma-2-2b-it-q4f16_1-MLC-1k";
+          const MODEL_ID = "Rainbow-AI-Specialist-MLC";
+          const repoBaseUrl = "https://huggingface.co/Rainbowlord16/Rainbow-AI-Specialist-MLC/resolve/main/";
+
+          const appConfig = {
+            model_list: [
+              ...(prebuiltAppConfig?.model_list || []),
+              {
+                model: repoBaseUrl,
+                model_url: repoBaseUrl,
+                model_id: MODEL_ID,
+                vram_required_MB: 1950,
+                low_resource_required: true,
+                required_features: ["shader-f16"],
+                tokenizer_files: ["tokenizer.model"],
+                conv_config: { conv_template: "gemma_instruction" }
+              }
+            ]
+          };
 
           webgpuEngine = await CreateMLCEngine(MODEL_ID, {
+            appConfig: appConfig,
+            chatOpts: { 
+              tokenizer_files: ["tokenizer.model"],
+              context_window_size: 5500
+            },
             initProgressCallback: (report) => {
               if (statusDiv) statusDiv.textContent = report.text;
             }
@@ -2345,17 +2371,17 @@
             statusDiv.textContent = "● Rainbow Specialist Ready";
             statusDiv.style.color = "var(--success)";
           }
-          if (vramMonitor) vramMonitor.textContent = "⚡ WebGPU: Ready (5.5k ctx)";
+          if (vramMonitor) vramMonitor.textContent = "⚡ WebGPU: Local Specialist";
           if (userInput) userInput.disabled = false;
           if (sendBtn) sendBtn.disabled = false;
           window.dismissLoader();
         } catch (err) {
           window.activeEngineMode = "HF_API";
           if (statusDiv) {
-            statusDiv.textContent = "● HF Cloud Fallback Active";
+            statusDiv.textContent = "● Internet Mode Active";
             statusDiv.style.color = "var(--success)";
           }
-          if (vramMonitor) vramMonitor.textContent = "☁️ Mode: HF API Gateway";
+          if (vramMonitor) vramMonitor.textContent = "☁️ Mode: HF API (Internet)";
           if (userInput) userInput.disabled = false;
           if (sendBtn) sendBtn.disabled = false;
           window.dismissLoader();
@@ -2363,10 +2389,24 @@
         }
       }
 
-      // Hugging Face Router Stream Handler for your custom model repository
+      // Toggle Engine Mode Manually by Clicking the VRAM Badge
+      window.toggleEngineMode = function () {
+        if (window.activeEngineMode === "WEBGPU") {
+          window.activeEngineMode = "HF_API";
+          vramMonitor.textContent = "☁️ Mode: HF API (Internet)";
+          document.getElementById("engineBadgeLabel").textContent = "Engine: Cloud API Fallback";
+          statusDiv.textContent = "● Internet Mode Active";
+        } else {
+          window.activeEngineMode = "WEBGPU";
+          vramMonitor.textContent = "⚡ WebGPU: Local Specialist";
+          document.getElementById("engineBadgeLabel").textContent = "Engine: Specialist (5,500 tkns)";
+          statusDiv.textContent = webgpuEngine ? "● Rainbow Specialist Ready" : "● WebGPU Active";
+        }
+      };
+
+      // Hugging Face Cloud Router Stream Handler
       async function streamFromHuggingFace(messages, onChunk, signal) {
         const hfToken = document.getElementById("hfTokenInput").value.trim();
-        
         const headers = { "Content-Type": "application/json" };
         if (hfToken) {
           headers["Authorization"] = `Bearer ${hfToken}`;
@@ -2376,7 +2416,7 @@
           method: "POST",
           headers: headers,
           body: JSON.stringify({
-            model: "Rainbowlord16/Rainbow-AI-Specialist-MLC:hf-inference",
+            model: "google/gemma-2-2b-it:hf-inference",
             messages: messages,
             stream: true,
             max_tokens: 4096,
