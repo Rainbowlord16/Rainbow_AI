@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rainbow AI 🌈✨</title>
+    <title>Rainbow AI</title>
     <!-- Google Fonts: Google Sans & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1981,7 +1981,7 @@
       });
     </script>
 
-    <!-- Core Local & Hugging Face Inference Engine with Manual Mode Toggle -->
+    <!-- Core Local & Hugging Face Inference Engine with Null-Safety Guards -->
     <script type="module">
       import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
@@ -1998,7 +1998,7 @@
       let webgpuEngine = null;
       let isGenerating = false;
       let abortGenerationFlag = false;
-      window.activeEngineMode = "WEBGPU";
+      window.activeEngineMode = "HF_API"; // Default safely to API until local WebGPU confirms ready
 
       let chatSessions = JSON.parse(localStorage.getItem("rainbow_ecosystem_chats")) || [];
       let currentSessionId = null;
@@ -2046,24 +2046,21 @@
       }
 
       async function generateAITitleForChat(sessionId, userPrompt) {
-        if (!webgpuEngine && window.activeEngineMode === "WEBGPU") return;
+        if (!webgpuEngine || window.activeEngineMode !== "WEBGPU") return;
         const session = chatSessions.find((s) => s.id === sessionId);
         if (!session || session.title !== "New Conversation") return;
 
         try {
-          let generatedTitle = "";
-          if (window.activeEngineMode === "WEBGPU" && webgpuEngine) {
-            const titleResponse = await webgpuEngine.chat.completions.create({
-              messages: [
-                { role: "system", content: "You are a concise summarizer. Respond with ONLY 3 to 4 words summarizing the topic of the user's prompt. Do not use quotes, punctuation, or emojis." },
-                { role: "user", content: userPrompt }
-              ],
-              stream: false,
-              temperature: 0.2,
-              max_tokens: 10
-            });
-            generatedTitle = titleResponse.choices[0]?.message?.content?.trim();
-          }
+          const titleResponse = await webgpuEngine.chat.completions.create({
+            messages: [
+              { role: "system", content: "You are a concise summarizer. Respond with ONLY 3 to 4 words summarizing the topic of the user's prompt. Do not use quotes, punctuation, or emojis." },
+              { role: "user", content: userPrompt }
+            ],
+            stream: false,
+            temperature: 0.2,
+            max_tokens: 10
+          });
+          let generatedTitle = titleResponse.choices[0]?.message?.content?.trim();
           if (generatedTitle) {
             generatedTitle = generatedTitle.replace(/["'.]/g, "").trim();
             session.title = generatedTitle;
@@ -2305,7 +2302,7 @@
         return bubble;
       }
 
-      // Initialize WebLLM Engine (Your Custom Model: Rainbowlord16/Rainbow-AI-Specialist-MLC)
+      // Safe WebLLM Engine Initialization
       async function initAI() {
         try {
           const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -2389,7 +2386,7 @@
         }
       }
 
-      // Toggle Engine Mode Manually by Clicking the VRAM Badge
+      // Manual Mode Toggle via VRAM Badge Click
       window.toggleEngineMode = function () {
         if (window.activeEngineMode === "WEBGPU") {
           window.activeEngineMode = "HF_API";
@@ -2397,10 +2394,14 @@
           document.getElementById("engineBadgeLabel").textContent = "Engine: Cloud API Fallback";
           statusDiv.textContent = "● Internet Mode Active";
         } else {
+          if (!webgpuEngine) {
+            alert("Local WebGPU engine is not loaded or not supported on this device.");
+            return;
+          }
           window.activeEngineMode = "WEBGPU";
           vramMonitor.textContent = "⚡ WebGPU: Local Specialist";
           document.getElementById("engineBadgeLabel").textContent = "Engine: Specialist (5,500 tkns)";
-          statusDiv.textContent = webgpuEngine ? "● Rainbow Specialist Ready" : "● WebGPU Active";
+          statusDiv.textContent = "● Rainbow Specialist Ready";
         }
       };
 
@@ -2457,7 +2458,6 @@
         }
       }
 
-      // Dynamic Send / Stop Button Manager
       window.handleSendOrStop = function () {
         if (isGenerating) {
           abortGenerationFlag = true;
@@ -2480,7 +2480,6 @@
         }
       }
 
-      // Unified Message Send Handler with Stop Trigger & Auto Title
       window.handleSend = async function () {
         const text = userInput.value.trim();
         if (!text) return;
@@ -2522,6 +2521,7 @@
             );
             currentMessages.push({ role: "assistant", content: responseText });
           } else {
+            if (!webgpuEngine) throw new Error("WebGPU engine is not initialized yet.");
             const chunks = await webgpuEngine.chat.completions.create({
               messages: payloadMessages,
               stream: true,
@@ -2569,9 +2569,7 @@
         if (chatbox) chatbox.scrollTop = chatbox.scrollHeight;
       };
 
-      // ========================================================
-      // NOVA EMOTIVE SPEECH-TO-SPEECH ENGINE
-      // ========================================================
+      // Nova Voice Companion Engine
       let novaVoiceRecognition = null;
       let isNovaListening = false;
       let isNovaGenerating = false;
@@ -2762,6 +2760,7 @@
               new AbortController().signal
             );
           } else {
+            if (!webgpuEngine) throw new Error("WebGPU engine not initialized.");
             const chunks = await webgpuEngine.chat.completions.create({
               messages: [
                 { role: "system", content: novaSys },
