@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rainbow AI 🌈✨</title>
+    <title>Rainbow AI</title>
     <!-- Google Fonts: Google Sans & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1424,7 +1424,7 @@
                 <span class="badge-status active-mod">100% Local</span>
               </div>
               <div class="feature-desc">
-                Zero-API-cost inference powered entirely by local WebGPU shaders and Gemma 2B tensors with automatic AI-generated title tagging.
+                Zero-API-cost inference powered entirely by local WebGPU shaders and custom model tensors with automatic AI-generated title tagging.
               </div>
             </div>
           </div>
@@ -1447,7 +1447,7 @@
                   </svg>`,
           },
           {
-            label: "Streaming 4-Bit Gemma Tensors (2/4)...",
+            label: "Streaming Custom Model Tensors (2/4)...",
             pct: "55%",
             svg: `<svg width="100" height="70" viewBox="0 0 100 80" fill="none">
                     <path d="M 15 65 A 35 35 0 0 1 65 15 L 65 30 A 20 20 0 0 0 30 65 Z" fill="#0284c7"/>
@@ -1573,9 +1573,9 @@
       window.cleanTextForSpeech = function (text) {
         if (!text) return "";
         return text
-          .replace(/```[\s\S]*?```/g, "Code block omitted.") // strip raw code blocks
-          .replace(/`([^`]+)`/g, "$1") // inline code backticks
-          .replace(/[*#_~>]/g, "") // markdown formatting
+          .replace(/```[\s\S]*?```/g, "Code block omitted.")
+          .replace(/`([^`]+)`/g, "$1")
+          .replace(/[*#_~>]/g, "")
           .replace(/[\u{1F300}-\u{1FAFF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{200D}]/gu, "")
           .replace(/\s+/g, " ")
           .trim();
@@ -2301,7 +2301,7 @@
         return bubble;
       }
 
-      // Safe WebGPU Engine Initialization with Hardware Pre-flight Check
+      // Safe WebGPU Engine Initialization with Hardware Pre-flight Check & Custom Model ID
       async function initAI() {
         try {
           const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -2332,10 +2332,9 @@
             return;
           }
 
-          const MODEL_ID = "gemma-2-2b-it-q4f16_1-MLC-1k";
-          const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
-          const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
-          const repoBaseUrl = "https://huggingface.co/mlc-ai/gemma-2-2b-it-q4f16_1-MLC/resolve/main/";
+          const MODEL_ID = "Rainbow-AI-Specialist-MLC";
+          const repoBaseUrl = "https://huggingface.co/Rainbowlord16/Rainbow-AI-Specialist-MLC/resolve/main/";
+          const wasmUrl = repoBaseUrl + "wasm/model.wasm";
 
           const appConfig = {
             model_list: [
@@ -2344,20 +2343,13 @@
                 model: repoBaseUrl,
                 model_url: repoBaseUrl,
                 model_id: MODEL_ID,
-                model_lib: wasmUrl,
-                model_lib_id: wasmLibId,
                 vram_required_MB: 1950,
                 low_resource_required: true,
                 required_features: ["shader-f16"],
                 tokenizer_files: ["tokenizer.model"],
                 conv_config: { conv_template: "gemma_instruction" }
               }
-            ],
-            model_lib_map: {
-              ...(prebuiltAppConfig?.model_lib_map || {}),
-              [wasmLibId]: wasmUrl,
-              [MODEL_ID]: wasmUrl
-            }
+            ]
           };
 
           webgpuEngine = await CreateMLCEngine(MODEL_ID, {
