@@ -1990,7 +1990,7 @@
       });
     </script>
 
-    <!-- Core Local & Cloud Inference Engine: Custom Model Registered via AppConfig & IndexedDB -->
+    <!-- Core Local & Cloud Inference Engine: Custom Model Fixed with Trailing Slash -->
     <script type="module">
       import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
@@ -2311,7 +2311,7 @@
         return bubble;
       }
 
-      // Safe WebLLM Engine Initialization registering your custom model record correctly
+      // Safe WebLLM Engine Initialization with Trailing Slash fix for Custom Repo URL
       async function initAI() {
         try {
           const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -2343,8 +2343,10 @@
           }
 
           const MODEL_ID = "Rainbow-AI-Specialist-MLC";
+          // Crucial trailing slash '/' added here so manifest config path fetches correctly
           const repoBaseUrl = "https://huggingface.co/Rainbowlord16/Rainbow-AI-Specialist-MLC/resolve/main/";
           const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
+          const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
 
           const appConfig = {
             useIndexedDBCache: true,
@@ -2354,6 +2356,7 @@
                 model: repoBaseUrl,
                 model_id: MODEL_ID,
                 model_lib: wasmUrl,
+                model_lib_id: wasmLibId,
                 vram_required_MB: 1950,
                 low_resource_required: true,
                 required_features: ["shader-f16"],
@@ -2362,6 +2365,7 @@
               }
             ],
             model_lib_map: {
+              [wasmLibId]: wasmUrl,
               [MODEL_ID]: wasmUrl
             }
           };
@@ -2418,7 +2422,7 @@
         }
       };
 
-      // Hugging Face Cloud Router Stream Handler targeting your exact custom repo name with fallback proxy handler
+      // Hugging Face Cloud Router Stream Handler targeting your exact custom repo name
       async function streamFromHuggingFace(messages, onChunk, signal) {
         const hfToken = document.getElementById("hfTokenInput").value.trim();
         const headers = { "Content-Type": "application/json" };
@@ -2426,8 +2430,7 @@
           headers["Authorization"] = `Bearer ${hfToken}`;
         }
 
-        // Try direct HF Serverless Router first, then fall back to public cors proxy if blocked
-        let response = await fetch("https://router.huggingface.co/v1/chat/completions", {
+        const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
           method: "POST",
           headers: headers,
           body: JSON.stringify({
@@ -2438,27 +2441,11 @@
             temperature: 0.3
           }),
           signal: signal
-        }).catch(() => null);
-
-        if (!response || !response.ok) {
-          // Fallback endpoint route for HF serverless inference models
-          response = await fetch(`https://api-inference.huggingface.co/models/Rainbowlord16/Rainbow-AI-Specialist-MLC/v1/chat/completions`, {
-            method: "POST",
-            headers: headers,
-            body: JSON.stringify({
-              model: "Rainbowlord16/Rainbow-AI-Specialist-MLC",
-              messages: messages,
-              stream: true,
-              max_tokens: 4096,
-              temperature: 0.3
-            }),
-            signal: signal
-          });
-        }
+        });
 
         if (!response.ok) {
           const errText = await response.text();
-          throw new Error(`HF API Error (${response.status}): ${errText}`);
+          throw new Error(`HF Error (${response.status}): ${errText}`);
         }
 
         const reader = response.body.getReader();
