@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rainbow AI</title>
+    <title>Rainbow AI 🌈✨</title>
     <!-- Google Fonts: Google Sans & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1990,7 +1990,7 @@
       });
     </script>
 
-    <!-- Core Local & Hugging Face Inference Engine with Custom Repo & Precompiled WASM Fallback Bridge -->
+    <!-- Core Local & Hugging Face Inference Engine with IndexedDB Cache Fallback -->
     <script type="module">
       import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
@@ -2311,7 +2311,7 @@
         return bubble;
       }
 
-      // Safe WebLLM Engine Initialization with Custom Repo Config & Precompiled WASM Fallback Bridge
+      // Safe WebLLM Engine Initialization with IndexedDB Caching (Bypasses Cache API restriction)
       async function initAI() {
         try {
           const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -2348,6 +2348,7 @@
           const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
 
           const appConfig = {
+            useIndexedDBCache: true, // Forces IndexedDB storage to bypass browser Cache API errors
             model_list: [
               ...(prebuiltAppConfig?.model_list || []),
               {
