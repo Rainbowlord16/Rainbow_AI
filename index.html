@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rainbow AI</title>
+    <title>Rainbow AI 🌈✨</title>
     <!-- Google Fonts: Google Sans & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1981,7 +1981,7 @@
       });
     </script>
 
-    <!-- Core Local & Hugging Face Inference Engine with Null-Safety Guards -->
+    <!-- Core Local & Hugging Face Inference Engine with Manual Switcher -->
     <script type="module">
       import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
@@ -1998,7 +1998,7 @@
       let webgpuEngine = null;
       let isGenerating = false;
       let abortGenerationFlag = false;
-      window.activeEngineMode = "HF_API"; // Default safely to API until local WebGPU confirms ready
+      window.activeEngineMode = "WEBGPU";
 
       let chatSessions = JSON.parse(localStorage.getItem("rainbow_ecosystem_chats")) || [];
       let currentSessionId = null;
@@ -2046,7 +2046,7 @@
       }
 
       async function generateAITitleForChat(sessionId, userPrompt) {
-        if (!webgpuEngine || window.activeEngineMode !== "WEBGPU") return;
+        if (!webgpuEngine && window.activeEngineMode === "WEBGPU") return;
         const session = chatSessions.find((s) => s.id === sessionId);
         if (!session || session.title !== "New Conversation") return;
 
@@ -2333,31 +2333,9 @@
             return;
           }
 
-          const MODEL_ID = "Rainbow-AI-Specialist-MLC";
-          const repoBaseUrl = "https://huggingface.co/Rainbowlord16/Rainbow-AI-Specialist-MLC/resolve/main/";
-
-          const appConfig = {
-            model_list: [
-              ...(prebuiltAppConfig?.model_list || []),
-              {
-                model: repoBaseUrl,
-                model_url: repoBaseUrl,
-                model_id: MODEL_ID,
-                vram_required_MB: 1950,
-                low_resource_required: true,
-                required_features: ["shader-f16"],
-                tokenizer_files: ["tokenizer.model"],
-                conv_config: { conv_template: "gemma_instruction" }
-              }
-            ]
-          };
+          const MODEL_ID = "gemma-2-2b-it-q4f16_1-MLC-1k";
 
           webgpuEngine = await CreateMLCEngine(MODEL_ID, {
-            appConfig: appConfig,
-            chatOpts: { 
-              tokenizer_files: ["tokenizer.model"],
-              context_window_size: 5500
-            },
             initProgressCallback: (report) => {
               if (statusDiv) statusDiv.textContent = report.text;
             }
@@ -2386,7 +2364,7 @@
         }
       }
 
-      // Manual Mode Toggle via VRAM Badge Click
+      // Manual Engine Mode Toggle (Click the top VRAM / Cloud badge to switch)
       window.toggleEngineMode = function () {
         if (window.activeEngineMode === "WEBGPU") {
           window.activeEngineMode = "HF_API";
@@ -2395,7 +2373,7 @@
           statusDiv.textContent = "● Internet Mode Active";
         } else {
           if (!webgpuEngine) {
-            alert("Local WebGPU engine is not loaded or not supported on this device.");
+            alert("Local WebGPU model is still loading or unavailable on this device.");
             return;
           }
           window.activeEngineMode = "WEBGPU";
@@ -2417,7 +2395,7 @@
           method: "POST",
           headers: headers,
           body: JSON.stringify({
-            model: "google/gemma-2-2b-it:hf-inference",
+            model: "Rainbowlord16/Rainbow-AI-Specialist-MLC:hf-inference",
             messages: messages,
             stream: true,
             max_tokens: 4096,
