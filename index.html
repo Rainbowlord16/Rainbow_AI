@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
-    <link rel="icon" type="image/svg+xml" href="RAINBOW_favicon.svg" />
+    <link rel="icon" type="image/png" href="icon-new.png" />
     <style>
       :root {
         --bg-base: #0b0f19;
@@ -1119,7 +1119,9 @@
 
     <!-- Loading Screen -->
     <div id="loadingOverlay">
-      <div class="logo-viewport-box" id="logoBox"></div>
+      <div class="logo-viewport-box" id="logoBox">
+        <img src="icon-new.png" alt="Rainbow AI Logo" style="width: 70px; height: 70px; object-fit: contain; border-radius: 12px;" />
+      </div>
       <div class="loading-meta-info">
         <div class="loading-status-text" id="statusLabel">
           Initializing WebGPU Unified Memory (1/4)...
@@ -1135,7 +1137,10 @@
       <!-- Sidebar -->
       <div class="sidebar" id="appSidebar">
         <div class="sidebar-header">
-          <div class="logo-area">Rainbow AI 🌈</div>
+          <div class="logo-area">
+            <img src="icon-new.png" alt="Logo" style="width: 24px; height: 24px; object-fit: contain; border-radius: 6px;" />
+            Rainbow AI 🌈
+          </div>
           <button class="theme-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">
             <svg class="svg-icon" id="themeIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
           </button>
@@ -1192,9 +1197,9 @@
             <div class="header-left">
               <button class="sidebar-toggle-btn" id="sidebarToggleBtn" onclick="toggleSidebar()" title="Toggle Sidebar">
                 <img
-                  src="RAINBOW_favicon.svg"
+                  src="icon-new.png"
                   alt="Toggle"
-                  style="width: 20px; height: 20px; display: block; border-radius: 4px;"
+                  style="width: 20px; height: 20px; display: block; border-radius: 4px; object-fit: contain;"
                 />
               </button>
               <h3 class="panel-title" id="activeChatTitle">Rainbow AI Workspace</h3>
@@ -1254,7 +1259,7 @@
           <div class="panel-header">
             <div class="header-left">
               <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
-                <img src="RAINBOW_favicon.svg" alt="Toggle" style="width: 20px; height: 20px; display: block; border-radius: 4px;" />
+                <img src="icon-new.png" alt="Toggle" style="width: 20px; height: 20px; display: block; border-radius: 4px; object-fit: contain;" />
               </button>
               <h3 class="panel-title">Prompt Engineering & Idea Vault (50 Live Generative Ideas)</h3>
             </div>
@@ -1273,7 +1278,7 @@
           <div class="panel-header">
             <div class="header-left">
               <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
-                <img src="RAINBOW_favicon.svg" alt="Toggle" style="width: 20px; height: 20px; display: block; border-radius: 4px;" />
+                <img src="icon-new.png" alt="Toggle" style="width: 20px; height: 20px; display: block; border-radius: 4px; object-fit: contain;" />
               </button>
               <h3 class="panel-title">Spectra • Creative Art Studio</h3>
             </div>
@@ -1316,7 +1321,7 @@
           <div class="panel-header">
             <div class="header-left">
               <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
-                <img src="RAINBOW_favicon.svg" alt="Toggle" style="width: 20px; height: 20px; display: block; border-radius: 4px;" />
+                <img src="icon-new.png" alt="Toggle" style="width: 20px; height: 20px; display: block; border-radius: 4px; object-fit: contain;" />
               </button>
               <h3 class="panel-title">Nova • Emotive Voice Companion</h3>
             </div>
@@ -1398,7 +1403,7 @@
           <div class="panel-header">
             <div class="header-left">
               <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
-                <img src="RAINBOW_favicon.svg" alt="Toggle" style="width: 20px; height: 20px; display: block; border-radius: 4px;" />
+                <img src="icon-new.png" alt="Toggle" style="width: 20px; height: 20px; display: block; border-radius: 4px; object-fit: contain;" />
               </button>
               <h3 class="panel-title">Ecosystem Roadmap & Architecture</h3>
             </div>
@@ -1506,7 +1511,11 @@
           logoBox.style.transform = "scale(0.85)";
 
           setTimeout(() => {
-            logoBox.innerHTML = stages[s].svg;
+            if (s === 0) {
+              logoBox.innerHTML = `<img src="icon-new.png" alt="Logo" style="width: 70px; height: 70px; object-fit: contain; border-radius: 12px;" />`;
+            } else {
+              logoBox.innerHTML = stages[s].svg;
+            }
             if (statusLabel) statusLabel.textContent = stages[s].label;
             if (progressFill) progressFill.style.width = stages[s].pct;
             if (progressPercent) progressPercent.textContent = stages[s].pct;
@@ -1981,7 +1990,7 @@
       });
     </script>
 
-    <!-- Core Local & Hugging Face Inference Engine with Manual Switcher -->
+    <!-- Core Local & Hugging Face Inference Engine with Custom Manifest Config -->
     <script type="module">
       import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
@@ -2302,7 +2311,7 @@
         return bubble;
       }
 
-      // Safe WebLLM Engine Initialization
+      // Safe WebLLM Engine Initialization with Custom Repo Config
       async function initAI() {
         try {
           const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -2333,9 +2342,30 @@
             return;
           }
 
-          const MODEL_ID = "gemma-2-2b-it-q4f16_1-MLC-1k";
+          const MODEL_ID = "Rainbow-AI-Specialist-MLC";
+          const repoBaseUrl = "https://huggingface.co/Rainbowlord16/Rainbow-AI-Specialist-MLC/resolve/main/";
+
+          const appConfig = {
+            model_list: [
+              ...(prebuiltAppConfig?.model_list || []),
+              {
+                model: repoBaseUrl,
+                model_url: repoBaseUrl,
+                model_id: MODEL_ID,
+                vram_required_MB: 1950,
+                low_resource_required: true,
+                required_features: ["shader-f16"],
+                tokenizer_files: ["tokenizer.model", "tokenizer.json", "tokenizer_config.json"],
+                conv_config: { conv_template: "gemma_instruction" }
+              }
+            ]
+          };
 
           webgpuEngine = await CreateMLCEngine(MODEL_ID, {
+            appConfig: appConfig,
+            chatOpts: { 
+              context_window_size: 5500
+            },
             initProgressCallback: (report) => {
               if (statusDiv) statusDiv.textContent = report.text;
             }
@@ -2351,6 +2381,7 @@
           if (sendBtn) sendBtn.disabled = false;
           window.dismissLoader();
         } catch (err) {
+          console.warn("Local WebGPU initialization failed, switching to Internet mode:", err);
           window.activeEngineMode = "HF_API";
           if (statusDiv) {
             statusDiv.textContent = "● Internet Mode Active";
@@ -2360,11 +2391,10 @@
           if (userInput) userInput.disabled = false;
           if (sendBtn) sendBtn.disabled = false;
           window.dismissLoader();
-          console.warn("WebGPU fallback triggered:", err);
         }
       }
 
-      // Manual Engine Mode Toggle (Click the top VRAM / Cloud badge to switch)
+      // Manual Engine Mode Toggle
       window.toggleEngineMode = function () {
         if (window.activeEngineMode === "WEBGPU") {
           window.activeEngineMode = "HF_API";
@@ -2373,7 +2403,7 @@
           statusDiv.textContent = "● Internet Mode Active";
         } else {
           if (!webgpuEngine) {
-            alert("Local WebGPU model is still loading or unavailable on this device.");
+            alert("Local WebGPU engine is not loaded or not supported on this device.");
             return;
           }
           window.activeEngineMode = "WEBGPU";
