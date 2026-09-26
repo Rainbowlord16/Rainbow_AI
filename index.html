@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rainbow AI</title>
+    <title>Rainbow AI 🌈✨</title>
     <!-- Google Fonts: Google Sans & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,31 +17,31 @@
     <link rel="icon" type="image/png" href="icon-new.png" />
     <style>
       :root {
-        --bg-base: #0b0f19;
-        --sidebar-bg: rgba(15, 23, 42, 0.65);
+        --bg-base: #000000; /* Pure Black */
+        --sidebar-bg: rgba(10, 10, 10, 0.75);
         --chat-bg: transparent;
         --text-main: #f8fafc;
         --text-muted: #94a3b8;
         --border-color: rgba(255, 255, 255, 0.08);
-        --panel-bg: rgba(30, 41, 59, 0.55);
+        --panel-bg: rgba(18, 18, 18, 0.75);
         --bubble-user: linear-gradient(135deg, #3b82f6, #8b5cf6);
-        --bubble-ai: rgba(30, 41, 59, 0.75);
-        --accent-glow: rgba(168, 85, 247, 0.4);
+        --bubble-ai: rgba(20, 20, 20, 0.85);
+        --accent-glow: rgba(168, 85, 247, 0.3);
         --danger: #ef4444;
         --success: #10b981;
       }
 
       [data-theme="light"] {
-        --bg-base: #f1f5f9;
-        --sidebar-bg: rgba(255, 255, 255, 0.75);
+        --bg-base: #ffffff; /* Pure White */
+        --sidebar-bg: rgba(255, 255, 255, 0.85);
         --chat-bg: transparent;
         --text-main: #0f172a;
         --text-muted: #64748b;
         --border-color: rgba(0, 0, 0, 0.08);
-        --panel-bg: rgba(255, 255, 255, 0.85);
+        --panel-bg: rgba(250, 250, 250, 0.9);
         --bubble-user: linear-gradient(135deg, #3b82f6, #6366f1);
-        --bubble-ai: rgba(241, 245, 249, 0.9);
-        --accent-glow: rgba(168, 85, 247, 0.2);
+        --bubble-ai: rgba(245, 245, 245, 0.95);
+        --accent-glow: rgba(168, 85, 247, 0.15);
         --danger: #dc2626;
         --success: #059669;
       }
@@ -79,7 +79,7 @@
         inset: 0;
         width: 100vw;
         height: 100vh;
-        background: #0b0f19;
+        background: #000000;
         z-index: 99999;
         display: flex;
         flex-direction: column;
@@ -514,7 +514,7 @@
         margin: 12px 0;
       }
       .ai .message-bubble pre {
-        background: #0f172a;
+        background: #050505;
         padding: 14px;
         padding-top: 36px;
         border-radius: 10px;
@@ -750,7 +750,7 @@
         inset: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(2, 6, 23, 0.85);
+        background: rgba(0, 0, 0, 0.85);
         backdrop-filter: blur(15px);
         z-index: 100000;
         display: none;
@@ -766,13 +766,13 @@
         width: 100%;
         max-width: 1080px;
         height: 85vh;
-        background: #0b0f19;
+        background: #000000;
         border: 1px solid var(--border-color);
         border-radius: 18px;
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px var(--accent-glow);
+        box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 40px var(--accent-glow);
         transition: all 0.25s ease;
       }
       .sandbox-window.fullscreen {
@@ -782,7 +782,7 @@
       }
       .sandbox-topbar {
         padding: 12px 20px;
-        background: rgba(15, 23, 42, 0.95);
+        background: rgba(10, 10, 10, 0.95);
         border-bottom: 1px solid var(--border-color);
         display: flex;
         align-items: center;
@@ -832,7 +832,7 @@
       }
       .sandbox-console-drawer {
         height: 130px;
-        background: #030712;
+        background: #030303;
         border-top: 1px solid var(--border-color);
         font-family: monospace;
         font-size: 12px;
@@ -927,7 +927,7 @@
       .spectra-preview {
         width: 100%;
         height: 200px;
-        background: linear-gradient(135deg, #1e1b4b, #3b82f6, #ec4899);
+        background: linear-gradient(135deg, #101010, #3b82f6, #ec4899);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1335,7 +1335,7 @@
               <div class="nova-avatar-frame" id="novaAvatar">
                 <svg width="150" height="150" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="45" fill="url(#novaGlow)" />
-                  <circle cx="50" cy="50" r="38" fill="#1e1b4b" stroke="#f43f5e" stroke-width="2.5" />
+                  <circle cx="50" cy="50" r="38" fill="#000000" stroke="#f43f5e" stroke-width="2.5" />
                   
                   <g id="novaEyes">
                     <circle cx="38" cy="45" r="5" fill="#38bdf8" />
@@ -2311,7 +2311,7 @@
         return bubble;
       }
 
-      // Safe WebLLM Engine Initialization registering your custom model ID
+      // Safe WebLLM Engine Initialization using IndexedDB Storage & Custom Prebuilt Mapping
       async function initAI() {
         try {
           const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -2342,39 +2342,10 @@
             return;
           }
 
-          const MODEL_ID = "Rainbow-AI-Specialist-MLC";
-          const repoBaseUrl = "https://huggingface.co/Rainbowlord16/Rainbow-AI-Specialist-MLC/resolve/main/";
-          const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
-          const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
-
-          const appConfig = {
-            useIndexedDBCache: true,
-            model_list: [
-              ...(prebuiltAppConfig?.model_list || []),
-              {
-                model: repoBaseUrl,
-                model_url: repoBaseUrl,
-                model_id: MODEL_ID,
-                model_lib: wasmUrl,
-                model_lib_id: wasmLibId,
-                vram_required_MB: 1950,
-                low_resource_required: true,
-                required_features: ["shader-f16"],
-                tokenizer_files: ["tokenizer.model", "tokenizer.json", "tokenizer_config.json"],
-                conv_config: { conv_template: "gemma_instruction" }
-              }
-            ],
-            model_lib_map: {
-              [wasmLibId]: wasmUrl,
-              [MODEL_ID]: wasmUrl
-            }
-          };
+          const MODEL_ID = "gemma-2-2b-it-q4f16_1-MLC-1k";
 
           webgpuEngine = await CreateMLCEngine(MODEL_ID, {
-            appConfig: appConfig,
-            chatOpts: { 
-              context_window_size: 5500
-            },
+            useIndexedDBCache: true,
             initProgressCallback: (report) => {
               if (statusDiv) statusDiv.textContent = report.text;
             }
@@ -2422,7 +2393,7 @@
         }
       };
 
-      // Hugging Face Cloud Router Stream Handler (Using a standard serverless model for API compatibility while keeping local repo for UI/custom display)
+      // Hugging Face Cloud Router Stream Handler targeting your exact custom repo name
       async function streamFromHuggingFace(messages, onChunk, signal) {
         const hfToken = document.getElementById("hfTokenInput").value.trim();
         const headers = { "Content-Type": "application/json" };
@@ -2434,7 +2405,7 @@
           method: "POST",
           headers: headers,
           body: JSON.stringify({
-            model: "meta-llama/Llama-3.1-8B-Instruct",
+            model: "Rainbowlord16/Rainbow-AI-Specialist-MLC",
             messages: messages,
             stream: true,
             max_tokens: 4096,
