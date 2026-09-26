@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rainbow AI</title>
+    <title>Rainbow AI 🌈✨</title>
     <!-- Google Fonts: Google Sans & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1164,7 +1164,7 @@
           <option value="poet">Creative Storyteller</option>
         </select>
 
-        <div class="section-label">HF Token (For API Fallback)</div>
+        <div class="section-label">HF Token (Optional for API)</div>
         <input type="password" class="search-box" id="hfTokenInput" placeholder="hf_xxxxxxxxxxxxxxxxxxx" style="font-family: monospace;" />
 
         <input
@@ -1978,7 +1978,7 @@
 
     <!-- Core Local & Hugging Face Fallback Inference Engine -->
     <script type="module">
-      import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
+      import { CreateMLCEngine } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
       const statusDiv = document.getElementById("status");
       const userInput = document.getElementById("userInput");
@@ -2301,7 +2301,7 @@
         return bubble;
       }
 
-      // Safe WebGPU Engine Initialization with Hardware Pre-flight Check & Custom Model ID
+      // Safe WebGPU Engine Initialization with Hardware Pre-flight Check & Auto-Fallback
       async function initAI() {
         try {
           const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -2332,37 +2332,15 @@
             return;
           }
 
-          const MODEL_ID = "Rainbow-AI-Specialist-MLC";
-          const repoBaseUrl = "https://huggingface.co/Rainbowlord16/Rainbow-AI-Specialist-MLC/resolve/main/";
-          const wasmUrl = repoBaseUrl + "wasm/model.wasm";
-
-          const appConfig = {
-            model_list: [
-              ...(prebuiltAppConfig?.model_list || []),
-              {
-                model: repoBaseUrl,
-                model_url: repoBaseUrl,
-                model_id: MODEL_ID,
-                vram_required_MB: 1950,
-                low_resource_required: true,
-                required_features: ["shader-f16"],
-                tokenizer_files: ["tokenizer.model"],
-                conv_config: { conv_template: "gemma_instruction" }
-              }
-            ]
-          };
+          const MODEL_ID = "gemma-2-2b-it-q4f16_1-MLC-1k";
 
           webgpuEngine = await CreateMLCEngine(MODEL_ID, {
-            appConfig: appConfig,
-            chatOpts: { 
-              tokenizer_files: ["tokenizer.model"],
-              context_window_size: 5500
-            },
             initProgressCallback: (report) => {
               if (statusDiv) statusDiv.textContent = report.text;
             }
           });
 
+          window.activeEngineMode = "WEBGPU";
           if (statusDiv) {
             statusDiv.textContent = "● Rainbow Specialist Ready";
             statusDiv.style.color = "var(--success)";
@@ -2385,19 +2363,18 @@
         }
       }
 
-      // Hugging Face Router Stream Handler
+      // Hugging Face Router Stream Handler for your custom model repository
       async function streamFromHuggingFace(messages, onChunk, signal) {
         const hfToken = document.getElementById("hfTokenInput").value.trim();
-        if (!hfToken) {
-          throw new Error("Please enter your Hugging Face Access Token in the sidebar settings!");
+        
+        const headers = { "Content-Type": "application/json" };
+        if (hfToken) {
+          headers["Authorization"] = `Bearer ${hfToken}`;
         }
 
         const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
           method: "POST",
-          headers: {
-            "Authorization": `Bearer ${hfToken}`,
-            "Content-Type": "application/json"
-          },
+          headers: headers,
           body: JSON.stringify({
             model: "Rainbowlord16/Rainbow-AI-Specialist-MLC:hf-inference",
             messages: messages,
