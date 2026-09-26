@@ -17,7 +17,7 @@
     <link rel="icon" type="image/png" href="icon-new.png" />
     <style>
       :root {
-        --bg-base: #000000; /* Pure Black */
+        --bg-base: #000000;
         --sidebar-bg: rgba(10, 10, 10, 0.75);
         --chat-bg: transparent;
         --text-main: #f8fafc;
@@ -32,7 +32,7 @@
       }
 
       [data-theme="light"] {
-        --bg-base: #ffffff; /* Pure White */
+        --bg-base: #ffffff;
         --sidebar-bg: rgba(255, 255, 255, 0.85);
         --chat-bg: transparent;
         --text-main: #0f172a;
@@ -1990,7 +1990,7 @@
       });
     </script>
 
-    <!-- Core Local & Cloud Inference Engine: Registered Custom Model & Record Mapping -->
+    <!-- Core Local & Cloud Inference Engine: Custom Model Registered via AppConfig & IndexedDB -->
     <script type="module">
       import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
@@ -2311,7 +2311,7 @@
         return bubble;
       }
 
-      // Safe WebLLM Engine Initialization using IndexedDB Storage & Custom Prebuilt Mapping
+      // Safe WebLLM Engine Initialization registering your custom model record correctly
       async function initAI() {
         try {
           const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -2342,10 +2342,35 @@
             return;
           }
 
-          const MODEL_ID = "gemma-2-2b-it-q4f16_1-MLC-1k";
+          const MODEL_ID = "Rainbow-AI-Specialist-MLC";
+          const repoBaseUrl = "https://huggingface.co/Rainbowlord16/Rainbow-AI-Specialist-MLC/resolve/main/";
+          const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
+
+          const appConfig = {
+            useIndexedDBCache: true,
+            model_list: [
+              ...(prebuiltAppConfig?.model_list || []),
+              {
+                model: repoBaseUrl,
+                model_id: MODEL_ID,
+                model_lib: wasmUrl,
+                vram_required_MB: 1950,
+                low_resource_required: true,
+                required_features: ["shader-f16"],
+                tokenizer_files: ["tokenizer.model", "tokenizer.json", "tokenizer_config.json"],
+                conv_config: { conv_template: "gemma_instruction" }
+              }
+            ],
+            model_lib_map: {
+              [MODEL_ID]: wasmUrl
+            }
+          };
 
           webgpuEngine = await CreateMLCEngine(MODEL_ID, {
-            useIndexedDBCache: true,
+            appConfig: appConfig,
+            chatOpts: { 
+              context_window_size: 5500
+            },
             initProgressCallback: (report) => {
               if (statusDiv) statusDiv.textContent = report.text;
             }
@@ -2393,7 +2418,7 @@
         }
       };
 
-      // Hugging Face Cloud Router Stream Handler targeting your exact custom repo name
+      // Hugging Face Cloud Router Stream Handler targeting your exact custom repo name with fallback proxy handler
       async function streamFromHuggingFace(messages, onChunk, signal) {
         const hfToken = document.getElementById("hfTokenInput").value.trim();
         const headers = { "Content-Type": "application/json" };
@@ -2401,7 +2426,8 @@
           headers["Authorization"] = `Bearer ${hfToken}`;
         }
 
-        const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
+        // Try direct HF Serverless Router first, then fall back to public cors proxy if blocked
+        let response = await fetch("https://router.huggingface.co/v1/chat/completions", {
           method: "POST",
           headers: headers,
           body: JSON.stringify({
@@ -2412,11 +2438,27 @@
             temperature: 0.3
           }),
           signal: signal
-        });
+        }).catch(() => null);
+
+        if (!response || !response.ok) {
+          // Fallback endpoint route for HF serverless inference models
+          response = await fetch(`https://api-inference.huggingface.co/models/Rainbowlord16/Rainbow-AI-Specialist-MLC/v1/chat/completions`, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({
+              model: "Rainbowlord16/Rainbow-AI-Specialist-MLC",
+              messages: messages,
+              stream: true,
+              max_tokens: 4096,
+              temperature: 0.3
+            }),
+            signal: signal
+          });
+        }
 
         if (!response.ok) {
           const errText = await response.text();
-          throw new Error(`HF Error (${response.status}): ${errText}`);
+          throw new Error(`HF API Error (${response.status}): ${errText}`);
         }
 
         const reader = response.body.getReader();
