@@ -1,9 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rainbow AI 🌈✨</title>
+    <title>Rainbow AI</title>
     <!-- Google Fonts: Google Sans & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1990,7 +1990,7 @@
       });
     </script>
 
-    <!-- Core Local & Hugging Face Inference Engine with Config Map -->
+    <!-- Core Local & Hugging Face Inference Engine with Custom Repo & Precompiled WASM Fallback Bridge -->
     <script type="module">
       import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
@@ -2311,7 +2311,7 @@
         return bubble;
       }
 
-      // Safe WebLLM Engine Initialization with Custom Repo Config
+      // Safe WebLLM Engine Initialization with Custom Repo Config & Precompiled WASM Fallback Bridge
       async function initAI() {
         try {
           const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -2345,6 +2345,7 @@
           const MODEL_ID = "Rainbow-AI-Specialist-MLC";
           const repoBaseUrl = "https://huggingface.co/Rainbowlord16/Rainbow-AI-Specialist-MLC/resolve/main/";
           const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
+          const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
 
           const appConfig = {
             model_list: [
@@ -2354,6 +2355,7 @@
                 model_url: repoBaseUrl,
                 model_id: MODEL_ID,
                 model_lib: wasmUrl,
+                model_lib_id: wasmLibId,
                 vram_required_MB: 1950,
                 low_resource_required: true,
                 required_features: ["shader-f16"],
@@ -2362,6 +2364,7 @@
               }
             ],
             model_lib_map: {
+              [wasmLibId]: wasmUrl,
               [MODEL_ID]: wasmUrl
             }
           };
