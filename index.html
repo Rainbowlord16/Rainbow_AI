@@ -2394,7 +2394,7 @@
         }
       };
 
-      // Hugging Face Cloud Router Stream Handler (Using standard hosted Gemma 2 2B for API compatibility)
+      // Hugging Face Cloud Router Stream Handler with Universal Model Routing
       async function streamFromHuggingFace(messages, onChunk, signal) {
         const hfToken = document.getElementById("hfTokenInput").value.trim();
         const headers = { "Content-Type": "application/json" };
@@ -2406,7 +2406,7 @@
           method: "POST",
           headers: headers,
           body: JSON.stringify({
-            model: "google/gemma-2-2b-it:hf-inference",
+            model: "meta-llama/Llama-3.1-8B-Instruct", // Universally supported serverless router model
             messages: messages,
             stream: true,
             max_tokens: 4096,
@@ -2446,6 +2446,7 @@
           }
         }
       }
+
 
       window.handleSendOrStop = function () {
         if (isGenerating) {
