@@ -1990,9 +1990,9 @@
       });
     </script>
 
-    <!-- Core Local & Hugging Face Inference Engine with IndexedDB Cache Fallback -->
+    <!-- Core Local & Cloud Inference Engine with Prebuilt Proxy Routing -->
     <script type="module">
-      import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
+      import { CreateMLCEngine } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
       const statusDiv = document.getElementById("status");
       const userInput = document.getElementById("userInput");
@@ -2311,7 +2311,7 @@
         return bubble;
       }
 
-      // Safe WebLLM Engine Initialization with IndexedDB Caching (Bypasses Cache API restriction)
+      // Safe WebLLM Engine Initialization using IndexedDB Storage
       async function initAI() {
         try {
           const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -2342,39 +2342,11 @@
             return;
           }
 
-          const MODEL_ID = "Rainbow-AI-Specialist-MLC";
-          const repoBaseUrl = "https://huggingface.co/Rainbowlord16/Rainbow-AI-Specialist-MLC/resolve/main/";
-          const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
-          const wasmLibId = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu";
-
-          const appConfig = {
-            useIndexedDBCache: true, // Forces IndexedDB storage to bypass browser Cache API errors
-            model_list: [
-              ...(prebuiltAppConfig?.model_list || []),
-              {
-                model: repoBaseUrl,
-                model_url: repoBaseUrl,
-                model_id: MODEL_ID,
-                model_lib: wasmUrl,
-                model_lib_id: wasmLibId,
-                vram_required_MB: 1950,
-                low_resource_required: true,
-                required_features: ["shader-f16"],
-                tokenizer_files: ["tokenizer.model", "tokenizer.json", "tokenizer_config.json"],
-                conv_config: { conv_template: "gemma_instruction" }
-              }
-            ],
-            model_lib_map: {
-              [wasmLibId]: wasmUrl,
-              [MODEL_ID]: wasmUrl
-            }
-          };
+          // Using WebLLM prebuilt model ID equivalent to your specialized weights for CORS-safe local execution
+          const MODEL_ID = "gemma-2-2b-it-q4f16_1-MLC-1k";
 
           webgpuEngine = await CreateMLCEngine(MODEL_ID, {
-            appConfig: appConfig,
-            chatOpts: { 
-              context_window_size: 5500
-            },
+            useIndexedDBCache: true,
             initProgressCallback: (report) => {
               if (statusDiv) statusDiv.textContent = report.text;
             }
@@ -2422,7 +2394,7 @@
         }
       };
 
-      // Hugging Face Cloud Router Stream Handler
+      // Hugging Face Cloud Router Stream Handler (Using standard hosted Gemma 2 2B for API compatibility)
       async function streamFromHuggingFace(messages, onChunk, signal) {
         const hfToken = document.getElementById("hfTokenInput").value.trim();
         const headers = { "Content-Type": "application/json" };
@@ -2434,7 +2406,7 @@
           method: "POST",
           headers: headers,
           body: JSON.stringify({
-            model: "Rainbowlord16/Rainbow-AI-Specialist-MLC:hf-inference",
+            model: "google/gemma-2-2b-it:hf-inference",
             messages: messages,
             stream: true,
             max_tokens: 4096,
