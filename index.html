@@ -1120,7 +1120,7 @@
     <!-- Loading Screen -->
     <div id="loadingOverlay">
       <div class="logo-viewport-box" id="logoBox">
-        <img src="icon-new.png" alt="Rainbow AI Logo" style="width: 70px; height: 70px; object-fit: contain; border-radius: 12px;" />
+        <img src="icon-new.png" alt="Logo" style="width: 70px; height: 70px; object-fit: contain; border-radius: 12px;" />
       </div>
       <div class="loading-meta-info">
         <div class="loading-status-text" id="statusLabel">
@@ -1990,7 +1990,7 @@
       });
     </script>
 
-    <!-- Core Local & Hugging Face Inference Engine with Custom Manifest Config -->
+    <!-- Core Local & Hugging Face Inference Engine with Config Map -->
     <script type="module">
       import { CreateMLCEngine, prebuiltAppConfig } from "https://esm.run/@mlc-ai/web-llm@0.2.48";
 
@@ -2344,6 +2344,7 @@
 
           const MODEL_ID = "Rainbow-AI-Specialist-MLC";
           const repoBaseUrl = "https://huggingface.co/Rainbowlord16/Rainbow-AI-Specialist-MLC/resolve/main/";
+          const wasmUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_48/gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
 
           const appConfig = {
             model_list: [
@@ -2352,13 +2353,17 @@
                 model: repoBaseUrl,
                 model_url: repoBaseUrl,
                 model_id: MODEL_ID,
+                model_lib: wasmUrl,
                 vram_required_MB: 1950,
                 low_resource_required: true,
                 required_features: ["shader-f16"],
                 tokenizer_files: ["tokenizer.model", "tokenizer.json", "tokenizer_config.json"],
                 conv_config: { conv_template: "gemma_instruction" }
               }
-            ]
+            ],
+            model_lib_map: {
+              [MODEL_ID]: wasmUrl
+            }
           };
 
           webgpuEngine = await CreateMLCEngine(MODEL_ID, {
