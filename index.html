@@ -52,8 +52,7 @@ body {
 
 body {
   font-family:
-    "Google Sans Flex",
-    "Google Sans",
+    Inter,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
@@ -819,79 +818,110 @@ body {
   }
 }
 
-
-/* =========================================================
-   RAINBOW AI — VISUAL UI ENHANCEMENT ONLY
-   Existing HTML structure, IDs and JavaScript are preserved.
-========================================================= */
+/* ===== Rainbow AI UI Skin ===== */
 :root{
-  --accent:#8ab4f8;
-  --accent2:#a78bfa;
-  --pink:#f28bba;
-  --green:#81c995;
-  --shadow:0 24px 80px rgba(0,0,0,.34);
+  --rainbow-blue:#4285f4;
+  --rainbow-purple:#8b5cf6;
+  --rainbow-pink:#ec4899;
 }
-
-body,button,input,textarea,select{font-family:"Google Sans Flex","Google Sans",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-button,input,textarea,select{letter-spacing:-.01em}
-
-.sidebar{background:linear-gradient(180deg,#111318 0%,#0d0f14 100%);border-right:1px solid rgba(255,255,255,.07)}
-[data-theme="light"] .sidebar{background:#fff}
-.brand img{border-radius:11px;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 8px 28px rgba(139,92,246,.18)}
-.brand-name{font-weight:650;letter-spacing:-.025em}
-.new-chat{border:0;border-radius:999px;background:#1b1e25;box-shadow:none}
-.new-chat:hover{background:#252932;transform:translateY(-1px)}
-.search{border:0;border-radius:999px;background:#171a20}
-.search:focus{border-color:transparent;box-shadow:0 0 0 2px rgba(138,180,248,.2)}
-.history-item{border-radius:12px}
-.history-item:hover,.history-item.active{background:rgba(255,255,255,.06)}
-.delete-chat{border-radius:50%;padding:4px}
-.sidebar-bottom button{border:0;border-radius:999px;background:transparent}
-.sidebar-bottom button:hover{background:rgba(255,255,255,.06)}
-
-.topbar{border-bottom:0;background:rgba(11,13,18,.72);backdrop-filter:blur(22px)}
-[data-theme="light"] .topbar{background:rgba(247,248,252,.78)}
-.icon-btn{border:0;border-radius:50%;background:transparent}
-.icon-btn:hover{background:rgba(255,255,255,.07)}
-.model-selector{border:0;border-radius:999px;background:transparent;font-weight:550}
-.model-selector:hover{background:rgba(255,255,255,.055)}
-.status{border:0;background:rgba(129,201,149,.09);color:var(--green);box-shadow:none}
-
-.welcome h1{font-weight:500;letter-spacing:-.055em}
-.welcome-gradient{background:linear-gradient(90deg,#8ab4f8 0%,#a78bfa 48%,#f28bba 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.welcome-logo{box-shadow:0 0 36px rgba(139,92,246,.24),0 0 70px rgba(66,133,244,.10)}
-.prompt-card{border:0;border-radius:20px;background:#171a21}
-.prompt-card:hover{background:#20242c;border-color:transparent;box-shadow:0 10px 30px rgba(0,0,0,.18);transform:translateY(-2px)}
-
-.ai-avatar{background:linear-gradient(135deg,#8ab4f8,#a78bfa,#f28bba);box-shadow:0 5px 18px rgba(139,92,246,.2)}
-.user-avatar{background:#242832}
-.user .message-content{background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:20px 20px 6px 20px}
-.message-action{border-radius:999px}
-
-.composer{border:1px solid rgba(255,255,255,.08);border-radius:28px;background:rgba(17,20,27,.94);backdrop-filter:blur(22px);box-shadow:0 20px 70px rgba(0,0,0,.30)}
-.composer:focus-within{border-color:rgba(138,180,248,.38);box-shadow:0 0 0 3px rgba(138,180,248,.07),0 20px 70px rgba(0,0,0,.30)}
-.tool-btn{border:0;border-radius:999px;background:transparent}
-.tool-btn:hover{background:rgba(255,255,255,.07);color:var(--text)}
-.send-btn{width:42px;height:42px;border:0;border-radius:50%;background:linear-gradient(135deg,#4285f4,#8b5cf6);box-shadow:0 6px 22px rgba(66,133,244,.22)}
-.send-btn:hover{transform:scale(1.06);box-shadow:0 8px 28px rgba(139,92,246,.3)}
-.send-btn.stop{background:#ef4444}
-.file-chip{border-radius:999px;background:#20242c}
-
-.settings{border-left:1px solid rgba(255,255,255,.07);box-shadow:-20px 0 70px rgba(0,0,0,.25)}
-.setting-input,.setting-select{border:0;border-radius:14px;background:#171a21}
-.setting-input:focus,.setting-select:focus{outline:2px solid rgba(138,180,248,.2)}
-.toggle.active{background:linear-gradient(135deg,#4285f4,#8b5cf6)}
-
-*{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.13) transparent}
-*::-webkit-scrollbar{width:7px}
-*::-webkit-scrollbar-track{background:transparent}
-*::-webkit-scrollbar-thumb{background:rgba(255,255,255,.13);border-radius:99px}
-*::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.22)}
-
-/* Preserve original controls while giving them cleaner icon-like visuals */
-.new-chat span:first-child{font-size:21px;line-height:1}
-.tool-btn{display:inline-flex;align-items:center;gap:6px}
-.send-btn{font-size:16px}
+body,button,input,textarea,select{
+  font-family:"Google Sans Flex","Google Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+button,input,textarea,select,.prompt-card,.history-item,.tool-btn,.icon-btn,.new-chat,.user-tab{
+  transition:background .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease,color .18s ease;
+}
+.brand-name,.welcome-gradient{
+  background:linear-gradient(90deg,var(--rainbow-blue),var(--rainbow-purple),var(--rainbow-pink));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.brand img,.welcome-logo{
+  box-shadow:0 0 28px rgba(139,92,246,.22);
+}
+.new-chat,.search,.prompt-card,.composer,.tool-btn,.user-tab{
+  border:1px solid rgba(255,255,255,.06);
+}
+.new-chat:hover,.prompt-card:hover,.user-tab:hover{
+  transform:translateY(-1px);
+  box-shadow:0 8px 28px rgba(0,0,0,.18);
+}
+.prompt-card:hover{background:#20242e}
+.composer{
+  backdrop-filter:blur(20px);
+  background:rgba(17,20,27,.94);
+}
+.send-btn{
+  background:linear-gradient(135deg,var(--rainbow-blue),var(--rainbow-purple));
+  box-shadow:0 6px 22px rgba(99,102,241,.28);
+}
+.send-btn:hover{transform:scale(1.06)}
+.tool-btn:hover,.icon-btn:hover{background:rgba(255,255,255,.07)}
+/* User tab */
+.user-tab{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:8px;
+  padding:9px 10px;
+  border-radius:15px;
+  background:transparent;
+  color:var(--text);
+  cursor:pointer;
+  text-align:left;
+}
+.user-avatar-small{
+  width:35px;height:35px;flex:0 0 35px;border-radius:50%;
+  display:grid;place-items:center;
+  color:#fff;font-size:12px;font-weight:700;
+  background:linear-gradient(135deg,var(--rainbow-blue),var(--rainbow-purple),var(--rainbow-pink));
+}
+.user-info{min-width:0;flex:1}
+.user-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-email{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-chevron{color:var(--muted)}
+.user-drawer{
+  position:fixed;inset:0;display:none;justify-content:flex-start;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(8px);z-index:100;
+}
+.user-drawer.show{display:flex}
+.user-panel{
+  width:min(390px,94vw);height:100%;overflow:auto;padding:24px;
+  background:var(--panel);border-right:1px solid var(--border);
+  box-shadow:20px 0 60px rgba(0,0,0,.25);
+}
+.user-panel-header{display:flex;align-items:center;justify-content:space-between}
+.user-panel-header h2{margin:0;font-size:20px;font-weight:600}
+.user-list{display:flex;flex-direction:column;gap:5px;margin-top:22px}
+.user-row{
+  display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;cursor:pointer;
+}
+.user-row:hover,.user-row.active{background:var(--panel2)}
+.user-row-info{min-width:0;flex:1}
+.user-row-name{font-size:14px;font-weight:600}
+.user-row-email{font-size:11px;color:var(--muted);margin-top:2px}
+.user-remove{
+  width:30px;height:30px;border:0;border-radius:50%;background:transparent;
+  color:var(--muted);cursor:pointer;
+}
+.user-remove:hover{background:var(--panel3);color:#ef4444}
+.add-user{
+  width:100%;height:44px;margin-top:18px;border:0;border-radius:999px;
+  background:var(--panel2);color:var(--text);cursor:pointer;font-weight:600;
+}
+.add-user:hover{background:var(--panel3)}
+.user-form{display:none;margin-top:14px;padding:15px;border-radius:16px;background:var(--panel2)}
+.user-form.show{display:block}
+.user-form input{
+  width:100%;height:42px;margin-bottom:9px;border:0;border-radius:11px;
+  padding:0 12px;background:var(--panel3);color:var(--text);outline:0;
+}
+.user-form button{
+  width:100%;height:40px;border:0;border-radius:999px;background:var(--text);
+  color:var(--bg);cursor:pointer;font-weight:600;
+}
+@media(max-width:800px){
+  .user-panel{width:min(360px,92vw)}
+}
 
 </style>
 </head>
@@ -930,6 +960,16 @@ button,input,textarea,select{letter-spacing:-.01em}
     <button id="themeButton">◐ Theme</button>
     <button id="settingsButton">⚙ Settings</button>
   </div>
+
+
+  <button class="user-tab" id="userTabButton" type="button">
+    <div class="user-avatar-small" id="currentUserAvatar">H</div>
+    <div class="user-info">
+      <div class="user-name" id="currentUserName">Herish</div>
+      <div class="user-email" id="currentUserEmail">Personal account</div>
+    </div>
+    <div class="user-chevron">›</div>
+  </button>
 
 </aside>
 
@@ -1114,7 +1154,7 @@ button,input,textarea,select{letter-spacing:-.01em}
           class="tool-btn"
           id="voiceButton"
         >
-          ◉ Voice
+          🎙 Voice
         </button>
 
         <button
@@ -1143,6 +1183,27 @@ button,input,textarea,select{letter-spacing:-.01em}
 
 </div>
 
+</div>
+
+
+<!-- ================= USERS ================= -->
+<div class="user-drawer" id="userDrawer">
+  <div class="user-panel">
+    <div class="user-panel-header">
+      <h2>Users</h2>
+      <button class="icon-btn" id="closeUserDrawer" type="button">×</button>
+    </div>
+
+    <div class="user-list" id="userList"></div>
+
+    <button class="add-user" id="addUserButton" type="button">＋ Add user</button>
+
+    <div class="user-form" id="userForm">
+      <input id="newUserName" type="text" placeholder="User name">
+      <input id="newUserEmail" type="text" placeholder="Email or description">
+      <button id="saveUserButton" type="button">Add user</button>
+    </div>
+  </div>
 </div>
 
 <!-- ================= SETTINGS ================= -->
@@ -2253,7 +2314,7 @@ $("voiceButton").onclick =
       recognition.start();
 
       $("voiceButton").textContent =
-        "◉ Listening…";
+        "🎙 Listening…";
 
     } catch {}
   };
@@ -2264,7 +2325,7 @@ if (recognition) {
     () => {
 
       $("voiceButton").textContent =
-        "◉ Voice";
+        "🎙 Voice";
     };
 }
 
@@ -2390,6 +2451,263 @@ $("model").onchange =
     }
   };
 
+
+
+/* ============================================
+   USERS
+============================================ */
+
+let users = JSON.parse(
+  localStorage.getItem("rainbow_ai_users") || "null"
+);
+
+if (!Array.isArray(users) || !users.length) {
+  users = [
+    {
+      id: "default",
+      name: "Herish",
+      email: "Personal account"
+    }
+  ];
+
+  localStorage.setItem(
+    "rainbow_ai_users",
+    JSON.stringify(users)
+  );
+}
+
+let currentUserId =
+  localStorage.getItem(
+    "rainbow_ai_current_user"
+  ) || users[0].id;
+
+function saveUsers() {
+  localStorage.setItem(
+    "rainbow_ai_users",
+    JSON.stringify(users)
+  );
+}
+
+function getCurrentUser() {
+  return (
+    users.find(
+      user => user.id === currentUserId
+    ) || users[0]
+  );
+}
+
+function getInitials(name) {
+  return String(name || "H")
+    .trim()
+    .split(/\s+/)
+    .map(word => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
+function escapeUserText(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function updateCurrentUserUI() {
+  const user = getCurrentUser();
+  if (!user) return;
+
+  $("currentUserName").textContent =
+    user.name;
+
+  $("currentUserEmail").textContent =
+    user.email || "Personal account";
+
+  $("currentUserAvatar").textContent =
+    getInitials(user.name);
+}
+
+function renderUsers() {
+  const list = $("userList");
+  if (!list) return;
+
+  list.innerHTML = "";
+
+  users.forEach(user => {
+    const row = document.createElement("div");
+
+    row.className =
+      "user-row" +
+      (user.id === currentUserId
+        ? " active"
+        : "");
+
+    const avatar =
+      document.createElement("div");
+
+    avatar.className =
+      "user-avatar-small";
+
+    avatar.textContent =
+      getInitials(user.name);
+
+    const info =
+      document.createElement("div");
+
+    info.className =
+      "user-row-info";
+
+    info.innerHTML =
+      `<div class="user-row-name">${escapeUserText(user.name)}</div>` +
+      `<div class="user-row-email">${escapeUserText(user.email || "Personal account")}</div>`;
+
+    row.append(avatar, info);
+
+    if (user.id !== "default") {
+      const remove =
+        document.createElement("button");
+
+      remove.className =
+        "user-remove";
+
+      remove.type = "button";
+      remove.textContent = "×";
+
+      remove.onclick = event => {
+        event.stopPropagation();
+
+        users =
+          users.filter(
+            item => item.id !== user.id
+          );
+
+        if (
+          currentUserId === user.id
+        ) {
+          currentUserId =
+            users[0].id;
+
+          localStorage.setItem(
+            "rainbow_ai_current_user",
+            currentUserId
+          );
+        }
+
+        saveUsers();
+        renderUsers();
+        updateCurrentUserUI();
+      };
+
+      row.appendChild(remove);
+    }
+
+    row.onclick = () => {
+      currentUserId = user.id;
+
+      localStorage.setItem(
+        "rainbow_ai_current_user",
+        currentUserId
+      );
+
+      updateCurrentUserUI();
+      renderUsers();
+
+      $("userDrawer")
+        .classList
+        .remove("show");
+    };
+
+    list.appendChild(row);
+  });
+}
+
+$("userTabButton").onclick = () => {
+  renderUsers();
+
+  $("userDrawer")
+    .classList
+    .add("show");
+};
+
+$("closeUserDrawer").onclick = () => {
+  $("userDrawer")
+    .classList
+    .remove("show");
+};
+
+$("userDrawer").onclick = event => {
+  if (event.target.id === "userDrawer") {
+    $("userDrawer")
+      .classList
+      .remove("show");
+  }
+};
+
+$("addUserButton").onclick = () => {
+  $("userForm")
+    .classList
+    .toggle("show");
+
+  if (
+    $("userForm")
+      .classList
+      .contains("show")
+  ) {
+    $("newUserName").focus();
+  }
+};
+
+$("saveUserButton").onclick = () => {
+  const name =
+    $("newUserName")
+      .value
+      .trim();
+
+  const email =
+    $("newUserEmail")
+      .value
+      .trim();
+
+  if (!name) {
+    $("newUserName").focus();
+    return;
+  }
+
+  const user = {
+    id:
+      "user_" +
+      Date.now(),
+    name,
+    email:
+      email || "Personal account"
+  };
+
+  users.push(user);
+
+  currentUserId =
+    user.id;
+
+  localStorage.setItem(
+    "rainbow_ai_current_user",
+    currentUserId
+  );
+
+  saveUsers();
+  updateCurrentUserUI();
+  renderUsers();
+
+  $("newUserName").value = "";
+  $("newUserEmail").value = "";
+
+  $("userForm")
+    .classList
+    .remove("show");
+};
+
+updateCurrentUserUI();
+renderUsers();
 
 /* ============================================
    STARTUP
