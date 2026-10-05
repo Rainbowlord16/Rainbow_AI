@@ -8,6 +8,9 @@
 <link rel="icon" href="icon-new.png">
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,400..700&display=swap" rel="stylesheet">
 
 <style>
 * {
@@ -49,7 +52,8 @@ body {
 
 body {
   font-family:
-    Inter,
+    "Google Sans Flex",
+    "Google Sans",
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
@@ -814,6 +818,81 @@ body {
     max-width: 90%;
   }
 }
+
+
+/* =========================================================
+   RAINBOW AI — VISUAL UI ENHANCEMENT ONLY
+   Existing HTML structure, IDs and JavaScript are preserved.
+========================================================= */
+:root{
+  --accent:#8ab4f8;
+  --accent2:#a78bfa;
+  --pink:#f28bba;
+  --green:#81c995;
+  --shadow:0 24px 80px rgba(0,0,0,.34);
+}
+
+body,button,input,textarea,select{font-family:"Google Sans Flex","Google Sans",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,textarea,select{letter-spacing:-.01em}
+
+.sidebar{background:linear-gradient(180deg,#111318 0%,#0d0f14 100%);border-right:1px solid rgba(255,255,255,.07)}
+[data-theme="light"] .sidebar{background:#fff}
+.brand img{border-radius:11px;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 8px 28px rgba(139,92,246,.18)}
+.brand-name{font-weight:650;letter-spacing:-.025em}
+.new-chat{border:0;border-radius:999px;background:#1b1e25;box-shadow:none}
+.new-chat:hover{background:#252932;transform:translateY(-1px)}
+.search{border:0;border-radius:999px;background:#171a20}
+.search:focus{border-color:transparent;box-shadow:0 0 0 2px rgba(138,180,248,.2)}
+.history-item{border-radius:12px}
+.history-item:hover,.history-item.active{background:rgba(255,255,255,.06)}
+.delete-chat{border-radius:50%;padding:4px}
+.sidebar-bottom button{border:0;border-radius:999px;background:transparent}
+.sidebar-bottom button:hover{background:rgba(255,255,255,.06)}
+
+.topbar{border-bottom:0;background:rgba(11,13,18,.72);backdrop-filter:blur(22px)}
+[data-theme="light"] .topbar{background:rgba(247,248,252,.78)}
+.icon-btn{border:0;border-radius:50%;background:transparent}
+.icon-btn:hover{background:rgba(255,255,255,.07)}
+.model-selector{border:0;border-radius:999px;background:transparent;font-weight:550}
+.model-selector:hover{background:rgba(255,255,255,.055)}
+.status{border:0;background:rgba(129,201,149,.09);color:var(--green);box-shadow:none}
+
+.welcome h1{font-weight:500;letter-spacing:-.055em}
+.welcome-gradient{background:linear-gradient(90deg,#8ab4f8 0%,#a78bfa 48%,#f28bba 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.welcome-logo{box-shadow:0 0 36px rgba(139,92,246,.24),0 0 70px rgba(66,133,244,.10)}
+.prompt-card{border:0;border-radius:20px;background:#171a21}
+.prompt-card:hover{background:#20242c;border-color:transparent;box-shadow:0 10px 30px rgba(0,0,0,.18);transform:translateY(-2px)}
+
+.ai-avatar{background:linear-gradient(135deg,#8ab4f8,#a78bfa,#f28bba);box-shadow:0 5px 18px rgba(139,92,246,.2)}
+.user-avatar{background:#242832}
+.user .message-content{background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:20px 20px 6px 20px}
+.message-action{border-radius:999px}
+
+.composer{border:1px solid rgba(255,255,255,.08);border-radius:28px;background:rgba(17,20,27,.94);backdrop-filter:blur(22px);box-shadow:0 20px 70px rgba(0,0,0,.30)}
+.composer:focus-within{border-color:rgba(138,180,248,.38);box-shadow:0 0 0 3px rgba(138,180,248,.07),0 20px 70px rgba(0,0,0,.30)}
+.tool-btn{border:0;border-radius:999px;background:transparent}
+.tool-btn:hover{background:rgba(255,255,255,.07);color:var(--text)}
+.send-btn{width:42px;height:42px;border:0;border-radius:50%;background:linear-gradient(135deg,#4285f4,#8b5cf6);box-shadow:0 6px 22px rgba(66,133,244,.22)}
+.send-btn:hover{transform:scale(1.06);box-shadow:0 8px 28px rgba(139,92,246,.3)}
+.send-btn.stop{background:#ef4444}
+.file-chip{border-radius:999px;background:#20242c}
+
+.settings{border-left:1px solid rgba(255,255,255,.07);box-shadow:-20px 0 70px rgba(0,0,0,.25)}
+.setting-input,.setting-select{border:0;border-radius:14px;background:#171a21}
+.setting-input:focus,.setting-select:focus{outline:2px solid rgba(138,180,248,.2)}
+.toggle.active{background:linear-gradient(135deg,#4285f4,#8b5cf6)}
+
+*{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.13) transparent}
+*::-webkit-scrollbar{width:7px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:rgba(255,255,255,.13);border-radius:99px}
+*::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.22)}
+
+/* Preserve original controls while giving them cleaner icon-like visuals */
+.new-chat span:first-child{font-size:21px;line-height:1}
+.tool-btn{display:inline-flex;align-items:center;gap:6px}
+.send-btn{font-size:16px}
+
 </style>
 </head>
 
