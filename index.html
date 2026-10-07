@@ -706,6 +706,7 @@ svg {
   color: var(--muted);
 }
 
+
 .dynamic-prompt-badge {
   background: var(--panel2);
   padding: 3px 8px;
@@ -1520,6 +1521,153 @@ svg {
   gap: 7px;
 }
 
+  /* Alerts Badge in Sidebar */
+.alerts-badge {
+  margin-left: auto;
+  background: var(--pink);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  display: none;
+}
+
+.alerts-badge.active {
+  display: inline-block;
+}
+
+/* Alerts Tab View Layout */
+.alerts-view {
+  width: min(900px, 100%);
+  margin: auto;
+  padding: 40px 25px 120px;
+}
+
+.alerts-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.alerts-view h1 {
+  font-size: 28px;
+  margin: 0 0 6px 0;
+  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.alerts-view p {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0;
+}
+
+.clear-alerts-btn {
+  background: var(--panel2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .18s;
+}
+
+.clear-alerts-btn:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.alerts-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Alert Item Card */
+.alert-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  transition: transform .2s, border-color .2s;
+  box-shadow: var(--shadow);
+}
+
+.alert-card:hover {
+  transform: translateY(-1px);
+}
+
+.alert-card.info {
+  border-left: 4px solid var(--accent2);
+}
+
+.alert-card.warning {
+  border-left: 4px solid #f59e0b;
+}
+
+.alert-card.error {
+  border-left: 4px solid #ef4444;
+}
+
+.alert-card.success {
+  border-left: 4px solid var(--green);
+}
+
+.alert-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.alert-info-container {
+  flex: 1;
+}
+
+.alert-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.alert-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.alert-time {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.alert-message {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 0;
+}
+
+.alert-empty-state {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+
 .user-item {
   width: 100%;
 
@@ -1830,6 +1978,20 @@ svg {
     </svg>
     <span>Nova</span>
   </button>
+
+  <button
+  class="nav-tab-btn"
+  id="alertsTabBtn"
+  type="button"
+>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  </svg>
+  <span>Alerts & Notifications</span>
+  <span class="alerts-badge" id="alertsCountBadge">0</span>
+</button>
+
 
   <input
     class="search"
@@ -2308,6 +2470,24 @@ svg {
     </div>
   </section>
 
+  <!-- ALERTS TAB VIEW -->
+<section class="alerts-view" id="alertsView" style="display: none;">
+  <div class="alerts-header-flex">
+    <div>
+      <h1>System Alerts & Notifications</h1>
+      <p>Stay informed about system health, model status, and runtime logs.</p>
+    </div>
+    <div class="alerts-actions">
+      <button class="clear-alerts-btn" id="clearAlertsBtn" type="button">Clear All</button>
+    </div>
+  </div>
+
+  <div class="alerts-feed" id="alertsFeed">
+    <!-- Dynamic alert items will render here -->
+  </div>
+</section>
+
+
 </div>
 
 </main>
@@ -2634,6 +2814,111 @@ svg {
 </div>
 
 <script>
+
+  /* ============================================
+   ALERTS TAB LOGIC
+============================================ */
+
+const alertsView = $("alertsView");
+const alertsTabBtn = $("alertsTabBtn");
+const alertsFeed = $("alertsFeed");
+const alertsCountBadge = $("alertsCountBadge");
+
+let alertsList = JSON.parse(localStorage.getItem("rainbow_ai_alerts") || "[]");
+
+// Update switchTab function to support 'alerts'
+const originalSwitchTab = switchTab;
+switchTab = function(tabName) {
+  alertsView.style.display = "none";
+  alertsTabBtn.classList.remove("active");
+
+  if (tabName === 'alerts') {
+    chatView.style.display = "none";
+    promptsView.style.display = "none";
+    novaView.style.display = "none";
+    composerArea.style.display = "none";
+
+    $("promptsTabBtn").classList.remove("active");
+    $("novaTabBtn").classList.remove("active");
+
+    alertsView.style.display = "block";
+    alertsTabBtn.classList.add("active");
+    renderAlertsFeed();
+  } else {
+    originalSwitchTab(tabName);
+  }
+};
+
+alertsTabBtn.onclick = () => {
+  switchTab('alerts');
+};
+
+$("clearAlertsBtn").onclick = () => {
+  alertsList = [];
+  localStorage.setItem("rainbow_ai_alerts", JSON.stringify(alertsList));
+  renderAlertsFeed();
+  updateAlertsBadge();
+};
+
+function updateAlertsBadge() {
+  if (alertsList.length > 0) {
+    alertsCountBadge.textContent = alertsList.length;
+    alertsCountBadge.classList.add("active");
+  } else {
+    alertsCountBadge.classList.remove("active");
+  }
+}
+
+function renderAlertsFeed() {
+  alertsFeed.innerHTML = "";
+
+  if (!alertsList.length) {
+    alertsFeed.innerHTML = `
+      <div class="alert-empty-state">
+        No active notifications or alerts. Everything is running smoothly.
+      </div>
+    `;
+    return;
+  }
+
+  alertsList.forEach(item => {
+    const card = document.createElement("div");
+    card.className = `alert-card ${item.type || 'info'}`;
+    card.innerHTML = `
+      <div class="alert-info-container">
+        <div class="alert-title-row">
+          <span class="alert-title">${item.title}</span>
+          <span class="alert-time">${item.time}</span>
+        </div>
+        <p class="alert-message">${item.message}</p>
+      </div>
+    `;
+    alertsFeed.appendChild(card);
+  });
+}
+
+// Global helper to trigger and store alerts from any event
+window.pushAlert = function(title, message, type = "info") {
+  const alertItem = {
+    id: Date.now().toString(),
+    title,
+    message,
+    type,
+    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  };
+
+  alertsList.unshift(alertItem);
+  localStorage.setItem("rainbow_ai_alerts", JSON.stringify(alertsList));
+  updateAlertsBadge();
+
+  if (alertsView.style.display === "block") {
+    renderAlertsFeed();
+  }
+};
+
+// Initial state render
+updateAlertsBadge();
+
 
 /* ============================================
    HELPERS
