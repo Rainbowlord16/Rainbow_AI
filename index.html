@@ -2036,6 +2036,30 @@ svg {
 
   <div class="top-right">
 
+    <!-- Export Chat Button -->
+    <button
+      class="tool-btn"
+      id="downloadChatBtn"
+      type="button"
+      title="Download conversation"
+    >
+      <svg
+        class="button-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <span>Export Chat</span>
+    </button>
+
     <span
       class="status"
       id="status"
@@ -2266,17 +2290,17 @@ svg {
   <section class="prompts-view" id="promptsView" style="display: none;">
     <div class="prompts-header-flex">
       <div>
-        <h1>🌈 Rainbow Prompts Library</h1>
+        <h1>Rainbow Prompts Library</h1>
         <p>50 hand-crafted inspiration prompts that shuffle automatically on every refresh!</p>
       </div>
-      <button class="refresh-prompts-btn" id="shufflePromptsBtn" type="button">🔄 Shuffle Prompts</button>
+      <button class="refresh-prompts-btn" id="shufflePromptsBtn" type="button">Shuffle Prompts</button>
     </div>
     <div class="fifty-prompts-grid" id="fiftyPromptsGrid"></div>
   </section>
 
   <!-- NOVA TAB VIEW -->
   <section class="nova-view" id="novaView" style="display: none;">
-    <h1>✨ Nova Assistant</h1>
+    <h1>Nova Assistant</h1>
     <p>Your specialized sub-module workspace for experimental features and advanced workflows.</p>
     <div class="nova-card">
       <h3>Nova Features</h3>
@@ -3011,6 +3035,50 @@ function loadSession(id) {
 
 
 /* ============================================
+   EXPORT CURRENT CHAT TO FILE
+============================================ */
+
+function exportCurrentChat() {
+  if (!currentSession || !currentSession.messages.length) {
+    alert("No messages to export in this conversation.");
+    return;
+  }
+
+  const currentUser = getCurrentUser();
+  const userName = currentUser ? currentUser.name : "User";
+
+  let exportContent = `# ${currentSession.title}\n`;
+  exportContent += `Exported on: ${new Date().toLocaleString()}\n`;
+  exportContent += `----------------------------------------\n\n`;
+
+  currentSession.messages.forEach(msg => {
+    const sender = msg.role === "assistant" ? "Rainbow AI" : userName;
+    exportContent += `### ${sender}\n${msg.content}\n\n`;
+  });
+
+  const blob = new Blob([exportContent], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  const safeTitle = currentSession.title
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "-")
+    .replace(/-+/g, "-")
+    .slice(0, 30);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${safeTitle || "chat-export"}.md`;
+  document.body.appendChild(link);
+  link.click();
+
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+$("downloadChatBtn").onclick = exportCurrentChat;
+
+
+/* ============================================
    MARKDOWN & MESSAGES
 ============================================ */
 
@@ -3142,11 +3210,11 @@ async function sendMessage() {
 }
 
 async function cloudGatewayChat(messagesArray, onChunk, signal) {
-  const selectedModel = $("model").value; // 'coder' or 'vision'
+  const selectedModel = $("model").value;
   const latestMessage = messagesArray[messagesArray.length - 1]?.content || "";
 
   // Replace this URL with your active Cloudflare Worker endpoint URL
-  const workerUrl = "https://rough-leaf-18d2.your-subdomain.workers.dev";
+  const workerUrl = "https://rough-leaf-18d2.herish-kondeti.workers.dev";
 
   const response = await fetch(workerUrl, {
     method: "POST",
