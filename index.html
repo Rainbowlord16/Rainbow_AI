@@ -183,7 +183,7 @@ svg {
   color: transparent;
 }
 
-/* New chat & Prompts Tab Button */
+/* Nav Tab Buttons */
 
 .nav-tab-btn {
   height: 44px;
@@ -593,12 +593,14 @@ svg {
 }
 
 /* ================================
-   CHAT VIEW & PROMPTS VIEW
+   VIEWS CONTAINER
 ================================ */
 
 .view-container {
   flex: 1;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .chat {
@@ -708,6 +710,42 @@ svg {
   background: var(--panel2);
   padding: 3px 8px;
   border-radius: 6px;
+}
+
+/* Nova Tab View Layout */
+.nova-view {
+  width: min(900px, 100%);
+  margin: auto;
+  padding: 40px 25px 120px;
+}
+
+.nova-view h1 {
+  font-size: 28px;
+  margin: 0 0 6px 0;
+  background: linear-gradient(90deg, #4285f4, #8b5cf6, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nova-view p {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.nova-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+
+.nova-card h3 {
+  margin-top: 0;
+  font-size: 18px;
+  color: var(--text);
 }
 
 /* ================================
@@ -1782,6 +1820,17 @@ svg {
     <span>Prompts Library</span>
   </button>
 
+  <button
+    class="nav-tab-btn"
+    id="novaTabBtn"
+    type="button"
+  >
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 2l2.4 7.2h7.6l-6.2 4.8 2.4 7.2-6.2-4.8-6.2 4.8 2.4-7.2-6.2-4.8h7.6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    </svg>
+    <span>Nova</span>
+  </button>
+
   <input
     class="search"
     id="search"
@@ -2225,6 +2274,16 @@ svg {
     <div class="fifty-prompts-grid" id="fiftyPromptsGrid"></div>
   </section>
 
+  <!-- NOVA TAB VIEW -->
+  <section class="nova-view" id="novaView" style="display: none;">
+    <h1>✨ Nova Assistant</h1>
+    <p>Your specialized sub-module workspace for experimental features and advanced workflows.</p>
+    <div class="nova-card">
+      <h3>Nova Features</h3>
+      <p style="color: var(--muted); margin: 0;">Nova is fully integrated into Rainbow AI. Enjoy high-speed intelligence and modular tools here!</p>
+    </div>
+  </section>
+
 </div>
 
 </main>
@@ -2597,6 +2656,9 @@ const chatView =
 const promptsView =
   $("promptsView");
 
+const novaView =
+  $("novaView");
+
 const composerArea =
   $("composerArea");
 
@@ -2715,27 +2777,39 @@ function renderFiftyPrompts() {
   });
 }
 
-// Switch between Chat and Prompts Tab
+// Switch between Chat, Prompts, and Nova Tabs
 function switchTab(tabName) {
-  const chatBtn = $("newChat"); // We keep chat active state
+  const chatBtn = $("newChat");
   const promptsBtn = $("promptsTabBtn");
+  const novaBtn = $("novaTabBtn");
+
+  chatView.style.display = "none";
+  promptsView.style.display = "none";
+  novaView.style.display = "none";
+  promptsBtn.classList.remove("active");
+  novaBtn.classList.remove("active");
 
   if (tabName === 'prompts') {
-    chatView.style.display = "none";
     promptsView.style.display = "block";
     composerArea.style.display = "none";
     promptsBtn.classList.add("active");
+  } else if (tabName === 'nova') {
+    novaView.style.display = "block";
+    composerArea.style.display = "none";
+    novaBtn.classList.add("active");
   } else {
     chatView.style.display = "block";
-    promptsView.style.display = "none";
     composerArea.style.display = "block";
-    promptsBtn.classList.remove("active");
   }
 }
 
 $("promptsTabBtn").onclick = () => {
   switchTab('prompts');
   renderFiftyPrompts();
+};
+
+$("novaTabBtn").onclick = () => {
+  switchTab('nova');
 };
 
 $("shufflePromptsBtn").onclick = () => {
@@ -3253,7 +3327,6 @@ async function generateAIChatTitle(firstUserMessage) {
         titleText += chunk.choices?.[0]?.delta?.content || "";
       }
     } else {
-      // Fallback AI Title Heuristic or lightweight fetch if local model isn't active
       titleText = firstUserMessage.replace(/\s+/g, " ").slice(0, 30) + "...";
     }
 
@@ -3262,7 +3335,6 @@ async function generateAIChatTitle(firstUserMessage) {
       saveSessions();
     }
   } catch (err) {
-    // Graceful fallback to regular truncation if AI title generation fails
     currentSession.title = firstUserMessage.replace(/\s+/g, " ").slice(0, 35) + "…";
     saveSessions();
   }
@@ -3291,7 +3363,6 @@ function saveMessage(
       "New chat"
   ) {
 
-    // Instantly apply temporary title, then request AI Title Generation
     currentSession.title =
       content
         .replace(/\s+/g, " ")
