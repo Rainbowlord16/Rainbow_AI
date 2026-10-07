@@ -183,41 +183,41 @@ svg {
   color: transparent;
 }
 
-/* New chat */
+/* New chat & Prompts Tab Button */
 
-.new-chat {
+.nav-tab-btn {
   height: 44px;
-
   border: 0;
   border-radius: 999px;
-
   background: var(--panel2);
   color: var(--text);
-
   cursor: pointer;
-
   display: flex;
   align-items: center;
   justify-content: flex-start;
-
   gap: 9px;
   padding: 0 15px;
-
   font-size: 14px;
   font-weight: 550;
-
   transition: .2s;
+  margin-bottom: 6px;
+  width: 100%;
 }
 
-.new-chat:hover {
+.nav-tab-btn:hover, .nav-tab-btn.active {
   background: var(--panel3);
   transform: translateY(-1px);
+}
+
+.nav-tab-btn.active {
+  background: linear-gradient(135deg, rgba(66,133,244,.15), rgba(139,92,246,.2));
+  border: 1px solid rgba(139,92,246,.3);
 }
 
 /* Search */
 
 .search {
-  margin-top: 10px;
+  margin-top: 4px;
 
   width: 100%;
   height: 42px;
@@ -245,7 +245,7 @@ svg {
 /* Section */
 
 .section-title {
-  margin: 20px 8px 8px;
+  margin: 16px 8px 8px;
 
   color: var(--muted);
 
@@ -593,12 +593,16 @@ svg {
 }
 
 /* ================================
-   CHAT
+   CHAT VIEW & PROMPTS VIEW
 ================================ */
+
+.view-container {
+  flex: 1;
+  overflow-y: auto;
+}
 
 .chat {
   flex: 1;
-  overflow-y: auto;
 }
 
 .chat-inner {
@@ -610,6 +614,100 @@ svg {
     34px
     25px
     180px;
+}
+
+/* Prompts Tab View Layout */
+.prompts-view {
+  width: min(1000px, 100%);
+  margin: auto;
+  padding: 40px 25px 120px;
+}
+
+.prompts-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.prompts-view h1 {
+  font-size: 28px;
+  margin: 0 0 6px 0;
+  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.prompts-view p {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0;
+}
+
+.refresh-prompts-btn {
+  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  color: white;
+  border: 0;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: transform .2s, filter .2s;
+  box-shadow: 0 4px 15px rgba(139,92,246,0.25);
+}
+
+.refresh-prompts-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.fifty-prompts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.dynamic-prompt-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 16px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: .2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.dynamic-prompt-card:hover {
+  background: var(--panel2);
+  border-color: rgba(139,92,246,.5);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,.15);
+}
+
+.dynamic-prompt-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.dynamic-prompt-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.dynamic-prompt-badge {
+  background: var(--panel2);
+  padding: 3px 8px;
+  border-radius: 6px;
 }
 
 /* ================================
@@ -1648,7 +1746,7 @@ svg {
   </div>
 
   <button
-    class="new-chat"
+    class="nav-tab-btn"
     id="newChat"
     type="button"
   >
@@ -1670,6 +1768,18 @@ svg {
 
     <span>New chat</span>
 
+  </button>
+
+  <button
+    class="nav-tab-btn"
+    id="promptsTabBtn"
+    type="button"
+  >
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M8 7h8M8 11h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <span>Prompts Library</span>
   </button>
 
   <input
@@ -1915,201 +2025,213 @@ svg {
 
 </header>
 
-<!-- ================= CHAT ================= -->
+<!-- ================= VIEWS CONTAINER ================= -->
 
-<section
-  class="chat"
-  id="chat"
->
+<div class="view-container" id="viewContainer">
 
-  <div class="chat-inner">
+  <!-- CHAT VIEW -->
+  <section class="chat" id="chatView">
+    <div class="chat-inner">
 
-    <div
-      class="welcome"
-      id="welcome"
-    >
-
-      <img
-        class="welcome-logo"
-        src="icon-new.png"
-        alt="Rainbow AI"
+      <div
+        class="welcome"
+        id="welcome"
       >
 
-      <h1>
-        Hello,
-        <span
-          class="welcome-gradient"
-          id="welcomeUserName"
-        >
-          Herish
-        </span>
-      </h1>
-
-      <p>
-        How can I help you today?
-      </p>
-
-      <div class="prompt-grid">
-
-        <button
-          class="prompt-card"
-          data-prompt="Build a modern responsive website for an AI assistant."
+        <img
+          class="welcome-logo"
+          src="icon-new.png"
+          alt="Rainbow AI"
         >
 
-          <div class="prompt-icon">
+        <h1>
+          Hello,
+          <span
+            class="welcome-gradient"
+            id="welcomeUserName"
+          >
+            Herish
+          </span>
+        </h1>
 
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <path
-                d="M12 3l1.7 6.3L20 11l-6.3 1.7L12 19l-1.7-6.3L4 11l6.3-1.7L12 3Z"
-                stroke="currentColor"
-                stroke-width="1.7"
-                stroke-linejoin="round"
-              />
+        <p>
+          How can I help you today?
+        </p>
 
-              <path
-                d="m19 4 .5 1.5L21 6l-1.5.5L19 8l-.5-1.5L17 6l1.5-.5L19 4Z"
-                stroke="currentColor"
-                stroke-width="1.3"
-                stroke-linejoin="round"
-              />
-            </svg>
+        <div class="prompt-grid">
 
-          </div>
+          <button
+            class="prompt-card"
+            data-prompt="Build a modern responsive website for an AI assistant."
+          >
 
-          <div class="prompt-title">
-            Build something
-          </div>
+            <div class="prompt-icon">
 
-          <div class="prompt-description">
-            Create websites, apps and projects
-          </div>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M12 3l1.7 6.3L20 11l-6.3 1.7L12 19l-1.7-6.3L4 11l6.3-1.7L12 3Z"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"
+                />
 
-        </button>
+                <path
+                  d="m19 4 .5 1.5L21 6l-1.5.5L19 8l-.5-1.5L17 6l1.5-.5L19 4Z"
+                  stroke="currentColor"
+                  stroke-width="1.3"
+                  stroke-linejoin="round"
+                />
+              </svg>
 
-        <button
-          class="prompt-card"
-          data-prompt="Explain a difficult topic to me step by step with simple examples."
-        >
+            </div>
 
-          <div class="prompt-icon">
+            <div class="prompt-title">
+              Build something
+            </div>
 
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <path
-                d="M9.2 19.5h5.6M9.8 22h4.4M8.2 15.8C6.2 14.5 5 12.3 5 9.9a7 7 0 0 1 14 0c0 2.4-1.2 4.6-3.2 5.9-.8.5-1.2 1.2-1.2 2.2H9.4c0-1-.4-1.7-1.2-2.2Z"
-                stroke="currentColor"
-                stroke-width="1.6"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+            <div class="prompt-description">
+              Create websites, apps and projects
+            </div>
 
-          </div>
+          </button>
 
-          <div class="prompt-title">
-            Learn something
-          </div>
+          <button
+            class="prompt-card"
+            data-prompt="Explain a difficult topic to me step by step with simple examples."
+          >
 
-          <div class="prompt-description">
-            Understand difficult topics easily
-          </div>
+            <div class="prompt-icon">
 
-        </button>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M9.2 19.5h5.6M9.8 22h4.4M8.2 15.8C6.2 14.5 5 12.3 5 9.9a7 7 0 0 1 14 0c0 2.4-1.2 4.6-3.2 5.9-.8.5-1.2 1.2-1.2 2.2H9.4c0-1-.4-1.7-1.2-2.2Z"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
 
-        <button
-          class="prompt-card"
-          data-prompt="Write a complete HTML, CSS and JavaScript project for me."
-        >
+            </div>
 
-          <div class="prompt-icon">
+            <div class="prompt-title">
+              Learn something
+            </div>
 
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <rect
-                x="3.5"
-                y="4.5"
-                width="17"
-                height="12"
-                rx="2"
-                stroke="currentColor"
-                stroke-width="1.6"
-              />
+            <div class="prompt-description">
+              Understand difficult topics easily
+            </div>
 
-              <path
-                d="M8 20h8M12 16.5V20M8.5 9.5l2.5 2.5-2.5 2.5M13.5 14.5h3"
-                stroke="currentColor"
-                stroke-width="1.6"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+          </button>
 
-          </div>
+          <button
+            class="prompt-card"
+            data-prompt="Write a complete HTML, CSS and JavaScript project for me."
+          >
 
-          <div class="prompt-title">
-            Write code
-          </div>
+            <div class="prompt-icon">
 
-          <div class="prompt-description">
-            Build and debug your code
-          </div>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <rect
+                  x="3.5"
+                  y="4.5"
+                  width="17"
+                  height="12"
+                  rx="2"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                />
 
-        </button>
+                <path
+                  d="M8 20h8M12 16.5V20M8.5 9.5l2.5 2.5-2.5 2.5M13.5 14.5h3"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
 
-        <button
-          class="prompt-card"
-          data-prompt="Give me 10 creative ideas for a new AI project."
-        >
+            </div>
 
-          <div class="prompt-icon">
+            <div class="prompt-title">
+              Write code
+            </div>
 
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <path
-                d="M9 18h6M10 21h4M8.2 14.8C7 13.7 6.2 12.1 6.2 10.3a5.8 5.8 0 1 1 11.6 0c0 1.8-.8 3.4-2 4.5-.9.8-1.4 1.4-1.4 3.2h-4.8c0-1.8-.5-2.4-1.4-3.2Z"
-                stroke="currentColor"
-                stroke-width="1.6"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+            <div class="prompt-description">
+              Build and debug your code
+            </div>
 
-          </div>
+          </button>
 
-          <div class="prompt-title">
-            Brainstorm
-          </div>
+          <button
+            class="prompt-card"
+            data-prompt="Give me 10 creative ideas for a new AI project."
+          >
 
-          <div class="prompt-description">
-            Explore ideas and possibilities
-          </div>
+            <div class="prompt-icon">
 
-        </button>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M9 18h6M10 21h4M8.2 14.8C7 13.7 6.2 12.1 6.2 10.3a5.8 5.8 0 1 1 11.6 0c0 1.8-.8 3.4-2 4.5-.9.8-1.4 1.4-1.4 3.2h-4.8c0-1.8-.5-2.4-1.4-3.2Z"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+
+            </div>
+
+            <div class="prompt-title">
+              Brainstorm
+            </div>
+
+            <div class="prompt-description">
+              Explore ideas and possibilities
+            </div>
+
+          </button>
+
+        </div>
 
       </div>
 
+      <div id="messages"></div>
+
     </div>
+  </section>
 
-    <div id="messages"></div>
+  <!-- PROMPTS TAB VIEW -->
+  <section class="prompts-view" id="promptsView" style="display: none;">
+    <div class="prompts-header-flex">
+      <div>
+        <h1>🌈 Rainbow Prompts Library</h1>
+        <p>50 hand-crafted inspiration prompts that shuffle automatically on every refresh!</p>
+      </div>
+      <button class="refresh-prompts-btn" id="shufflePromptsBtn" type="button">🔄 Shuffle Prompts</button>
+    </div>
+    <div class="fifty-prompts-grid" id="fiftyPromptsGrid"></div>
+  </section>
 
-  </div>
-
-</section>
+</div>
 
 </main>
 
 <!-- ================= COMPOSER ================= -->
 
-<div class="composer-area">
+<div class="composer-area" id="composerArea">
 
   <div class="composer">
 
@@ -2469,8 +2591,14 @@ const $ =
 const sidebar =
   $("sidebar");
 
-const chat =
-  $("chat");
+const chatView =
+  $("chatView");
+
+const promptsView =
+  $("promptsView");
+
+const composerArea =
+  $("composerArea");
 
 const messages =
   $("messages");
@@ -2493,6 +2621,126 @@ let engine = null;
 let generating = false;
 
 let abortController = null;
+
+
+/* ============================================
+   50 PROMPTS MASTER LIST & REFRESH LOGIC
+============================================ */
+
+const masterPrompts = [
+  // Code & Development
+  "Refactor this React component to use custom hooks for better reusability.",
+  "Write a robust custom debounce hook in TypeScript with proper typing.",
+  "Debug this CSS Grid layout issue where items are overflowing on mobile screens.",
+  "Create a sleek glassmorphism card component using Tailwind CSS.",
+  "Explain how Event Bubbling and Event Capturing work with a quick code example.",
+  "Write a Python script to scrape daily manga release schedules from a web page.",
+  "Optimize this SQL query that is causing heavy latency on the user dashboard.",
+  "Build a lightweight state management store using JavaScript Proxies.",
+  "Write unit tests using Jest and React Testing Library for a modal component.",
+  "Implement dark mode toggle persistence using localStorage and CSS variables.",
+  "Write a regex expression to validate complex passwords with special characters.",
+  "Create an infinite scroll hook using the Intersection Observer API.",
+  "How do I set up a secure JWT authentication middleware in Node.js/Express?",
+  "Write a Web Audio API snippet to play a subtle notification chime.",
+  "Build a draggable kanban board column using native HTML Drag and Drop API.",
+
+  // Manga Art & Drawing
+  "Draft a dynamic battle shonen manga panel layout focusing on high-speed action lines.",
+  "How do I sketch expressive shojo manga eyes with dramatic lighting highlights?",
+  "Design a cyberpunk mecha character sheet sketch concept with futuristic armor.",
+  "Give me a step-by-step tutorial for inking clean line art digitally using Clip Studio Paint.",
+  "What are the best techniques for creating soft, atmospheric screentone gradients in manga?",
+  "Draw a dramatic low-angle perspective shot of a hero standing atop a crumbling skyscraper.",
+  "Sketch a cute slice-of-life chibi character enjoying a steaming bowl of ramen.",
+  "How do I shade intricate flowing hair using dramatic cel-shading techniques?",
+  "Design a mystical fantasy beast companion for a young manga protagonist.",
+  "Create a storyboard thumbnail sequence for a thrilling plot-twist scene.",
+  "Practice drawing dynamic hands gripping a traditional katana sword.",
+  "How can I use cross-hatching to create a gritty, noir manga aesthetic?",
+  "Design an ornate fantasy guild emblem badge for a webtoon series.",
+  "Sketch a melancholic rainy-day background scene with detailed reflections.",
+  "Explore different panel pacing techniques for a high-tension suspense chapter.",
+
+  // Badminton & Athletics
+  "What is the exact biomechanics technique for generating lethal power in a jump smash?",
+  "Drills to improve explosive footwork speed around the four corners of the badminton court.",
+  "How to disguise a deception drop shot effectively from the rear court.",
+  "Tactics for maintaining high stamina and court coverage during a grueling 3-set singles match.",
+  "What is the optimal racket string tension for maximizing control versus power?",
+  "How to execute a fast, aggressive low backhand serve in doubles play.",
+  "Explain the rotational rotation and positioning strategies in mixed doubles badminton.",
+  "Pre-match dynamic warm-up routine specifically designed for badminton players.",
+  "How to read your opponent's racket angle early to intercept cross-court drives.",
+  "Recovery drills to transition instantly from a net kill back to base position.",
+
+  // Web Results & Creative Exploration
+  "Summarize the latest breakthroughs in WebAssembly and browser performance trends.",
+  "What are the core principles of building lightning-fast Progressive Web Apps (PWAs)?",
+  "Explore the evolution of modern CSS features like container queries and nesting.",
+  "How to optimize core web vitals for a content-heavy web application.",
+  "Write a compelling blog post outline about the future of AI-assisted web development.",
+  "Research innovative UI/UX micro-interactions that elevate user engagement.",
+  "How do modern browsers handle rendering pipelines during heavy JavaScript execution?",
+  "Analyze the impact of Server-Side Rendering (SSR) vs. Static Site Generation (SSG).",
+  "Design a playful, interactive 404 error page concept with hidden easter eggs.",
+  "What are the best practices for implementing accessible keyboard navigation in web apps?"
+];
+
+function renderFiftyPrompts() {
+  const grid = $("fiftyPromptsGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  // Shuffle master list randomly on refresh
+  const shuffled = [...masterPrompts].sort(() => 0.5 - Math.random()).slice(0, 50);
+
+  shuffled.forEach((promptText, index) => {
+    const card = document.createElement("div");
+    card.className = "dynamic-prompt-card";
+    card.innerHTML = `
+      <div class="dynamic-prompt-text">"${promptText}"</div>
+      <div class="dynamic-prompt-footer">
+        <span class="dynamic-prompt-badge">Prompt #${index + 1}</span>
+        <span style="color: var(--accent); font-weight:600;">Use Prompt ✨</span>
+      </div>
+    `;
+    card.onclick = () => {
+      switchTab('chat');
+      input.value = promptText;
+      resizeInput();
+      input.focus();
+    };
+    grid.appendChild(card);
+  });
+}
+
+// Switch between Chat and Prompts Tab
+function switchTab(tabName) {
+  const chatBtn = $("newChat"); // We keep chat active state
+  const promptsBtn = $("promptsTabBtn");
+
+  if (tabName === 'prompts') {
+    chatView.style.display = "none";
+    promptsView.style.display = "block";
+    composerArea.style.display = "none";
+    promptsBtn.classList.add("active");
+  } else {
+    chatView.style.display = "block";
+    promptsView.style.display = "none";
+    composerArea.style.display = "block";
+    promptsBtn.classList.remove("active");
+  }
+}
+
+$("promptsTabBtn").onclick = () => {
+  switchTab('prompts');
+  renderFiftyPrompts();
+};
+
+$("shufflePromptsBtn").onclick = () => {
+  renderFiftyPrompts();
+};
 
 
 /* ============================================
@@ -2930,7 +3178,7 @@ function systemMessage() {
 
 
 /* ============================================
-   CHAT STORAGE
+   CHAT STORAGE & AI TITLE GENERATION
 ============================================ */
 
 function saveSessions() {
@@ -2946,7 +3194,7 @@ function saveSessions() {
 
 
 function createSession() {
-
+  switchTab('chat');
   currentSession = {
 
     id:
@@ -2984,6 +3232,43 @@ function createSession() {
 }
 
 
+async function generateAIChatTitle(firstUserMessage) {
+  if (!currentSession || currentSession.title !== "New chat") return;
+  
+  try {
+    const payload = [
+      { role: "system", content: "You generate catchy, brief chat titles (max 4 words). Output ONLY the title text, no quotes or explanations." },
+      { role: "user", content: `Summarize this prompt into a short title: "${firstUserMessage}"` }
+    ];
+
+    let titleText = "";
+    if ($("model").value === "local" && engine) {
+      const stream = await engine.chat.completions.create({
+        messages: payload,
+        stream: true,
+        temperature: 0.3,
+        max_tokens: 15
+      });
+      for await (const chunk of stream) {
+        titleText += chunk.choices?.[0]?.delta?.content || "";
+      }
+    } else {
+      // Fallback AI Title Heuristic or lightweight fetch if local model isn't active
+      titleText = firstUserMessage.replace(/\s+/g, " ").slice(0, 30) + "...";
+    }
+
+    if (titleText.trim()) {
+      currentSession.title = titleText.replace(/['"]+/g, '').trim().slice(0, 35);
+      saveSessions();
+    }
+  } catch (err) {
+    // Graceful fallback to regular truncation if AI title generation fails
+    currentSession.title = firstUserMessage.replace(/\s+/g, " ").slice(0, 35) + "…";
+    saveSessions();
+  }
+}
+
+
 function saveMessage(
   role,
   content
@@ -3006,16 +3291,19 @@ function saveMessage(
       "New chat"
   ) {
 
+    // Instantly apply temporary title, then request AI Title Generation
     currentSession.title =
       content
         .replace(/\s+/g, " ")
-        .slice(0, 42) +
+        .slice(0, 30) +
       (
-        content.length > 42
+        content.length > 30
           ? "…"
           : ""
       );
-
+    
+    saveSessions();
+    generateAIChatTitle(content);
   }
 
   saveSessions();
@@ -3154,7 +3442,7 @@ function renderHistory(
 
 
 function loadSession(id) {
-
+  switchTab('chat');
   const session =
     sessions.find(
       s => s.id === id
@@ -3190,8 +3478,8 @@ function loadSession(id) {
 
   renderHistory();
 
-  chat.scrollTop =
-    chat.scrollHeight;
+  chatView.scrollTop =
+    chatView.scrollHeight;
 
 }
 
@@ -3374,8 +3662,8 @@ function addMessage(
     message
   );
 
-  chat.scrollTop =
-    chat.scrollHeight;
+  chatView.scrollTop =
+    chatView.scrollHeight;
 
   if (save) {
 
@@ -3543,8 +3831,8 @@ async function sendMessage() {
         responseBubble.innerHTML =
           markdown(answer);
 
-        chat.scrollTop =
-          chat.scrollHeight;
+        chatView.scrollTop =
+          chatView.scrollHeight;
 
       }
 
@@ -3567,8 +3855,8 @@ async function sendMessage() {
           responseBubble.innerHTML =
             markdown(answer);
 
-          chat.scrollTop =
-            chat.scrollHeight;
+          chatView.scrollTop =
+            chatView.scrollHeight;
 
         },
 
@@ -4329,6 +4617,8 @@ updateCurrentUserUI();
 renderUsers();
 
 renderHistory();
+
+renderFiftyPrompts(); // Initial population of the 50 dynamic prompts
 
 if (sessions.length) {
 
