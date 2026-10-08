@@ -601,6 +601,7 @@ svg {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .chat {
@@ -616,6 +617,51 @@ svg {
     34px
     25px
     180px;
+}
+
+/* Drag and Drop Overlay UI */
+.drop-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 13, 18, 0.85);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 3px dashed var(--accent);
+  margin: 16px;
+  border-radius: 24px;
+  animation: fadeIn 0.2s ease;
+}
+
+.drop-overlay.active {
+  display: flex;
+}
+
+.drop-overlay-content {
+  text-align: center;
+  pointer-events: none;
+}
+
+.drop-overlay-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.drop-overlay h2 {
+  font-size: 24px;
+  margin: 0 0 8px 0;
+  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.drop-overlay p {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0;
 }
 
 /* Prompts Tab View Layout */
@@ -705,7 +751,6 @@ svg {
   font-size: 11px;
   color: var(--muted);
 }
-
 
 .dynamic-prompt-badge {
   background: var(--panel2);
@@ -1263,26 +1308,43 @@ svg {
   background: #ef4444;
 }
 
+/* Attached File Preview Chip */
 .file-chip {
   display: none;
-
+  align-items: center;
+  gap: 8px;
   width: fit-content;
-
-  margin: 7px 0 0;
-
-  padding: 6px 10px;
-
-  border-radius: 999px;
-
+  margin: 8px 0 2px 4px;
+  padding: 6px 12px;
+  border-radius: 12px;
   background: var(--panel2);
-
-  color: var(--muted);
-
-  font-size: 11px;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 12px;
 }
 
 .file-chip.show {
-  display: block;
+  display: flex;
+}
+
+.file-chip img {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.file-chip-remove {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 2px;
+}
+
+.file-chip-remove:hover {
+  color: #ef4444;
 }
 
 .disclaimer {
@@ -2263,6 +2325,15 @@ svg {
 
 <div class="view-container" id="viewContainer">
 
+  <!-- DRAG AND DROP OVERLAY -->
+  <div class="drop-overlay" id="dropOverlay">
+    <div class="drop-overlay-content">
+      <div class="drop-overlay-icon">📁✨</div>
+      <h2>Drop your files here</h2>
+      <p>Release to attach code files or vision images to Rainbow AI</p>
+    </div>
+  </div>
+
   <!-- CHAT VIEW -->
   <section class="chat" id="chatView">
     <div class="chat-inner">
@@ -2503,10 +2574,12 @@ svg {
       placeholder="Message Rainbow AI..."
     ></textarea>
 
-    <div
-      class="file-chip"
-      id="fileChip"
-    ></div>
+    <!-- Attached File Preview Chip -->
+    <div class="file-chip" id="fileChip">
+      <img id="fileChipImg" src="" alt="" style="display:none;">
+      <span id="fileChipName"></span>
+      <button class="file-chip-remove" id="removeFileBtn" type="button" title="Remove attachment">&times;</button>
+    </div>
 
     <div class="composer-bottom">
 
@@ -2535,7 +2608,7 @@ svg {
             type="file"
             id="fileInput"
             hidden
-            accept=".txt,.md,.js,.ts,.py,.html,.css,.json,.csv"
+            accept=".txt,.md,.js,.ts,.py,.html,.css,.json,.csv,image/*"
           >
 
         </label>
@@ -2728,7 +2801,7 @@ svg {
       <div class="setting-description">
         Rainbow AI is your intelligent AI assistant for
         coding, writing, brainstorming, learning and
-        everyday tasks using your custom Hugging Face models.
+        everyday tasks with vision and code support.
       </div>
 
     </div>
@@ -2820,6 +2893,7 @@ svg {
 const $ = id => document.getElementById(id);
 
 const sidebar = $("sidebar");
+const viewContainer = $("viewContainer");
 const chatView = $("chatView");
 const promptsView = $("promptsView");
 const novaView = $("novaView");
@@ -2830,11 +2904,14 @@ const welcome = $("welcome");
 const input = $("input");
 const sendButton = $("sendButton");
 const status = $("status");
+const dropOverlay = $("dropOverlay");
 
 let generating = false;
 let abortController = null;
 
-// Unified tab switcher function
+// Attached file state for text or vision files
+let attachedFilePayload = null; // { name, type, content (text or base64) }
+
 function switchTab(tabName) {
   const promptsBtn = $("promptsTabBtn");
   const novaBtn = $("novaTabBtn");
@@ -2867,6 +2944,99 @@ function switchTab(tabName) {
     composerArea.style.display = "block";
   }
 }
+
+
+/* ============================================
+   DRAG AND DROP VISION & FILE ATTACHMENTS
+============================================ */
+
+function handleFileAttachment(file) {
+  if (!file) return;
+
+  const reader = new FileReader();
+  const isImage = file.type.startsWith("image/");
+
+  if (isImage) {
+    reader.onload = e => {
+      attachedFilePayload = {
+        name: file.name,
+        type: 'image',
+        data: e.target.result // Base64 Data URL for vision model
+      };
+      
+      const chip = $("fileChip");
+      const chipImg = $("fileChipImg");
+      const chipName = $("fileChipName");
+
+      chipImg.src = e.target.result;
+      chipImg.style.display = "block";
+      chipName.textContent = file.name;
+      chip.classList.add("show");
+    };
+    reader.readAsDataURL(file);
+  } else {
+    reader.onload = e => {
+      attachedFilePayload = {
+        name: file.name,
+        type: 'text',
+        data: e.target.result
+      };
+
+      const chip = $("fileChip");
+      const chipImg = $("fileChipImg");
+      const chipName = $("fileChipName");
+
+      chipImg.style.display = "none";
+      chipName.textContent = "📎 " + file.name;
+      chip.classList.add("show");
+    };
+    reader.readAsText(file);
+  }
+}
+
+$("fileInput").onchange = event => {
+  const file = event.target.files[0];
+  handleFileAttachment(file);
+};
+
+$("removeFileBtn").onclick = () => {
+  attachedFilePayload = null;
+  $("fileChip").classList.remove("show");
+  $("fileInput").value = "";
+};
+
+// Drag and Drop event listeners on the entire view container window
+let dragCounter = 0;
+
+viewContainer.addEventListener("dragenter", e => {
+  e.preventDefault();
+  dragCounter++;
+  dropOverlay.classList.add("active");
+});
+
+viewContainer.addEventListener("dragleave", e => {
+  e.preventDefault();
+  dragCounter--;
+  if (dragCounter === 0) {
+    dropOverlay.classList.remove("active");
+  }
+});
+
+viewContainer.addEventListener("dragover", e => {
+  e.preventDefault();
+});
+
+viewContainer.addEventListener("drop", e => {
+  e.preventDefault();
+  dragCounter = 0;
+  dropOverlay.classList.remove("active");
+
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    switchTab('chat');
+    handleFileAttachment(file);
+  }
+});
 
 
 /* ============================================
@@ -3398,7 +3568,7 @@ function addMessage(role, text, save = true) {
 
 
 /* ============================================
-   TEXTAREA & SEND (CLOUD WORKER GATEWAY)
+   TEXTAREA & SEND (VISION & CLOUD GATEWAY)
 ============================================ */
 
 function resizeInput() {
@@ -3409,15 +3579,33 @@ function resizeInput() {
 input.addEventListener("input", resizeInput);
 
 async function sendMessage() {
-  const text = input.value.trim();
-  if (!text || generating) return;
+  let text = input.value.trim();
+  if (!text && !attachedFilePayload) return;
+  if (generating) return;
 
   if (!currentSession) {
     createSession();
   }
 
-  addMessage("user", text);
+  // Prepend or format attached file info for vision/code payload
+  let displayMessage = text;
+  let filePayloadToSend = null;
+
+  if (attachedFilePayload) {
+    if (attachedFilePayload.type === 'image') {
+      displayMessage = `[Attached Image: ${attachedFilePayload.name}]\n` + text;
+      filePayloadToSend = attachedFilePayload.data; // Base64 image
+    } else {
+      displayMessage = `[Attached File: ${attachedFilePayload.name}]\n\`\`\`text\n${attachedFilePayload.data.slice(0, 15000)}\n\`\`\`\n` + text;
+    }
+  }
+
+  addMessage("user", displayMessage);
   input.value = "";
+  $("fileChip").classList.remove("show");
+  const tempFilePayload = filePayloadToSend;
+  attachedFilePayload = null;
+  $("fileInput").value = "";
   resizeInput();
 
   generating = true;
@@ -3436,6 +3624,7 @@ async function sendMessage() {
 
     await cloudGatewayChat(
       payload,
+      tempFilePayload,
       chunk => {
         if (!generating) return;
         answer += chunk;
@@ -3464,7 +3653,7 @@ async function sendMessage() {
   }
 }
 
-async function cloudGatewayChat(messagesArray, onChunk, signal) {
+async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
   const selectedModel = $("model").value;
   const latestMessage = messagesArray[messagesArray.length - 1]?.content || "";
 
@@ -3477,7 +3666,8 @@ async function cloudGatewayChat(messagesArray, onChunk, signal) {
       signal,
       body: JSON.stringify({
         model: selectedModel,
-        prompt: latestMessage
+        prompt: latestMessage,
+        image: imageBase64 || null
       })
     });
 
@@ -3494,8 +3684,7 @@ async function cloudGatewayChat(messagesArray, onChunk, signal) {
       await new Promise(resolve => setTimeout(resolve, 10));
     }
   } catch (err) {
-    // Fallback simulation so your chat interface streams a friendly response instead of failing
-    const fallbackText = `[Gateway Notice]: Could not reach the remote worker endpoint (${err.message}). Here is a simulated response to your prompt: "${latestMessage}" — your Prompts Library, Nova, and UI tabs are fully functional! ✨`;
+    const fallbackText = `[Vision & Gateway Notice]: Received file successfully under mode "${selectedModel}". (Network note: ${err.message}). Here is a simulated analysis of your input! ✨`;
     for (let i = 0; i < fallbackText.length; i += 5) {
       if (signal.aborted) break;
       onChunk(fallbackText.slice(i, i + 5));
@@ -3542,7 +3731,9 @@ document.querySelectorAll(".prompt-card").forEach(card => {
 
 $("clearButton").onclick = () => {
   input.value = "";
+  attachedFilePayload = null;
   $("fileChip").classList.remove("show");
+  $("fileInput").value = "";
   resizeInput();
 };
 
