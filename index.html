@@ -633,7 +633,6 @@ svg {
   border: 3px dashed var(--accent);
   margin: 16px;
   border-radius: 24px;
-  animation: fadeIn 0.2s ease;
 }
 
 .drop-overlay.active {
@@ -793,6 +792,96 @@ svg {
   font-size: 18px;
   color: var(--text);
 }
+
+/* Alerts Tab View Layout */
+.alerts-view {
+  width: min(900px, 100%);
+  margin: auto;
+  padding: 40px 25px 120px;
+}
+
+.alerts-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.alerts-view h1 {
+  font-size: 28px;
+  margin: 0 0 6px 0;
+  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.alerts-view p {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0;
+}
+
+.clear-alerts-btn {
+  background: var(--panel2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .18s;
+}
+
+.clear-alerts-btn:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.alerts-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.alert-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  box-shadow: var(--shadow);
+}
+
+.alert-card.info { border-left: 4px solid var(--accent2); }
+.alert-card.warning { border-left: 4px solid #f59e0b; }
+.alert-card.error { border-left: 4px solid #ef4444; }
+.alert-card.success { border-left: 4px solid var(--green); }
+
+.alert-info-container { flex: 1; }
+.alert-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.alert-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.alert-time { font-size: 11px; color: var(--muted); }
+.alert-message { font-size: 13px; line-height: 1.5; color: var(--muted); margin: 0; }
+.alert-empty-state { text-align: center; padding: 50px 20px; color: var(--muted); font-size: 14px; }
+
+/* Alerts Badge in Sidebar */
+.alerts-badge {
+  margin-left: auto;
+  background: var(--pink);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  display: none;
+}
+.alerts-badge.active { display: inline-block; }
 
 /* ================================
    WELCOME
@@ -1249,21 +1338,6 @@ svg {
   height: 17px;
 }
 
-.voice-icon {
-  transition: .18s;
-}
-
-#voiceButton.listening {
-  color: var(--accent2);
-
-  background:
-    rgba(59,130,246,.09);
-}
-
-#voiceButton.listening .voice-icon {
-  transform: scale(1.08);
-}
-
 .send-btn {
   width: 42px;
   height: 42px;
@@ -1582,153 +1656,6 @@ svg {
 
   gap: 7px;
 }
-
-  /* Alerts Badge in Sidebar */
-.alerts-badge {
-  margin-left: auto;
-  background: var(--pink);
-  color: white;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 999px;
-  display: none;
-}
-
-.alerts-badge.active {
-  display: inline-block;
-}
-
-/* Alerts Tab View Layout */
-.alerts-view {
-  width: min(900px, 100%);
-  margin: auto;
-  padding: 40px 25px 120px;
-}
-
-.alerts-header-flex {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.alerts-view h1 {
-  font-size: 28px;
-  margin: 0 0 6px 0;
-  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.alerts-view p {
-  color: var(--muted);
-  font-size: 14px;
-  margin: 0;
-}
-
-.clear-alerts-btn {
-  background: var(--panel2);
-  color: var(--muted);
-  border: 1px solid var(--border);
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: .18s;
-}
-
-.clear-alerts-btn:hover {
-  background: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
-  border-color: rgba(239, 68, 68, 0.3);
-}
-
-.alerts-feed {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* Alert Item Card */
-.alert-card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px 20px;
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  transition: transform .2s, border-color .2s;
-  box-shadow: var(--shadow);
-}
-
-.alert-card:hover {
-  transform: translateY(-1px);
-}
-
-.alert-card.info {
-  border-left: 4px solid var(--accent2);
-}
-
-.alert-card.warning {
-  border-left: 4px solid #f59e0b;
-}
-
-.alert-card.error {
-  border-left: 4px solid #ef4444;
-}
-
-.alert-card.success {
-  border-left: 4px solid var(--green);
-}
-
-.alert-icon {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.alert-info-container {
-  flex: 1;
-}
-
-.alert-title-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 4px;
-}
-
-.alert-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.alert-time {
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.alert-message {
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--muted);
-  margin: 0;
-}
-
-.alert-empty-state {
-  text-align: center;
-  padding: 50px 20px;
-  color: var(--muted);
-  font-size: 14px;
-}
-
 
 .user-item {
   width: 100%;
@@ -2050,7 +1977,7 @@ svg {
       <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
     </svg>
-    <span>Alerts & Notifications</span>
+    <span>Alerts</span>
     <span class="alerts-badge" id="alertsCountBadge">0</span>
   </button>
 
@@ -2615,44 +2542,6 @@ svg {
 
         <button
           class="tool-btn"
-          id="voiceButton"
-          type="button"
-        >
-
-          <svg
-            class="button-icon voice-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-
-            <rect
-              x="8"
-              y="3"
-              width="8"
-              height="12"
-              rx="4"
-              stroke="currentColor"
-              stroke-width="1.7"
-            />
-
-            <path
-              d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"
-              stroke="currentColor"
-              stroke-width="1.7"
-              stroke-linecap="round"
-            />
-
-          </svg>
-
-          <span id="voiceLabel">
-            Voice
-          </span>
-
-        </button>
-
-        <button
-          class="tool-btn"
           id="clearButton"
           type="button"
         >
@@ -2909,8 +2798,7 @@ const dropOverlay = $("dropOverlay");
 let generating = false;
 let abortController = null;
 
-// Attached file state for text or vision files
-let attachedFilePayload = null; // { name, type, content (text or base64) }
+let attachedFilePayload = null; // { name, type, data }
 
 function switchTab(tabName) {
   const promptsBtn = $("promptsTabBtn");
@@ -2961,7 +2849,7 @@ function handleFileAttachment(file) {
       attachedFilePayload = {
         name: file.name,
         type: 'image',
-        data: e.target.result // Base64 Data URL for vision model
+        data: e.target.result
       };
       
       const chip = $("fileChip");
@@ -3005,7 +2893,6 @@ $("removeFileBtn").onclick = () => {
   $("fileInput").value = "";
 };
 
-// Drag and Drop event listeners on the entire view container window
 let dragCounter = 0;
 
 viewContainer.addEventListener("dragenter", e => {
@@ -3587,14 +3474,13 @@ async function sendMessage() {
     createSession();
   }
 
-  // Prepend or format attached file info for vision/code payload
   let displayMessage = text;
   let filePayloadToSend = null;
 
   if (attachedFilePayload) {
     if (attachedFilePayload.type === 'image') {
       displayMessage = `[Attached Image: ${attachedFilePayload.name}]\n` + text;
-      filePayloadToSend = attachedFilePayload.data; // Base64 image
+      filePayloadToSend = attachedFilePayload.data;
     } else {
       displayMessage = `[Attached File: ${attachedFilePayload.name}]\n\`\`\`text\n${attachedFilePayload.data.slice(0, 15000)}\n\`\`\`\n` + text;
     }
@@ -3643,6 +3529,7 @@ async function sendMessage() {
   } catch (error) {
     if (error.name !== "AbortError") {
       responseBubble.textContent = "Error: " + error.message;
+      window.pushAlert("Gateway Error", error.message, "error");
     }
   } finally {
     generating = false;
@@ -3657,6 +3544,7 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
   const selectedModel = $("model").value;
   const latestMessage = messagesArray[messagesArray.length - 1]?.content || "";
 
+  // 🌈 Connected to your exact Cloudflare Worker Gateway URL
   const workerUrl = "https://rough-leaf-18d2.herish-kondeti.workers.dev";
 
   try {
@@ -3684,7 +3572,8 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
       await new Promise(resolve => setTimeout(resolve, 10));
     }
   } catch (err) {
-    const fallbackText = `[Vision & Gateway Notice]: Received file successfully under mode "${selectedModel}". (Network note: ${err.message}). Here is a simulated analysis of your input! ✨`;
+    window.pushAlert("Cloud Worker Connection", err.message, "warning");
+    const fallbackText = `[Gateway Notice]: Connected to custom model mapping for "${selectedModel}". (Network note: ${err.message}).`;
     for (let i = 0; i < fallbackText.length; i += 5) {
       if (signal.aborted) break;
       onChunk(fallbackText.slice(i, i + 5));
