@@ -3544,18 +3544,16 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
   const selectedModel = $("model").value;
   const latestMessage = messagesArray[messagesArray.length - 1]?.content || "";
 
-  // 🌈 Connected to your exact Cloudflare Worker Gateway URL
-  const workerUrl = "https://rough-leaf-18d2.herish-kondeti.workers.dev";
+  // 🌈 Connected to your live Hugging Face Space backend endpoint
+  const spaceApiUrl = "https://rainbowlord-rainbow-ai-backend.hf.space/run/predict";
 
   try {
-    const response = await fetch(workerUrl, {
+    const response = await fetch(spaceApiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       signal,
       body: JSON.stringify({
-        model: selectedModel,
-        prompt: latestMessage,
-        image: imageBase64 || null
+        data: [latestMessage, selectedModel]
       })
     });
 
@@ -3563,8 +3561,8 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
       throw new Error("Gateway error status: " + response.status);
     }
 
-    const data = await response.json();
-    const outputText = data.generated_text || data.choices?.[0]?.message?.content || data.error || JSON.stringify(data);
+    const result = await response.json();
+    const outputText = result.data ? result.data[0] : "No response generated.";
 
     for (let i = 0; i < outputText.length; i += 5) {
       if (signal.aborted) break;
@@ -3572,7 +3570,7 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
       await new Promise(resolve => setTimeout(resolve, 10));
     }
   } catch (err) {
-    window.pushAlert("Cloud Worker Connection", err.message, "warning");
+    window.pushAlert("Hugging Face Space Connection", err.message, "warning");
     const fallbackText = `[Gateway Notice]: Connected to custom model mapping for "${selectedModel}". (Network note: ${err.message}).`;
     for (let i = 0; i < fallbackText.length; i += 5) {
       if (signal.aborted) break;
