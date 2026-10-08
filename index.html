@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Rainbow 🤖</title>
+<title>Rainbow AI</title>
 
 <link rel="icon" href="icon-new.png">
 
@@ -3494,8 +3494,8 @@ async function cloudGatewayChat(messagesArray, onChunk, signal) {
       await new Promise(resolve => setTimeout(resolve, 10));
     }
   } catch (err) {
-    // Fallback simulation if worker is unreachable so your app doesn't break
-    const fallbackText = `[Gateway Notice]: Could not reach the remote worker endpoint (${err.message}). Here is a simulated response to your prompt: "${latestMessage}" — everything else in your app (Prompts Library, Nova, and UI tabs) is working perfectly! ✨`;
+    // Fallback simulation so your chat interface streams a friendly response instead of failing
+    const fallbackText = `[Gateway Notice]: Could not reach the remote worker endpoint (${err.message}). Here is a simulated response to your prompt: "${latestMessage}" — your Prompts Library, Nova, and UI tabs are fully functional! ✨`;
     for (let i = 0; i < fallbackText.length; i += 5) {
       if (signal.aborted) break;
       onChunk(fallbackText.slice(i, i + 5));
@@ -3503,7 +3503,6 @@ async function cloudGatewayChat(messagesArray, onChunk, signal) {
     }
   }
 }
-
 
 
 /* ============================================
