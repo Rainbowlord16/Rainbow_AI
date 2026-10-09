@@ -3584,10 +3584,10 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
     const selectedModel = $("model").value;
     const latestMessage = messagesArray[messagesArray.length - 1]?.content || "";
 
-    const baseUrl = "https://rainbowlord-rainbow-ai-backend.hf.space/gradio_api";
+    const spaceApiUrl = "https://rainbowlord-rainbow-ai-backend.hf.space/api/predict";
 
     try {
-        const postResponse = await fetch(`${baseUrl}/call/predict`, {
+        const response = await fetch(spaceApiUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             signal,
@@ -3596,70 +3596,18 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
             })
         });
 
-        if (!postResponse.ok) {
-            throw new Error("Job submission error status: " + postResponse.status);
+        if (!response.ok) {
+            throw new Error("Gateway error status: " + response.status);
         }
 
-        const { event_id } = await postResponse.json();
-        if (!event_id) {
-            throw new Error("Failed to retrieve event ID from Gradio queue.");
-        }
-
-        const getResponse = await fetch(`${baseUrl}/call/predict/${event_id}`, {
-            method: "GET",
-            headers: { "Accept": "text/event-stream" },
-            signal
-        });
-
-        if (!getResponse.ok) {
-            throw new Error("Job result fetch error status: " + getResponse.status);
-        }
-
-        const reader = getResponse.body.getReader();
-        const decoder = new TextDecoder();
-        let outputText = "";
-
-        while (true) {
-            const { value, done } = await reader.read();
-            if (done) break;
-
-            const chunkText = decoder.decode(value, { stream: true });
-            const lines = chunkText.split("\n");
-
-            for (const line of lines) {
-                if (line.startsWith("data:")) {
-                    const jsonStr = line.replace("data:", "").trim();
-                    if (!jsonStr) continue;
-
-                    try {
-                        const parsedData = JSON.parse(jsonStr);
-                        // Gradio completion events often pass the result inside an array or object
-                        if (Array.isArray(parsedData) && parsedData.length > 0) {
-                            outputText = parsedData[0];
-                        } else if (parsedData.data && Array.isArray(parsedData.data)) {
-                            outputText = parsedData.data[0];
-                        } else if (typeof parsedData === "string") {
-                            outputText = parsedData;
-                        }
-                    } catch (e) {
-                        // If it's plain text stream chunks
-                        outputText += jsonStr;
-                    }
-                }
-            }
-            if (outputText && outputText !== "No response generated.") break;
-        }
-
-        if (!outputText) {
-            outputText = "No response generated.";
-        }
+        const result = await response.json();
+        const outputText = result.data ? result.data[0] : "No response generated.";
 
         for (let i = 0; i < outputText.length; i += 5) {
             if (signal.aborted) break;
             onChunk(outputText.slice(i, i + 5));
-            await new Promise(resolve => setTimeout(resolve, 5));
+            await new Promise(resolve => setTimeout(resolve, 10));
         }
-
     } catch (err) {
         window.pushAlert("Hugging Face Space Connection", err.message, "warning");
         throw err;
