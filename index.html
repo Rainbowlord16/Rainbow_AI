@@ -3525,13 +3525,14 @@ async function sendMessage() {
   abortController = new AbortController();
   status.textContent = "Processing...";
 
-  const responseBubble = addMessage("ai", `
+// Replace this part in your sendMessage function:
+const responseBubble = addMessage("ai", `
     <div class="typing-indicator">
         <div class="typing-dot"></div>
         <div class="typing-dot"></div>
         <div class="typing-dot"></div>
     </div>
-  `, false);
+`, false);
 
   let answer = "";
 
