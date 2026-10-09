@@ -3606,9 +3606,10 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
             throw new Error("Failed to retrieve event ID from Gradio queue.");
         }
 
-        // Step 2: Fetch the completed result directly using the event_id (Non-SSE fallback)
+        // Step 2: Fetch the event stream result as text
         const resultResponse = await fetch(`${baseUrl}/call/predict/${event_id}`, {
             method: "GET",
+            headers: { "Accept": "text/event-stream" },
             signal
         });
 
@@ -3619,33 +3620,39 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
         const rawText = await resultResponse.text();
         let outputText = "";
 
-        // Parse Gradio event stream format
+        // Extract all data lines and find the valid JSON response payload
         const lines = rawText.split("\n");
         for (const line of lines) {
             if (line.startsWith("data:")) {
                 const jsonStr = line.replace("data:", "").trim();
+                if (!jsonStr) continue;
                 try {
-                    const parsedData = JSON.parse(jsonStr);
-                    if (Array.isArray(parsedData) && parsedData[0]) {
-                        outputText = parsedData[0];
-                    } else if (typeof parsedData === "string") {
-                        outputText = parsedData;
+                    const parsed = JSON.parse(jsonStr);
+                    // Gradio returns the output inside an array e.g., ["Generated text here"]
+                    if (Array.isArray(parsed) && parsed[0]) {
+                        outputText = parsed[0];
+                        break;
+                    } else if (typeof parsed === "string" && parsed.length > 0) {
+                        outputText = parsed;
                     }
                 } catch (e) {
-                    // Ignore non-json lines
+                    // Not JSON, check if it's raw text content
+                    if (jsonStr !== "complete" && jsonStr.length > 2) {
+                        outputText = jsonStr;
+                    }
                 }
             }
         }
 
         if (!outputText) {
-            outputText = "No response generated.";
+            outputText = "Model completed execution but returned an empty payload.";
         }
 
         // Stream output smoothly into the UI
-        for (let i = 0; i < outputText.length; i += 5) {
+        for (let i = 0; i < outputText.length; i += 4) {
             if (signal.aborted) break;
-            onChunk(outputText.slice(i, i + 5));
-            await new Promise(resolve => setTimeout(resolve, 10));
+            onChunk(outputText.slice(i, i + 4));
+            await new Promise(resolve => setTimeout(resolve, 8));
         }
 
     } catch (err) {
