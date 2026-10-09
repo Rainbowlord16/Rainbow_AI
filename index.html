@@ -3438,7 +3438,6 @@ function addMessage(role, text, save = true) {
   content.dataset.raw = text;
 
   if (role === "ai") {
-    // If text contains HTML tags (like our loading indicator), render directly as HTML
     if (text.trim().startsWith("<")) {
       content.innerHTML = text;
     } else {
@@ -3530,16 +3529,16 @@ async function sendMessage() {
   abortController = new AbortController();
   status.textContent = "Processing...";
 
-// Replace this part in your sendMessage function:
-const responseBubble = addMessage("ai", `
+  const responseBubble = addMessage("ai", `
     <div class="typing-indicator">
         <div class="typing-dot"></div>
         <div class="typing-dot"></div>
         <div class="typing-dot"></div>
     </div>
-`, false);
+  `, false);
 
   let answer = "";
+  let firstChunkReceived = false;
 
   try {
     const history = currentSession.messages.slice(-12);
@@ -3550,6 +3549,10 @@ const responseBubble = addMessage("ai", `
       tempFilePayload,
       chunk => {
         if (!generating) return;
+        if (!firstChunkReceived) {
+          answer = "";
+          firstChunkReceived = true;
+        }
         answer += chunk;
         responseBubble.dataset.raw = answer;
         responseBubble.innerHTML = markdown(answer);
@@ -3584,7 +3587,6 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
     const baseUrl = "https://rainbowlord-rainbow-ai-backend.hf.space/gradio_api";
 
     try {
-        // Step 1: Submit the prediction job to the queue
         const postResponse = await fetch(`${baseUrl}/call/predict`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -3603,7 +3605,6 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
             throw new Error("Failed to retrieve event ID from Gradio queue.");
         }
 
-        // Step 2: Stream or fetch the results using Server-Sent Events (SSE)
         const getResponse = await fetch(`${baseUrl}/call/predict/${event_id}`, {
             method: "GET",
             headers: { "Accept": "text/event-stream" },
@@ -3636,7 +3637,6 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
                             outputText = parsedData;
                         }
                     } catch (e) {
-                        // Not JSON, handle as raw text chunk
                         outputText += line.replace("data:", "");
                     }
                 }
@@ -3658,6 +3658,7 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
         throw err;
     }
 }
+
 /* ============================================
    EVENT HANDLERS & INITIALIZATION
 ============================================ */
@@ -3701,7 +3702,6 @@ $("clearButton").onclick = () => {
   resizeInput();
 };
 
-// Settings & Users Drawers
 function openSettings() { $("drawer").classList.add("show"); }
 function closeSettings() { $("drawer").classList.remove("show"); }
 $("settingsButton").onclick = openSettings;
@@ -3716,7 +3716,6 @@ $("closeUserDrawer").onclick = closeUsers;
 $("addUserButton").onclick = addUser;
 $("userDrawer").onclick = event => { if (event.target.id === "userDrawer") closeUsers(); };
 
-// Theme Toggle
 function setTheme(dark) {
   document.documentElement.dataset.theme = dark ? "dark" : "light";
   $("themeToggle").classList.toggle("active", dark);
@@ -3726,7 +3725,6 @@ setTheme(localStorage.getItem("rainbow_theme") !== "light");
 $("themeButton").onclick = () => setTheme(document.documentElement.dataset.theme !== "dark");
 $("themeToggle").onclick = () => setTheme(document.documentElement.dataset.theme !== "dark");
 
-// Startup Execution
 updateCurrentUserUI();
 renderUsers();
 renderHistory();
