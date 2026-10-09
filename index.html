@@ -3584,10 +3584,11 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
     const selectedModel = $("model").value;
     const latestMessage = messagesArray[messagesArray.length - 1]?.content || "";
 
-    const spaceApiUrl = "https://rainbowlord-rainbow-ai-backend.hf.space/api/predict";
+    const baseUrl = "https://rainbowlord-rainbow-ai-backend.hf.space/gradio_api";
 
     try {
-        const response = await fetch(spaceApiUrl, {
+        // Step 1: Submit to Gradio queue
+        const postResponse = await fetch(`${baseUrl}/call/predict`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             signal,
@@ -3596,18 +3597,57 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
             })
         });
 
-        if (!response.ok) {
-            throw new Error("Gateway error status: " + response.status);
+        if (!postResponse.ok) {
+            throw new Error("Job submission error status: " + postResponse.status);
         }
 
-        const result = await response.json();
-        const outputText = result.data ? result.data[0] : "No response generated.";
+        const { event_id } = await postResponse.json();
+        if (!event_id) {
+            throw new Error("Failed to retrieve event ID from Gradio queue.");
+        }
 
+        // Step 2: Fetch the completed result directly using the event_id (Non-SSE fallback)
+        const resultResponse = await fetch(`${baseUrl}/call/predict/${event_id}`, {
+            method: "GET",
+            signal
+        });
+
+        if (!resultResponse.ok) {
+            throw new Error("Job result fetch error status: " + resultResponse.status);
+        }
+
+        const rawText = await resultResponse.text();
+        let outputText = "";
+
+        // Parse Gradio event stream format
+        const lines = rawText.split("\n");
+        for (const line of lines) {
+            if (line.startsWith("data:")) {
+                const jsonStr = line.replace("data:", "").trim();
+                try {
+                    const parsedData = JSON.parse(jsonStr);
+                    if (Array.isArray(parsedData) && parsedData[0]) {
+                        outputText = parsedData[0];
+                    } else if (typeof parsedData === "string") {
+                        outputText = parsedData;
+                    }
+                } catch (e) {
+                    // Ignore non-json lines
+                }
+            }
+        }
+
+        if (!outputText) {
+            outputText = "No response generated.";
+        }
+
+        // Stream output smoothly into the UI
         for (let i = 0; i < outputText.length; i += 5) {
             if (signal.aborted) break;
             onChunk(outputText.slice(i, i + 5));
             await new Promise(resolve => setTimeout(resolve, 10));
         }
+
     } catch (err) {
         window.pushAlert("Hugging Face Space Connection", err.message, "warning");
         throw err;
