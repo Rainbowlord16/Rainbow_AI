@@ -3629,30 +3629,35 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
             for (const line of lines) {
                 if (line.startsWith("data:")) {
                     const jsonStr = line.replace("data:", "").trim();
-                    if (jsonStr === "[ؤ]") continue;
+                    if (!jsonStr) continue;
+
                     try {
                         const parsedData = JSON.parse(jsonStr);
-                        if (Array.isArray(parsedData) && parsedData[0]) {
+                        // Gradio completion events often pass the result inside an array or object
+                        if (Array.isArray(parsedData) && parsedData.length > 0) {
                             outputText = parsedData[0];
+                        } else if (parsedData.data && Array.isArray(parsedData.data)) {
+                            outputText = parsedData.data[0];
                         } else if (typeof parsedData === "string") {
                             outputText = parsedData;
                         }
                     } catch (e) {
-                        // Ignore non-json lines or heartbeats
+                        // If it's plain text stream chunks
+                        outputText += jsonStr;
                     }
                 }
             }
+            if (outputText && outputText !== "No response generated.") break;
         }
 
         if (!outputText) {
             outputText = "No response generated.";
         }
 
-        // Stream out the final response cleanly
         for (let i = 0; i < outputText.length; i += 5) {
             if (signal.aborted) break;
             onChunk(outputText.slice(i, i + 5));
-            await new Promise(resolve => setTimeout(resolve, 10));
+            await new Promise(resolve => setTimeout(resolve, 5));
         }
 
     } catch (err) {
