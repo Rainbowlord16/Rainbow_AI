@@ -3628,16 +3628,17 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
 
             for (const line of lines) {
                 if (line.startsWith("data:")) {
+                    const jsonStr = line.replace("data:", "").trim();
+                    if (jsonStr === "[ؤ]") continue;
                     try {
-                        const jsonStr = line.replace("data:", "").trim();
                         const parsedData = JSON.parse(jsonStr);
                         if (Array.isArray(parsedData) && parsedData[0]) {
                             outputText = parsedData[0];
-                        } else {
+                        } else if (typeof parsedData === "string") {
                             outputText = parsedData;
                         }
                     } catch (e) {
-                        outputText += line.replace("data:", "");
+                        // Ignore non-json lines or heartbeats
                     }
                 }
             }
@@ -3647,6 +3648,7 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
             outputText = "No response generated.";
         }
 
+        // Stream out the final response cleanly
         for (let i = 0; i < outputText.length; i += 5) {
             if (signal.aborted) break;
             onChunk(outputText.slice(i, i + 5));
