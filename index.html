@@ -214,6 +214,30 @@ svg {
   border: 1px solid rgba(139,92,246,.3);
 }
 
+/* Loading Dots Animation */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 0;
+}
+
+.typing-dot {
+    width: 7px;
+    height: 7px;
+    background-color: var(--muted);
+    border-radius: 50%;
+    animation: typingBounce 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typingBounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1.0); }
+}
+
 /* Search */
 
 .search {
@@ -3501,8 +3525,17 @@ async function sendMessage() {
   abortController = new AbortController();
   status.textContent = "Processing...";
 
-  const responseBubble = addMessage("ai", "Thinking...", false);
-  let answer = "";
+// Inside sendMessage(), replace:
+// const responseBubble = addMessage("ai", "Thinking...", false);
+
+// With this animated loader:
+const responseBubble = addMessage("ai", `
+    <div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+    </div>
+`, false);
 
   try {
     const history = currentSession.messages.slice(-12);
