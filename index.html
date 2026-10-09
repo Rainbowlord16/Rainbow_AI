@@ -3525,17 +3525,15 @@ async function sendMessage() {
   abortController = new AbortController();
   status.textContent = "Processing...";
 
-// Inside sendMessage(), replace:
-// const responseBubble = addMessage("ai", "Thinking...", false);
-
-// With this animated loader:
-const responseBubble = addMessage("ai", `
+  const responseBubble = addMessage("ai", `
     <div class="typing-indicator">
         <div class="typing-dot"></div>
         <div class="typing-dot"></div>
         <div class="typing-dot"></div>
     </div>
-`, false);
+  `, false);
+
+  let answer = "";
 
   try {
     const history = currentSession.messages.slice(-12);
