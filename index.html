@@ -3438,7 +3438,12 @@ function addMessage(role, text, save = true) {
   content.dataset.raw = text;
 
   if (role === "ai") {
-    content.innerHTML = markdown(text);
+    // If text contains HTML tags (like our loading indicator), render directly as HTML
+    if (text.trim().startsWith("<")) {
+      content.innerHTML = text;
+    } else {
+      content.innerHTML = markdown(text);
+    }
   } else {
     content.textContent = text;
   }
