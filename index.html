@@ -3541,7 +3541,7 @@ async function sendMessage() {
   let firstChunkReceived = false;
 
   try {
-    const history = currentSession.messages.slice(-12);
+    const history = currentSession.messages.slice(-1000);
     const payload = [systemMessage(), ...history];
 
     await cloudGatewayChat(
@@ -3584,11 +3584,10 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
     const selectedModel = $("model").value;
     const latestMessage = messagesArray[messagesArray.length - 1]?.content || "";
 
-    const baseUrl = "https://rainbowlord-rainbow-ai-backend.hf.space/gradio_api";
+    const baseUrl = "https://YOUR-TRYCLOUDFLARE-URL.trycloudflare.com";
 
     try {
-        // Step 1: Submit to Gradio queue
-        const postResponse = await fetch(`${baseUrl}/call/predict`, {
+        const response = await fetch(`${baseUrl}/call/predict`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             signal,
@@ -3597,58 +3596,13 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
             })
         });
 
-        if (!postResponse.ok) {
-            throw new Error("Job submission error status: " + postResponse.status);
+        if (!response.ok) {
+            throw new Error("Server error status: " + response.status);
         }
 
-        const { event_id } = await postResponse.json();
-        if (!event_id) {
-            throw new Error("Failed to retrieve event ID from Gradio queue.");
-        }
+        const jsonRes = await response.json();
+        const outputText = jsonRes.data && jsonRes.data[0] ? jsonRes.data[0] : "No response generated.";
 
-        // Step 2: Fetch the event stream result as text
-        const resultResponse = await fetch(`${baseUrl}/call/predict/${event_id}`, {
-            method: "GET",
-            headers: { "Accept": "text/event-stream" },
-            signal
-        });
-
-        if (!resultResponse.ok) {
-            throw new Error("Job result fetch error status: " + resultResponse.status);
-        }
-
-        const rawText = await resultResponse.text();
-        let outputText = "";
-
-        // Extract all data lines and find the valid JSON response payload
-        const lines = rawText.split("\n");
-        for (const line of lines) {
-            if (line.startsWith("data:")) {
-                const jsonStr = line.replace("data:", "").trim();
-                if (!jsonStr) continue;
-                try {
-                    const parsed = JSON.parse(jsonStr);
-                    // Gradio returns the output inside an array e.g., ["Generated text here"]
-                    if (Array.isArray(parsed) && parsed[0]) {
-                        outputText = parsed[0];
-                        break;
-                    } else if (typeof parsed === "string" && parsed.length > 0) {
-                        outputText = parsed;
-                    }
-                } catch (e) {
-                    // Not JSON, check if it's raw text content
-                    if (jsonStr !== "complete" && jsonStr.length > 2) {
-                        outputText = jsonStr;
-                    }
-                }
-            }
-        }
-
-        if (!outputText) {
-            outputText = "Model completed execution but returned an empty payload.";
-        }
-
-        // Stream output smoothly into the UI
         for (let i = 0; i < outputText.length; i += 4) {
             if (signal.aborted) break;
             onChunk(outputText.slice(i, i + 4));
@@ -3656,7 +3610,7 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
         }
 
     } catch (err) {
-        window.pushAlert("Hugging Face Space Connection", err.message, "warning");
+        window.pushAlert("Gateway Connection Error", err.message, "warning");
         throw err;
     }
 }
