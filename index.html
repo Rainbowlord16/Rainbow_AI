@@ -74,6 +74,42 @@ body {
   background: var(--bg);
   color: var(--text);
   overflow: hidden;
+  position: relative;
+}
+
+/* Background Neural Canvas */
+#neural-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Rainbow Gradient Loading Bar (Gemini Style) */
+.loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #4285f4, #8b5cf6, #ec4899, #3b82f6);
+  background-size: 300% auto;
+  animation: rainbowBar 2s linear infinite;
+  z-index: 9999;
+  display: none;
+}
+
+.loading-bar.active {
+  display: block;
+}
+
+@keyframes rainbowBar {
+  to {
+    background-position: 300% center;
+  }
 }
 
 button,
@@ -99,6 +135,8 @@ svg {
   width: 100%;
   height: 100%;
   display: flex;
+  position: relative;
+  z-index: 10;
 }
 
 /* ================================
@@ -214,28 +252,40 @@ svg {
   border: 1px solid rgba(139,92,246,.3);
 }
 
-/* Loading Dots Animation */
-.typing-indicator {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 0;
+/* Gemini Sparkle Thinking Animation */
+.gemini-thinking {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
 }
 
-.typing-dot {
-    width: 7px;
-    height: 7px;
-    background-color: var(--muted);
-    border-radius: 50%;
-    animation: typingBounce 1.4s infinite ease-in-out both;
+.sparkle-icon {
+  font-size: 1.4rem;
+  animation: geminiSpin 2.5s infinite linear;
 }
 
-.typing-dot:nth-child(1) { animation-delay: -0.32s; }
-.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+@keyframes geminiSpin {
+  0% { transform: rotate(0deg) scale(1); filter: drop-shadow(0 0 2px rgba(168,85,247,0.6)); }
+  50% { transform: rotate(180deg) scale(1.25); filter: drop-shadow(0 0 8px rgba(59,130,246,0.9)); }
+  100% { transform: rotate(360deg) scale(1); filter: drop-shadow(0 0 2px rgba(168,85,247,0.6)); }
+}
 
-@keyframes typingBounce {
-    0%, 80%, 100% { transform: scale(0); }
-    40% { transform: scale(1.0); }
+.shimmer-text {
+  font-weight: 500;
+  font-size: 15px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+  background-size: 300% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: textShimmer 3s linear infinite;
+}
+
+@keyframes textShimmer {
+  to {
+    background-position: 300% center;
+  }
 }
 
 /* Search */
@@ -908,7 +958,7 @@ svg {
 .alerts-badge.active { display: inline-block; }
 
 /* ================================
-   WELCOME
+   WELCOME (Gemini Style)
 ================================ */
 
 .welcome {
@@ -923,29 +973,24 @@ svg {
   text-align: center;
 }
 
-.welcome-logo {
-  width: 72px;
-  height: 72px;
-
-  border-radius: 22px;
-
-  margin-bottom: 22px;
-
-  box-shadow:
-    0 0 35px rgba(139,92,246,.28),
-    0 0 70px rgba(59,130,246,.12);
+/* Gemini Sparkle Icon Header */
+.welcome-sparkle-icon {
+  font-size: 38px;
+  margin-bottom: 18px;
+  animation: geminiSpin 3s infinite linear;
 }
 
 .welcome h1 {
   margin: 0;
 
-  font-size: clamp(34px, 5vw, 54px);
+  font-size: clamp(34px, 5vw, 52px);
 
   letter-spacing: -.055em;
 
-  line-height: 1.05;
+  line-height: 1.15;
 
   font-weight: 500;
+  color: var(--text);
 }
 
 .welcome-gradient {
@@ -1869,7 +1914,7 @@ svg {
   }
 
   .welcome h1 {
-    font-size: 36px;
+    font-size: 34px;
   }
 
   .prompt-grid {
@@ -1925,7 +1970,15 @@ svg {
 
 <body>
 
+<!-- Background Neural Canvas -->
+<canvas id="neural-canvas"></canvas>
+
+<!-- Rainbow Loading Bar -->
+<div class="loading-bar" id="loadingBar"></div>
+
 <div class="app">
+
+  
 
 <!-- ================= SIDEBAR ================= -->
 
@@ -2294,25 +2347,17 @@ svg {
         id="welcome"
       >
 
-        <img
-          class="welcome-logo"
-          src="icon-new.png"
-          alt="Rainbow AI"
-        >
+        <div class="welcome-sparkle-icon">✨</div>
 
         <h1>
-          Hello,
+          Your move,
           <span
             class="welcome-gradient"
             id="welcomeUserName"
           >
             Herish
-          </span>
+          </span>!
         </h1>
-
-        <p>
-          How can I help you today?
-        </p>
 
         <div class="prompt-grid">
 
@@ -2800,6 +2845,75 @@ svg {
 <script>
 
 /* ============================================
+   NEURAL PARTICLES BACKGROUND ANIMATION
+============================================ */
+
+const canvas = document.getElementById('neural-canvas');
+const ctx = canvas.getContext('2d');
+
+let particles = [];
+const numParticles = 45;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+class Particle {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.vx = (Math.random() - 0.5) * 0.7;
+    this.vy = (Math.random() - 0.5) * 0.7;
+    this.radius = Math.random() * 2 + 1;
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(147, 197, 253, 0.45)';
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < numParticles; i++) {
+  particles.push(new Particle());
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  for (let i = 0; i < particles.length; i++) {
+    particles[i].update();
+    particles[i].draw();
+    
+    for (let j = i + 1; j < particles.length; j++) {
+      let dx = particles[i].x - particles[j].x;
+      let dy = particles[i].y - particles[j].y;
+      let dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 130) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(168, 85, 247, ${0.14 * (1 - dist / 130)})`;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+
+/* ============================================
    HELPERS & GLOBAL SWITCH TAB LOGIC
 ============================================ */
 
@@ -2818,6 +2932,7 @@ const input = $("input");
 const sendButton = $("sendButton");
 const status = $("status");
 const dropOverlay = $("dropOverlay");
+const loadingBar = $("loadingBar");
 
 let generating = false;
 let abortController = null;
@@ -3528,12 +3643,12 @@ async function sendMessage() {
 
   abortController = new AbortController();
   status.textContent = "Processing...";
+  loadingBar.classList.add("active");
 
   const responseBubble = addMessage("ai", `
-    <div class="typing-indicator">
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
+    <div class="gemini-thinking">
+      <div class="sparkle-icon">✨</div>
+      <span class="shimmer-text">Rainbow AI is thinking...</span>
     </div>
   `, false);
 
@@ -3576,6 +3691,7 @@ async function sendMessage() {
     sendButton.classList.remove("stop");
     sendButton.innerHTML = `<svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5 20 12 4 18.5l2.2-5.7L15 12l-8.8-.8L4 5.5Z" fill="currentColor"/></svg>`;
     status.textContent = "Gateway Ready";
+    loadingBar.classList.remove("active");
     abortController = null;
   }
 }
@@ -3584,7 +3700,7 @@ async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
     const selectedModel = $("model").value;
     const latestMessage = messagesArray[messagesArray.length - 1]?.content || "";
 
-    const baseUrl = "https://menu-capitol-organize-london.trycloudflare.com";
+    const baseUrl = "https://naval-may-brochures-thousands.trycloudflare.com";
 
     try {
         const response = await fetch(`${baseUrl}/call/predict`, {
