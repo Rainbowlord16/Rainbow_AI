@@ -88,16 +88,16 @@ body {
   z-index: 0;
 }
 
-/* Rainbow Gradient Loading Bar (Gemini Style) */
+/* Rainbow Gradient Loading Bar (Top Screen) */
 .loading-bar {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 3px;
-  background: linear-gradient(90deg, #4285f4, #8b5cf6, #ec4899, #3b82f6);
-  background-size: 300% auto;
-  animation: rainbowBar 2s linear infinite;
+  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6, #22c55e, #ec4899);
+  background-size: 400% auto;
+  animation: rainbowBar 2.5s linear infinite;
   z-index: 9999;
   display: none;
 }
@@ -108,7 +108,7 @@ body {
 
 @keyframes rainbowBar {
   to {
-    background-position: 300% center;
+    background-position: 400% center;
   }
 }
 
@@ -252,7 +252,7 @@ svg {
   border: 1px solid rgba(139,92,246,.3);
 }
 
-/* Gemini Sparkle Thinking Animation */
+/* Rainbow Sparkle Thinking Animation */
 .gemini-thinking {
   display: flex;
   align-items: center;
@@ -274,7 +274,7 @@ svg {
 .shimmer-text {
   font-weight: 500;
   font-size: 15px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6, #ec4899);
   background-size: 300% auto;
   color: transparent;
   -webkit-background-clip: text;
@@ -958,7 +958,7 @@ svg {
 .alerts-badge.active { display: inline-block; }
 
 /* ================================
-   WELCOME (Gemini Style)
+   WELCOME
 ================================ */
 
 .welcome {
@@ -973,7 +973,6 @@ svg {
   text-align: center;
 }
 
-/* Gemini Sparkle Icon Header */
 .welcome-sparkle-icon {
   font-size: 38px;
   margin-bottom: 18px;
@@ -997,9 +996,9 @@ svg {
   background:
     linear-gradient(
       90deg,
-      #4285f4,
+      #ec4899,
       #8b5cf6,
-      #ec4899
+      #3b82f6
     );
 
   -webkit-background-clip: text;
@@ -1144,9 +1143,9 @@ svg {
   background:
     linear-gradient(
       135deg,
-      #4285f4,
+      #ec4899,
       #8b5cf6,
-      #ec4899
+      #3b82f6
     );
 }
 
@@ -1418,7 +1417,7 @@ svg {
   background:
     linear-gradient(
       135deg,
-      #4285f4,
+      #ec4899,
       #8b5cf6
     );
 
@@ -1430,7 +1429,7 @@ svg {
   place-items: center;
 
   box-shadow:
-    0 5px 20px rgba(66,133,244,.20);
+    0 5px 20px rgba(139,92,246,.25);
 
   transition: .18s;
 }
@@ -1439,7 +1438,7 @@ svg {
   transform: scale(1.06);
 
   box-shadow:
-    0 8px 28px rgba(139,92,246,.30);
+    0 8px 28px rgba(139,92,246,.35);
 }
 
 .send-btn svg {
@@ -1651,7 +1650,7 @@ svg {
   background:
     linear-gradient(
       135deg,
-      #4285f4,
+      #ec4899,
       #8b5cf6
     );
 }
@@ -1693,7 +1692,7 @@ svg {
   background:
     linear-gradient(
       135deg,
-      #4285f4,
+      #ec4899,
       #8b5cf6
     );
 
@@ -1765,7 +1764,7 @@ svg {
   background:
     linear-gradient(
       135deg,
-      rgba(66,133,244,.08),
+      rgba(236,72,153,.08),
       rgba(139,92,246,.10)
     );
 }
@@ -1784,7 +1783,7 @@ svg {
   background:
     linear-gradient(
       135deg,
-      #4285f4,
+      #ec4899,
       #8b5cf6
     );
 
@@ -2937,7 +2936,7 @@ const loadingBar = $("loadingBar");
 let generating = false;
 let abortController = null;
 
-let attachedFilePayload = null; // { name, type, data }
+let attachedFilePayload = null;
 
 function switchTab(tabName) {
   const promptsBtn = $("promptsTabBtn");
