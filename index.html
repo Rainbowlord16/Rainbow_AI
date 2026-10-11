@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Rainbow-AI</title>
+<title>Rainbow AI</title>
 
 <link rel="icon" href="icon-new.png">
 
@@ -125,6 +125,12 @@ button {
 
 svg {
   display: block;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Cute ChatGPT-style SVG Hover Animation */
+button:hover svg, .prompt-card:hover svg, .nav-tab-btn:hover svg {
+  transform: scale(1.15) rotate(3deg);
 }
 
 /* ================================
@@ -884,6 +890,114 @@ svg {
   color: var(--text);
 }
 
+/* Artifacts Drawer & Tab View Layout */
+.artifacts-view {
+  width: min(1000px, 100%);
+  margin: auto;
+  padding: 40px 25px 120px;
+}
+
+.artifacts-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.artifacts-view h1 {
+  font-size: 28px;
+  margin: 0 0 6px 0;
+  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.artifacts-view p {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0;
+}
+
+.artifacts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.artifact-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform .2s, border-color .2s;
+}
+
+.artifact-card:hover {
+  border-color: rgba(139,92,246,0.4);
+  transform: translateY(-2px);
+}
+
+.artifact-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.artifact-card-title {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.artifact-card-body {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  font-family: monospace;
+  font-size: 12px;
+  max-height: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.artifact-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.artifact-action-btn {
+  flex: 1;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background .18s;
+  text-align: center;
+}
+
+.artifact-action-btn:hover {
+  background: var(--panel3);
+}
+
 /* Alerts Tab View Layout */
 .alerts-view {
   width: min(900px, 100%);
@@ -961,8 +1075,8 @@ svg {
 .alert-message { font-size: 13px; line-height: 1.5; color: var(--muted); margin: 0; }
 .alert-empty-state { text-align: center; padding: 50px 20px; color: var(--muted); font-size: 14px; }
 
-/* Alerts Badge in Sidebar */
-.alerts-badge {
+/* Alerts & Artifacts Badges in Sidebar */
+.sidebar-badge {
   margin-left: auto;
   background: var(--pink);
   color: white;
@@ -972,7 +1086,7 @@ svg {
   border-radius: 999px;
   display: none;
 }
-.alerts-badge.active { display: inline-block; }
+.sidebar-badge.active { display: inline-block; }
 
 /* ================================
    WELCOME
@@ -1109,7 +1223,7 @@ svg {
 }
 
 /* ================================
-   MESSAGES
+   MESSAGES & DUAL-PANE WORKSPACE
 ================================ */
 
 .message {
@@ -1209,16 +1323,39 @@ svg {
   margin-top: 0;
 }
 
+/* Dual-pane modular container for code vs prose */
+.dual-pane-card {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--panel);
+  margin: 12px 0;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.dual-pane-header {
+  background: var(--panel2);
+  padding: 8px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.dual-pane-body {
+  padding: 16px;
+}
+
 .message-content pre {
   overflow-x: auto;
-
   padding: 17px;
-
   background: #090b10;
-
   border: 1px solid var(--border);
-
   border-radius: 13px;
+  margin: 0;
 }
 
 .message-content code {
@@ -1656,6 +1793,7 @@ svg {
   display: block;
 
   width: 19px;
+
   height: 19px;
 
   border-radius: 50%;
@@ -2052,6 +2190,18 @@ svg {
 
   <button
     class="nav-tab-btn"
+    id="artifactsTabBtn"
+    type="button"
+  >
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M19 11H5m14 0a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2m14 0V9a2 2 0 0 0-2-2M5 11V9a2 2 0 0 1 2-2m0 0V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2M7 7h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span>Artifacts</span>
+    <span class="sidebar-badge" id="artifactsCountBadge">0</span>
+  </button>
+
+  <button
+    class="nav-tab-btn"
     id="novaTabBtn"
     type="button"
   >
@@ -2067,11 +2217,11 @@ svg {
     type="button"
   >
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
       <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
     </svg>
     <span>Alerts</span>
-    <span class="alerts-badge" id="alertsCountBadge">0</span>
+    <span class="sidebar-badge" id="alertsCountBadge">0</span>
   </button>
 
   <input
@@ -2548,6 +2698,18 @@ svg {
     <div class="fifty-prompts-grid" id="fiftyPromptsGrid"></div>
   </section>
 
+  <!-- ARTIFACTS TAB VIEW -->
+  <section class="artifacts-view" id="artifactsView" style="display: none;">
+    <div class="artifacts-header-flex">
+      <div>
+        <h1>Saved Artifacts & Snippets</h1>
+        <p>Access your pinned code blocks, stories, and generated snippets instantly.</p>
+      </div>
+      <button class="clear-alerts-btn" id="clearArtifactsBtn" type="button">Clear All</button>
+    </div>
+    <div class="artifacts-grid" id="artifactsGrid"></div>
+  </section>
+
   <!-- NOVA TAB VIEW -->
   <section class="nova-view" id="novaView" style="display: none;">
     <h1>Nova Assistant</h1>
@@ -2945,6 +3107,7 @@ const sidebar = $("sidebar");
 const viewContainer = $("viewContainer");
 const chatView = $("chatView");
 const promptsView = $("promptsView");
+const artifactsView = $("artifactsView");
 const novaView = $("novaView");
 const alertsView = $("alertsView");
 const composerArea = $("composerArea");
@@ -2963,15 +3126,18 @@ let attachedFilePayload = null;
 
 function switchTab(tabName) {
   const promptsBtn = $("promptsTabBtn");
+  const artifactsBtn = $("artifactsTabBtn");
   const novaBtn = $("novaTabBtn");
   const alertsTabBtn = $("alertsTabBtn");
 
   chatView.style.display = "none";
   promptsView.style.display = "none";
+  if (artifactsView) artifactsView.style.display = "none";
   novaView.style.display = "none";
   if (alertsView) alertsView.style.display = "none";
 
   if (promptsBtn) promptsBtn.classList.remove("active");
+  if (artifactsBtn) artifactsBtn.classList.remove("active");
   if (novaBtn) novaBtn.classList.remove("active");
   if (alertsTabBtn) alertsTabBtn.classList.remove("active");
 
@@ -2979,6 +3145,11 @@ function switchTab(tabName) {
     promptsView.style.display = "block";
     composerArea.style.display = "none";
     if (promptsBtn) promptsBtn.classList.add("active");
+  } else if (tabName === 'artifacts') {
+    if (artifactsView) artifactsView.style.display = "block";
+    composerArea.style.display = "none";
+    if (artifactsBtn) artifactsBtn.classList.add("active");
+    renderArtifactsFeed();
   } else if (tabName === 'nova') {
     novaView.style.display = "block";
     composerArea.style.display = "none";
@@ -3085,6 +3256,101 @@ viewContainer.addEventListener("drop", e => {
     handleFileAttachment(file);
   }
 });
+
+
+/* ============================================
+   ARTIFACTS & PINNED CONTENT MANAGER
+============================================ */
+
+const artifactsTabBtn = $("artifactsTabBtn");
+const artifactsGrid = $("artifactsGrid");
+const artifactsCountBadge = $("artifactsCountBadge");
+
+let artifactsList = JSON.parse(localStorage.getItem("rainbow_ai_artifacts") || "[]");
+
+if (artifactsTabBtn) {
+  artifactsTabBtn.onclick = () => switchTab('artifacts');
+}
+
+const clearArtifactsBtn = $("clearArtifactsBtn");
+if (clearArtifactsBtn) {
+  clearArtifactsBtn.onclick = () => {
+    artifactsList = [];
+    localStorage.setItem("rainbow_ai_artifacts", JSON.stringify(artifactsList));
+    renderArtifactsFeed();
+    updateArtifactsBadge();
+  };
+}
+
+function updateArtifactsBadge() {
+  if (!artifactsCountBadge) return;
+  if (artifactsList.length > 0) {
+    artifactsCountBadge.textContent = artifactsList.length;
+    artifactsCountBadge.classList.add("active");
+  } else {
+    artifactsCountBadge.classList.remove("active");
+  }
+}
+
+function renderArtifactsFeed() {
+  if (!artifactsGrid) return;
+  artifactsGrid.innerHTML = "";
+
+  if (!artifactsList.length) {
+    artifactsGrid.innerHTML = `
+      <div class="alert-empty-state" style="grid-column: 1 / -1;">
+        No saved artifacts or code chunks yet. Click "Pin" on any AI response to store it here.
+      </div>
+    `;
+    return;
+  }
+
+  artifactsList.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "artifact-card";
+    card.innerHTML = `
+      <div>
+        <div class="artifact-card-header">
+          <span class="artifact-card-title">${item.title}</span>
+          <span>${item.time}</span>
+        </div>
+        <div class="artifact-card-body">${item.content.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+      </div>
+      <div class="artifact-card-actions">
+        <button class="artifact-action-btn copy-art">Copy</button>
+        <button class="artifact-action-btn delete-art">Remove</button>
+      </div>
+    `;
+
+    card.querySelector(".copy-art").onclick = () => {
+      navigator.clipboard?.writeText(item.content);
+    };
+
+    card.querySelector(".delete-art").onclick = () => {
+      artifactsList = artifactsList.filter(a => a.id !== item.id);
+      localStorage.setItem("rainbow_ai_artifacts", JSON.stringify(artifactsList));
+      renderArtifactsFeed();
+      updateArtifactsBadge();
+    };
+
+    artifactsGrid.appendChild(card);
+  });
+}
+
+window.pinArtifact = function(title, content) {
+  const artifact = {
+    id: Date.now().toString(),
+    title: title || "Generated Artifact",
+    content,
+    time: new Date().toLocaleDateString()
+  };
+  artifactsList.unshift(artifact);
+  localStorage.setItem("rainbow_ai_artifacts", JSON.stringify(artifactsList));
+  updateArtifactsBadge();
+  window.pushAlert("Artifact Saved", "Successfully pinned snippet to your Artifacts collection.", "success");
+};
+
+updateArtifactsBadge();
 
 
 /* ============================================
@@ -3552,11 +3818,28 @@ $("downloadChatBtn").onclick = exportCurrentChat;
 
 
 /* ============================================
-   MARKDOWN & MESSAGES
+   MARKDOWN & DUAL-PANE CODE FORMATTING
 ============================================ */
 
 function markdown(text) {
-  if (window.marked) return marked.parse(text);
+  if (window.marked) {
+    let html = marked.parse(text);
+    // Convert code blocks into dual-pane structured card containers
+    html = html.replace(/<pre><code([^>]*)>([\s\S]*?)<\/code><\/pre>/gi, (match, attr, codeContent) => {
+      return `
+        <div class="dual-pane-card">
+          <div class="dual-pane-header">
+            <span>Code Synthesizer Output</span>
+            <button class="artifact-action-btn" style="width:auto; padding:3px 10px;" onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText)">Copy Code</button>
+          </div>
+          <div class="dual-pane-body">
+            <pre><code${attr}>${codeContent}</code></pre>
+          </div>
+        </div>
+      `;
+    });
+    return html;
+  }
   return text.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
 }
 
@@ -3596,6 +3879,12 @@ function addMessage(role, text, save = true) {
     copy.textContent = "Copy";
     copy.onclick = () => navigator.clipboard?.writeText(content.dataset.raw);
 
+    const pin = document.createElement("button");
+    pin.className = "message-action";
+    pin.type = "button";
+    pin.textContent = "Pin Artifact";
+    pin.onclick = () => window.pinArtifact(currentSession?.title || "Artifact", content.dataset.raw);
+
     const speak = document.createElement("button");
     speak.className = "message-action";
     speak.type = "button";
@@ -3605,7 +3894,7 @@ function addMessage(role, text, save = true) {
       speechSynthesis.speak(speech);
     };
 
-    actions.append(copy, speak);
+    actions.append(copy, pin, speak);
     content.appendChild(actions);
   }
 
@@ -3827,6 +4116,7 @@ updateCurrentUserUI();
 renderUsers();
 renderHistory();
 renderFiftyPrompts();
+renderArtifactsFeed();
 
 if (sessions.length) {
   loadSession(sessions[0].id);
