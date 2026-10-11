@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Rainbow AI</title>
+<title>Rainbow-AI</title>
 
 <link rel="icon" href="icon-new.png">
 
@@ -128,9 +128,115 @@ svg {
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Cute ChatGPT-style SVG Hover Animation */
-button:hover svg, .prompt-card:hover svg, .nav-tab-btn:hover svg {
-  transform: scale(1.15) rotate(3deg);
+/* ============================================
+   MORPHING & INTERACTIVE VECTOR ANIMATIONS
+============================================ */
+
+.morph-icon-box {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.morph-icon-box svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity 0.28s ease,
+              stroke-dashoffset 0.4s ease;
+}
+
+/* Theme Button: Sun morphs to Moon */
+.theme-sun {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+.theme-moon {
+  opacity: 0;
+  transform: scale(0.4) rotate(-45deg);
+}
+
+#themeButton:hover .theme-sun {
+  opacity: 0;
+  transform: scale(0.3) rotate(90deg);
+}
+
+#themeButton:hover .theme-moon {
+  opacity: 1;
+  transform: scale(1.1) rotate(0deg);
+}
+
+/* New Chat Button: Plus morphs into Pencil on Paper */
+.newchat-plus {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+.newchat-pencil {
+  opacity: 0;
+  transform: scale(0.4) translate(-4px, 4px) rotate(-20deg);
+}
+
+.newchat-pencil .paper-line {
+  stroke-dasharray: 12;
+  stroke-dashoffset: 12;
+  transition: stroke-dashoffset 0.35s ease 0.08s;
+}
+
+#newChat:hover .newchat-plus {
+  opacity: 0;
+  transform: scale(0.3) rotate(90deg);
+}
+
+#newChat:hover .newchat-pencil {
+  opacity: 1;
+  transform: scale(1.1) translate(0, 0) rotate(0deg);
+}
+
+#newChat:hover .newchat-pencil .paper-line {
+  stroke-dashoffset: 0;
+}
+
+/* Subtle & Cute Tab Micro-Interactions */
+.nav-tab-btn:hover .tab-svg-sparkle {
+  transform: scale(1.2) rotate(12deg);
+  filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.6));
+}
+
+.nav-tab-btn:hover .tab-svg-book {
+  transform: translateY(-2px) scale(1.12);
+}
+
+.nav-tab-btn:hover .tab-svg-archive {
+  transform: translateY(-2px) scale(1.12);
+}
+
+.nav-tab-btn:hover .tab-svg-bell {
+  transform-origin: top center;
+  animation: cuteBellWiggle 0.6s ease-in-out;
+}
+
+@keyframes cuteBellWiggle {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(14deg); }
+  50% { transform: rotate(-12deg); }
+  75% { transform: rotate(6deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Clean SVG Hover Transitions for Other Buttons */
+.icon-btn:hover svg,
+.prompt-card:hover svg,
+.tool-btn:hover svg {
+  transform: scale(1.12) rotate(3deg);
 }
 
 /* ================================
@@ -854,43 +960,7 @@ button:hover svg, .prompt-card:hover svg, .nav-tab-btn:hover svg {
   border-radius: 6px;
 }
 
-/* Nova Tab View Layout */
-.nova-view {
-  width: min(900px, 100%);
-  margin: auto;
-  padding: 40px 25px 120px;
-}
-
-.nova-view h1 {
-  font-size: 28px;
-  margin: 0 0 6px 0;
-  background: linear-gradient(90deg, #4285f4, #8b5cf6, #ec4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.nova-view p {
-  color: var(--muted);
-  font-size: 14px;
-  margin-bottom: 24px;
-}
-
-.nova-card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 24px;
-  margin-bottom: 20px;
-  box-shadow: var(--shadow);
-}
-
-.nova-card h3 {
-  margin-top: 0;
-  font-size: 18px;
-  color: var(--text);
-}
-
-/* Artifacts Drawer & Tab View Layout */
+/* Artifacts View Layout */
 .artifacts-view {
   width: min(1000px, 100%);
   margin: auto;
@@ -998,6 +1068,42 @@ button:hover svg, .prompt-card:hover svg, .nav-tab-btn:hover svg {
   background: var(--panel3);
 }
 
+/* Nova Tab View Layout */
+.nova-view {
+  width: min(900px, 100%);
+  margin: auto;
+  padding: 40px 25px 120px;
+}
+
+.nova-view h1 {
+  font-size: 28px;
+  margin: 0 0 6px 0;
+  background: linear-gradient(90deg, #4285f4, #8b5cf6, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nova-view p {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.nova-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+
+.nova-card h3 {
+  margin-top: 0;
+  font-size: 18px;
+  color: var(--text);
+}
+
 /* Alerts Tab View Layout */
 .alerts-view {
   width: min(900px, 100%);
@@ -1075,7 +1181,7 @@ button:hover svg, .prompt-card:hover svg, .nav-tab-btn:hover svg {
 .alert-message { font-size: 13px; line-height: 1.5; color: var(--muted); margin: 0; }
 .alert-empty-state { text-align: center; padding: 50px 20px; color: var(--muted); font-size: 14px; }
 
-/* Alerts & Artifacts Badges in Sidebar */
+/* Sidebar Badges */
 .sidebar-badge {
   margin-left: auto;
   background: var(--pink);
@@ -1323,7 +1429,7 @@ button:hover svg, .prompt-card:hover svg, .nav-tab-btn:hover svg {
   margin-top: 0;
 }
 
-/* Dual-pane modular container for code vs prose */
+/* Dual-Pane Code Container */
 .dual-pane-card {
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -1793,7 +1899,6 @@ button:hover svg, .prompt-card:hover svg, .nav-tab-btn:hover svg {
   display: block;
 
   width: 19px;
-
   height: 19px;
 
   border-radius: 50%;
@@ -2156,24 +2261,18 @@ button:hover svg, .prompt-card:hover svg, .nav-tab-btn:hover svg {
     id="newChat"
     type="button"
   >
-
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M12 5v14M5 12h14"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-      />
-    </svg>
-
+    <div class="morph-icon-box">
+      <!-- Default: Clean Plus Icon -->
+      <svg class="newchat-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      <!-- Hover: Cute Animated Pencil on Paper -->
+      <svg class="newchat-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 3l4 4L7 18H3v-4L14 3z"/>
+        <path class="paper-line" d="M13 21h8"/>
+      </svg>
+    </div>
     <span>New chat</span>
-
   </button>
 
   <button
@@ -2181,7 +2280,7 @@ button:hover svg, .prompt-card:hover svg, .nav-tab-btn:hover svg {
     id="promptsTabBtn"
     type="button"
   >
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg class="tab-svg-book" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
       <path d="M8 7h8M8 11h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
     </svg>
@@ -2193,7 +2292,7 @@ button:hover svg, .prompt-card:hover svg, .nav-tab-btn:hover svg {
     id="artifactsTabBtn"
     type="button"
   >
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg class="tab-svg-archive" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M19 11H5m14 0a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2m14 0V9a2 2 0 0 0-2-2M5 11V9a2 2 0 0 1 2-2m0 0V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2M7 7h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     <span>Artifacts</span>
@@ -2205,7 +2304,7 @@ button:hover svg, .prompt-card:hover svg, .nav-tab-btn:hover svg {
     id="novaTabBtn"
     type="button"
   >
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg class="tab-svg-sparkle" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M12 2l2.4 7.2h7.6l-6.2 4.8 2.4 7.2-6.2-4.8-6.2 4.8 2.4-7.2-6.2-4.8h7.6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
     </svg>
     <span>Nova</span>
@@ -2216,8 +2315,8 @@ button:hover svg, .prompt-card:hover svg, .nav-tab-btn:hover svg {
     id="alertsTabBtn"
     type="button"
   >
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    <svg class="tab-svg-bell" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
     </svg>
     <span>Alerts</span>
@@ -2298,32 +2397,18 @@ button:hover svg, .prompt-card:hover svg, .nav-tab-btn:hover svg {
       id="themeButton"
       type="button"
     >
-
-      <svg
-        width="17"
-        height="17"
-        viewBox="0 0 24 24"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M12 3v2M12 19v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M3 12h2M19 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"
-          stroke="currentColor"
-          stroke-width="1.7"
-          stroke-linecap="round"
-        />
-
-        <circle
-          cx="12"
-          cy="12"
-          r="4"
-          stroke="currentColor"
-          stroke-width="1.7"
-        />
-      </svg>
-
-      Theme
-
+      <div class="morph-icon-box">
+        <!-- Sun (visible in Dark Mode by default) -->
+        <svg class="theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        </svg>
+        <!-- Moon (animates in when hovering) -->
+        <svg class="theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </div>
+      <span>Theme</span>
     </button>
 
     <button
@@ -3299,7 +3384,7 @@ function renderArtifactsFeed() {
   if (!artifactsList.length) {
     artifactsGrid.innerHTML = `
       <div class="alert-empty-state" style="grid-column: 1 / -1;">
-        No saved artifacts or code chunks yet. Click "Pin" on any AI response to store it here.
+        No saved artifacts or code chunks yet. Click "Pin Artifact" on any AI response to store it here.
       </div>
     `;
     return;
