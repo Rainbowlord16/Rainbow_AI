@@ -19,65 +19,51 @@
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <style>
-
 * {
   box-sizing: border-box;
 }
 
 :root {
-  --bg: #0b0d12;
-  --panel: #11141b;
-  --panel2: #171a22;
-  --panel3: #20242e;
-  --text: #f4f6fb;
-  --muted: #969dac;
-  --border: rgba(255,255,255,.09);
+  --bg: #000000;
+  --panel: #0a0b0e;
+  --panel2: #12141a;
+  --panel3: #1a1e27;
+  --text: #ffffff;
+  --muted: #8e95a5;
+  --border: rgba(255, 255, 255, 0.08);
 
-  --accent: #8b5cf6;
-  --accent2: #3b82f6;
-  --pink: #ec4899;
+  /* Full Balanced Spectral Rainbow Gradients */
+  --rainbow-gradient: linear-gradient(135deg, #ef4444, #f97316, #eab308, #10b981, #06b6d4, #3b82f6, #8b5cf6, #ec4899);
+  --rainbow-text: linear-gradient(90deg, #ef4444, #f97316, #eab308, #10b981, #06b6d4, #3b82f6, #8b5cf6, #ec4899);
+  --rainbow-border: linear-gradient(90deg, #ef4444, #eab308, #10b981, #3b82f6, #ec4899);
+
+  --accent: #3b82f6;
   --green: #22c55e;
-
-  --shadow:
-    0 20px 70px rgba(0,0,0,.35);
+  --shadow: 0 20px 70px rgba(0, 0, 0, 0.65);
 }
 
 [data-theme="light"] {
-  --bg: #f7f8fc;
-  --panel: #ffffff;
-  --panel2: #f1f3f7;
-  --panel3: #e6e9ef;
-  --text: #171923;
-  --muted: #687083;
-  --border: rgba(20,25,40,.1);
-
-  --shadow:
-    0 20px 60px rgba(20,25,40,.12);
+  --bg: #ffffff;
+  --panel: #f8fafc;
+  --panel2: #f1f5f9;
+  --panel3: #e2e8f0;
+  --text: #000000;
+  --muted: #64748b;
+  --border: rgba(0, 0, 0, 0.09);
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
 }
 
-html,
-body {
+html, body {
   width: 100%;
   height: 100%;
   margin: 0;
-}
-
-body {
-  font-family:
-    "Google Sans Flex",
-    "Google Sans",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
-
+  font-family: "Google Sans Flex", "Google Sans", -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg);
   color: var(--text);
   overflow: hidden;
   position: relative;
 }
 
-/* Background Neural Canvas */
 #neural-canvas {
   position: fixed;
   top: 0;
@@ -88,232 +74,50 @@ body {
   z-index: 0;
 }
 
-/* Rainbow Gradient Loading Bar (Top Screen) */
 .loading-bar {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 3px;
-  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6, #22c55e, #ec4899);
-  background-size: 400% auto;
-  animation: rainbowBar 2.5s linear infinite;
+  background: var(--rainbow-gradient);
+  background-size: 300% auto;
+  animation: rainbowScroll 2.2s linear infinite;
   z-index: 9999;
   display: none;
 }
+.loading-bar.active { display: block; }
 
-.loading-bar.active {
+@keyframes rainbowScroll {
+  to { background-position: 300% center; }
+}
+
+svg {
   display: block;
-}
-
-@keyframes rainbowBar {
-  to {
-    background-position: 400% center;
-  }
-}
-
-button,
-input,
-textarea,
-select {
-  font-family: inherit;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
 }
 
 button {
   -webkit-tap-highlight-color: transparent;
+  font-family: inherit;
 }
 
-/* Base interactive transitions on all SVGs */
-svg {
-  display: block;
-  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
-              filter 0.28s ease,
-              opacity 0.28s ease;
+.rainbow-title-gradient {
+  background: var(--rainbow-text);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: rainbowTitleFlow 6s linear infinite;
 }
 
-/* Global Subtle & Cute Interactive Hover Motion for interactive elements */
-button:hover svg:not(.no-anim),
-.prompt-card:hover svg:not(.no-anim),
-.tool-btn:hover svg:not(.no-anim),
-.icon-btn:hover svg:not(.no-anim),
-.history-item:hover svg:not(.no-anim) {
-  transform: scale(1.18) rotate(4deg);
+@keyframes rainbowTitleFlow {
+  to { background-position: 200% center; }
 }
 
-/* Extra playful bounce on click */
-button:active svg,
-.prompt-card:active svg {
-  transform: scale(0.92) rotate(-2deg);
-}
-
-/* ============================================
-   MORPHING DUAL-STATE VECTOR ANIMATIONS
-============================================ */
-
-.morph-icon-box {
-  position: relative;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.morph-icon-box svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 18px;
-  height: 18px;
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-              opacity 0.28s ease,
-              stroke-dashoffset 0.4s ease;
-}
-
-/* Theme Button: Sun morphs to Moon */
-.theme-sun {
-  opacity: 1;
-  transform: scale(1) rotate(0deg);
-}
-
-.theme-moon {
-  opacity: 0;
-  transform: scale(0.35) rotate(-45deg);
-}
-
-#themeButton:hover .theme-sun {
-  opacity: 0;
-  transform: scale(0.3) rotate(90deg);
-}
-
-#themeButton:hover .theme-moon {
-  opacity: 1;
-  transform: scale(1.15) rotate(0deg);
-}
-
-/* New Chat Button: Plus morphs into Pencil & Paper */
-.newchat-plus {
-  opacity: 1;
-  transform: scale(1) rotate(0deg);
-}
-
-.newchat-pencil {
-  opacity: 0;
-  transform: scale(0.35) translate(-4px, 4px) rotate(-20deg);
-}
-
-.newchat-pencil .paper-line {
-  stroke-dasharray: 12;
-  stroke-dashoffset: 12;
-  transition: stroke-dashoffset 0.35s ease 0.08s;
-}
-
-#newChat:hover .newchat-plus {
-  opacity: 0;
-  transform: scale(0.3) rotate(90deg);
-}
-
-#newChat:hover .newchat-pencil {
-  opacity: 1;
-  transform: scale(1.15) translate(0, 0) rotate(0deg);
-}
-
-#newChat:hover .newchat-pencil .paper-line {
-  stroke-dashoffset: 0;
-}
-
-/* Export Chat Button: Download arrow morphs into Checkmark File */
-.export-download {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-}
-
-.export-filecheck {
-  opacity: 0;
-  transform: scale(0.4) rotate(-15deg);
-}
-
-#downloadChatBtn:hover .export-download {
-  opacity: 0;
-  transform: scale(0.3) translateY(6px);
-}
-
-#downloadChatBtn:hover .export-filecheck {
-  opacity: 1;
-  transform: scale(1.15) rotate(0deg);
-}
-
-/* Add User Button: Plus Person morphs into Multiple Team People */
-.useradd-single {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.useradd-group {
-  opacity: 0;
-  transform: scale(0.4) rotate(15deg);
-}
-
-#addUserButton:hover .useradd-single {
-  opacity: 0;
-  transform: scale(0.3) rotate(-30deg);
-}
-
-#addUserButton:hover .useradd-group {
-  opacity: 1;
-  transform: scale(1.15) rotate(0deg);
-}
-
-/* Subtle & Cute Tab Micro-Interactions */
-.nav-tab-btn:hover .tab-svg-sparkle {
-  transform: scale(1.22) rotate(14deg);
-  filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.65));
-}
-
-.nav-tab-btn:hover .tab-svg-book {
-  transform: translateY(-2.5px) scale(1.12);
-}
-
-.nav-tab-btn:hover .tab-svg-archive {
-  transform: translateY(-2.5px) scale(1.12);
-}
-
-.nav-tab-btn:hover .tab-svg-bell {
-  transform-origin: top center;
-  animation: cuteBellWiggle 0.6s ease-in-out;
-}
-
-@keyframes cuteBellWiggle {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(14deg); }
-  50% { transform: rotate(-12deg); }
-  75% { transform: rotate(6deg); }
-  100% { transform: rotate(0deg); }
-}
-
-/* Clean Hover Transitions for Action Buttons */
-.tool-btn:hover .paperclip-svg {
-  transform: rotate(-15deg) scale(1.15);
-}
-
-.settings-btn-svg {
-  transform-origin: center;
-}
-
-#settingsButton:hover .settings-btn-svg,
-#topSettings:hover .settings-btn-svg {
-  transform: rotate(60deg) scale(1.12);
-}
-
-.send-btn:hover svg {
-  transform: translate(2px, -2px) scale(1.12);
-}
-
-/* ================================
-   APP
-================================ */
-
+/* ========================================================
+   GEMINI-STYLE RAIL & SIDEBAR (SMOOTH HOVER MORPH)
+======================================================== */
 .app {
   width: 100%;
   height: 100%;
@@ -322,207 +126,165 @@ button:active svg,
   z-index: 10;
 }
 
-/* ================================
-   SIDEBAR
-================================ */
-
 .sidebar {
   width: 275px;
   flex-shrink: 0;
   height: 100%;
-
-  padding: 18px 14px;
-
+  padding: 16px 12px;
   display: flex;
   flex-direction: column;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(17,20,27,.98),
-      rgba(11,13,18,.98)
-    );
-
-  border-right: 1px solid var(--border);
-
-  transition:
-    width .25s ease,
-    transform .25s ease,
-    padding .25s ease;
-
-  z-index: 50;
-}
-
-[data-theme="light"] .sidebar {
   background: var(--panel);
-}
-
-.sidebar.collapsed {
-  width: 0;
-  padding-left: 0;
-  padding-right: 0;
+  border-right: 1px solid var(--border);
+  transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), padding 0.28s ease;
+  z-index: 50;
   overflow: hidden;
 }
 
-/* Brand */
+.sidebar.collapsed {
+  width: 68px;
+  padding: 16px 10px;
+}
 
-.brand {
+/* Brand container: Logo morphs to Sidebar Icon on Hover when collapsed */
+.brand-container {
   display: flex;
   align-items: center;
-  gap: 10px;
-
-  padding: 4px 9px 20px;
-
-  font-size: 18px;
-  font-weight: 650;
-  letter-spacing: -.025em;
+  gap: 12px;
+  padding: 4px 6px 18px;
+  cursor: pointer;
+  border-radius: 12px;
+  user-select: none;
 }
 
-.brand img {
-  width: 31px;
-  height: 31px;
+.brand-icon-box {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+}
 
+.brand-icon-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   border-radius: 9px;
-
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.08),
-    0 8px 24px rgba(139,92,246,.18);
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
-.brand-name {
-  background:
-    linear-gradient(
-      90deg,
-      #ec4899,
-      #8b5cf6,
-      #3b82f6
-    );
-
-  -webkit-background-clip: text;
-  background-clip: text;
-
-  color: transparent;
+.brand-icon-box .rail-toggle-svg {
+  position: absolute;
+  opacity: 0;
+  transform: scale(0.6);
+  color: var(--text);
 }
 
-/* Nav Tab Buttons */
+.sidebar.collapsed .brand-container:hover .brand-icon-box img {
+  opacity: 0;
+  transform: scale(0.4) rotate(-15deg);
+}
 
+.sidebar.collapsed .brand-container:hover .brand-icon-box .rail-toggle-svg {
+  opacity: 1;
+  transform: scale(1.1) rotate(0deg);
+}
+
+.brand-text {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar.collapsed .brand-text {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Nav Tab Buttons (Accessible directly in rail or full sidebar) */
 .nav-tab-btn {
   height: 44px;
   border: 0;
   border-radius: 999px;
-  background: var(--panel2);
-  color: var(--text);
+  background: transparent;
+  color: var(--muted);
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 9px;
-  padding: 0 15px;
+  gap: 12px;
+  padding: 0 14px;
   font-size: 14px;
-  font-weight: 550;
-  transition: .2s;
-  margin-bottom: 6px;
+  font-weight: 600;
+  transition: background 0.18s, color 0.18s, transform 0.18s;
+  margin-bottom: 4px;
   width: 100%;
+  flex-shrink: 0;
 }
 
-.nav-tab-btn:hover, .nav-tab-btn.active {
-  background: var(--panel3);
-  transform: translateY(-1px);
+.nav-tab-btn:hover {
+  background: var(--panel2);
+  color: var(--text);
 }
 
 .nav-tab-btn.active {
-  background: linear-gradient(135deg, rgba(66,133,244,.15), rgba(139,92,246,.2));
-  border: 1px solid rgba(139,92,246,.3);
+  background: var(--panel3);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--border);
 }
 
-/* Gemini-Style Morphing Thinking Animation */
-.gemini-thinking {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 0;
+.nav-tab-btn span {
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
 }
 
-.gemini-orb-loader {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+.sidebar.collapsed .nav-tab-btn {
+  padding: 0 14px;
+  justify-content: flex-start;
 }
 
-.gemini-orb {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  animation: geminiPulse 1.4s infinite ease-in-out both;
+.sidebar.collapsed .nav-tab-btn span,
+.sidebar.collapsed .sidebar-badge,
+.sidebar.collapsed .section-title,
+.sidebar.collapsed .search,
+.sidebar.collapsed .history,
+.sidebar.collapsed .current-user-info,
+.sidebar.collapsed .user-chevron {
+  display: none !important;
 }
 
-.gemini-orb:nth-child(1) { background: #4285f4; animation-delay: -0.32s; }
-.gemini-orb:nth-child(2) { background: #8b5cf6; animation-delay: -0.16s; }
-.gemini-orb:nth-child(3) { background: #ec4899; animation-delay: 0s; }
-
-@keyframes geminiPulse {
-  0%, 80%, 100% { transform: scale(0.4); opacity: 0.5; }
-  40% { transform: scale(1.3); opacity: 1; filter: drop-shadow(0 0 6px currentColor); }
+.sidebar-badge {
+  margin-left: auto;
+  background: #ec4899;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
 }
-
-.shimmer-text {
-  font-weight: 500;
-  font-size: 15px;
-  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6, #ec4899);
-  background-size: 300% auto;
-  color: transparent;
-  -webkit-background-clip: text;
-  background-clip: text;
-  animation: textShimmer 3s linear infinite;
-}
-
-@keyframes textShimmer {
-  to {
-    background-position: 300% center;
-  }
-}
-
-/* Search */
 
 .search {
-  margin-top: 4px;
-
   width: 100%;
-  height: 42px;
-
+  height: 40px;
   border: 1px solid var(--border);
   border-radius: 999px;
-
   background: var(--panel2);
   color: var(--text);
-
   outline: none;
-
   padding: 0 15px;
-
-  transition: .2s;
+  margin-top: 6px;
+  font-size: 13px;
 }
-
-.search:focus {
-  border-color: rgba(139,92,246,.5);
-
-  box-shadow:
-    0 0 0 3px rgba(139,92,246,.08);
-}
-
-/* Section */
 
 .section-title {
   margin: 16px 8px 8px;
-
   color: var(--muted);
-
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: .09em;
+  letter-spacing: 0.08em;
 }
-
-/* History */
 
 .history {
   flex: 1;
@@ -530,346 +292,175 @@ button:active svg,
 }
 
 .history-item {
-  padding: 10px 11px;
+  padding: 8px 10px;
   margin: 2px 0;
-
   border-radius: 12px;
-
   color: var(--muted);
-
   font-size: 13px;
-
   cursor: pointer;
-
   display: flex;
-  gap: 8px;
   align-items: center;
-
-  transition: .18s;
+  gap: 6px;
+  transition: background 0.18s, color 0.18s;
 }
 
-.history-item:hover,
-.history-item.active {
+.history-item:hover, .history-item.active {
   background: var(--panel2);
   color: var(--text);
 }
 
 .history-title {
   flex: 1;
-
-  overflow: hidden;
-
   white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.delete-chat {
+.history-action-btn {
   border: 0;
   background: transparent;
-
   color: var(--muted);
-
   cursor: pointer;
-
+  padding: 4px;
+  border-radius: 6px;
   opacity: 0;
-
-  width: 26px;
-  height: 26px;
-
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
 }
-
-.history-item:hover .delete-chat {
-  opacity: 1;
-}
-
-.delete-chat:hover {
-  background: rgba(239,68,68,.1);
-  color: #ef4444;
-}
-
-/* Sidebar bottom */
-
-.sidebar-bottom {
-  display: flex;
-  gap: 7px;
-  padding-top: 10px;
-}
-
-.sidebar-bottom button {
-  flex: 1;
-
-  height: 39px;
-
-  border: 0;
-  border-radius: 999px;
-
-  background: var(--panel2);
-  color: var(--muted);
-
-  cursor: pointer;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 7px;
-
-  transition: .18s;
-}
-
-.sidebar-bottom button:hover {
-  color: var(--text);
-  background: var(--panel3);
-}
-
-/* Users tab */
+.history-item:hover .history-action-btn { opacity: 1; }
+.history-action-btn:hover { color: var(--text); background: var(--panel3); }
+.history-action-btn.delete:hover { color: #ef4444; }
 
 .users-tab {
   width: 100%;
-
-  margin-top: 9px;
-
-  height: 50px;
-
+  margin-top: 8px;
+  height: 48px;
   border: 0;
-  border-radius: 15px;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(66,133,244,.10),
-      rgba(139,92,246,.12)
-    );
-
+  border-radius: 14px;
+  background: var(--panel2);
   color: var(--text);
-
   cursor: pointer;
-
   display: flex;
   align-items: center;
-
   gap: 10px;
-
-  padding: 0 12px;
-
-  transition: .2s;
-}
-
-.users-tab:hover {
-  background:
-    linear-gradient(
-      135deg,
-      rgba(66,133,244,.16),
-      rgba(139,92,246,.18)
-    );
-
-  transform: translateY(-1px);
+  padding: 0 10px;
+  flex-shrink: 0;
 }
 
 .current-user-avatar {
   width: 32px;
   height: 32px;
-
-  flex: 0 0 32px;
-
   border-radius: 50%;
-
   display: grid;
   place-items: center;
-
-  background:
-    linear-gradient(
-      135deg,
-      #4285f4,
-      #8b5cf6
-    );
-
+  background: var(--rainbow-gradient);
   color: white;
-
-  font-size: 11px;
-  font-weight: 650;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
-.current-user-info {
-  min-width: 0;
+.current-user-info { min-width: 0; flex: 1; text-align: left; }
+.current-user-name { font-size: 13px; font-weight: 600; }
+.current-user-email { font-size: 11px; color: var(--muted); }
+
+.sidebar-bottom {
+  display: flex;
+  gap: 6px;
+  padding-top: 10px;
+  flex-shrink: 0;
+}
+
+.sidebar-bottom button {
   flex: 1;
-  text-align: left;
-}
-
-.current-user-name {
-  font-size: 13px;
-  font-weight: 600;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.current-user-email {
-  margin-top: 2px;
-
-  font-size: 10px;
-
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--panel2);
   color: var(--muted);
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
 }
+.sidebar-bottom button:hover { background: var(--panel3); color: var(--text); }
+.sidebar.collapsed .sidebar-bottom button span { display: none; }
 
-.user-chevron {
-  width: 18px;
-  height: 18px;
-
-  display: grid;
-  place-items: center;
-
-  color: var(--muted);
-}
-
-.users-tab:hover .user-chevron svg {
-  transform: translateX(3px) scale(1.15);
-}
-
-/* ================================
-   MAIN
-================================ */
-
+/* ========================================================
+   MAIN VIEWPORT & TOPBAR (NO HAMBURGER BUTTON)
+======================================================== */
 .main {
   min-width: 0;
-
   flex: 1;
-
   height: 100%;
-
   display: flex;
   flex-direction: column;
 }
 
-/* ================================
-   TOP BAR
-================================ */
-
 .topbar {
-  height: 64px;
-
+  height: 60px;
   padding: 0 20px;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   border-bottom: 1px solid var(--border);
-
-  background:
-    rgba(11,13,18,.72);
-
+  background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(18px);
-
   z-index: 20;
 }
+[data-theme="light"] .topbar { background: rgba(255, 255, 255, 0.85); }
 
-[data-theme="light"] .topbar {
-  background: rgba(247,248,252,.8);
-}
-
-.top-left,
-.top-right {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-
-.icon-btn {
-  width: 39px;
-  height: 39px;
-
-  border-radius: 50%;
-
-  border: 0;
-
-  background: transparent;
-  color: var(--text);
-
-  cursor: pointer;
-
-  display: grid;
-  place-items: center;
-
-  transition: .18s;
-}
-
-.icon-btn:hover {
-  background: var(--panel2);
-}
-
-.icon-btn svg {
-  width: 19px;
-  height: 19px;
-}
-
-/* Model selector */
+.top-left, .top-right { display: flex; align-items: center; gap: 10px; }
 
 .model-selector {
-  height: 39px;
-
-  border: 0;
+  height: 36px;
+  border: 1px solid var(--border);
   border-radius: 999px;
-
   background: var(--panel2);
   color: var(--text);
-
   padding: 0 14px;
-
   outline: none;
-
   font-size: 13px;
-  font-weight: 550;
-
+  font-weight: 600;
   cursor: pointer;
 }
-
-/* Status */
 
 .status {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-
   color: var(--green);
-
   font-size: 12px;
-
-  border: 1px solid rgba(34,197,94,.2);
-
-  background: rgba(34,197,94,.08);
-
-  padding: 7px 11px;
-
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  background: rgba(34, 197, 94, 0.08);
+  padding: 6px 12px;
   border-radius: 999px;
 }
-
 .status::before {
   content: "";
-
   width: 7px;
   height: 7px;
-
   border-radius: 50%;
-
   background: currentColor;
-
-  box-shadow:
-    0 0 9px currentColor;
+  box-shadow: 0 0 8px currentColor;
 }
 
-/* ================================
-   VIEWS CONTAINER
-================================ */
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.icon-btn:hover { background: var(--panel2); }
 
+/* ========================================================
+   CHAT & COMPOSER
+======================================================== */
 .view-container {
   flex: 1;
   overflow-y: auto;
@@ -878,380 +469,447 @@ button:active svg,
   position: relative;
 }
 
-.chat {
-  flex: 1;
-}
-
+.chat { flex: 1; }
 .chat-inner {
-  width: min(920px, 100%);
-
+  width: min(900px, 100%);
   margin: auto;
-
-  padding:
-    34px
-    25px
-    180px;
+  padding: 24px 20px 220px;
 }
 
-/* Drag and Drop Overlay UI */
-.drop-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(11, 13, 18, 0.85);
-  backdrop-filter: blur(12px);
-  z-index: 100;
-  display: none;
+.welcome {
+  min-height: 52vh;
+  display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  border: 3px dashed var(--accent);
-  margin: 16px;
-  border-radius: 24px;
-}
-
-.drop-overlay.active {
-  display: flex;
-}
-
-.drop-overlay-content {
+  align-items: center;
   text-align: center;
-  pointer-events: none;
 }
 
-.drop-overlay-icon {
-  margin-bottom: 12px;
-  display: inline-flex;
-}
-
-.drop-overlay-icon svg {
-  width: 48px;
-  height: 48px;
-  color: var(--accent);
-  animation: floatCloud 2.2s infinite ease-in-out;
-}
-
-@keyframes floatCloud {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-7px); }
-}
-
-.drop-overlay h2 {
-  font-size: 24px;
-  margin: 0 0 8px 0;
-  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.drop-overlay p {
-  color: var(--muted);
-  font-size: 14px;
-  margin: 0;
-}
-
-/* Prompts Tab View Layout */
-.prompts-view {
-  width: min(1000px, 100%);
-  margin: auto;
-  padding: 40px 25px 120px;
-}
-
-.prompts-header-flex {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.prompts-view h1 {
-  font-size: 28px;
-  margin: 0 0 6px 0;
-  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.prompts-view p {
-  color: var(--muted);
-  font-size: 14px;
-  margin: 0;
-}
-
-.refresh-prompts-btn {
-  background: linear-gradient(135deg, #ec4899, #8b5cf6);
-  color: white;
-  border: 0;
-  padding: 10px 18px;
-  border-radius: 999px;
+.welcome h1 {
+  font-size: clamp(34px, 5.2vw, 50px);
+  margin: 0 0 10px 0;
+  letter-spacing: -0.04em;
   font-weight: 600;
-  font-size: 13px;
-  cursor: pointer;
-  transition: transform .2s, filter .2s;
-  box-shadow: 0 4px 15px rgba(139,92,246,0.25);
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
 }
 
-.refresh-prompts-btn:hover {
-  filter: brightness(1.1);
+.welcome p { color: var(--muted); font-size: 15px; margin: 0; }
+
+.message {
+  display: flex;
+  gap: 14px;
+  margin: 26px 0;
+  animation: messageFade 0.22s ease;
+}
+@keyframes messageFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.message.user { justify-content: flex-end; }
+
+/* Favicon-powered AI chat avatar */
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar.user-avatar {
+  background: var(--panel3);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.message-content {
+  max-width: 82%;
+  line-height: 1.68;
+  font-size: 15px;
+}
+
+.user .message-content {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  padding: 12px 18px;
+  border-radius: 20px 20px 4px 20px;
+  color: var(--text);
+}
+
+.ai .message-content { padding: 4px 0; }
+
+.composer-area {
+  position: fixed;
+  left: 275px;
+  right: 0;
+  bottom: 0;
+  padding: 12px 24px 18px;
+  background: linear-gradient(transparent, var(--bg) 38%);
+  z-index: 30;
+  transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sidebar.collapsed ~ .main .composer-area { left: 68px; }
+
+.composer {
+  width: min(900px, 100%);
+  margin: auto;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 10px 14px 8px;
+  background: rgba(10, 11, 14, 0.92);
+  backdrop-filter: blur(24px);
+  box-shadow: var(--shadow);
+  transition: border-color 0.2s;
+}
+[data-theme="light"] .composer { background: rgba(248, 250, 252, 0.94); }
+
+.composer:focus-within {
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.input {
+  width: 100%;
+  max-height: 140px;
+  min-height: 30px;
+  resize: none;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.composer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  margin-top: 6px;
+}
+
+.composer-left { display: flex; align-items: center; gap: 6px; }
+
+.tool-btn {
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tool-btn:hover { background: var(--panel2); color: var(--text); }
+.tool-btn.listening { color: #ef4444; background: rgba(239, 68, 68, 0.12); }
+
+.send-btn {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--rainbow-gradient);
+  color: white;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
+  transition: transform 0.18s;
+}
+.send-btn:hover { transform: scale(1.06); }
+
+/* Inspiration pills placed directly below the chat composer */
+.suggested-pills-bar {
+  width: min(900px, 100%);
+  margin: 10px auto 0;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.suggested-pills-bar::-webkit-scrollbar { display: none; }
+
+.prompt-pill {
+  flex-shrink: 0;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: transform 0.18s, color 0.18s, border-color 0.18s;
+}
+.prompt-pill:hover {
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.25);
   transform: translateY(-1px);
 }
 
-.refresh-prompts-btn:hover svg {
-  transform: rotate(180deg);
+/* ========================================================
+   NOVA TAB VIEW & STATE-DRIVEN AVATAR
+======================================================== */
+.nova-view {
+  width: min(840px, 100%);
+  margin: auto;
+  padding: 30px 20px 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.fifty-prompts-grid {
+.nova-stage-card {
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 40px 20px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+
+.nova-face-wrapper {
+  width: 160px;
+  height: 160px;
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  place-items: center;
+  margin-bottom: 20px;
+}
+
+.nova-face-circle {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: #0f121a;
+  border: 4px solid #ef4444;
+  box-shadow: 0 0 35px rgba(239, 68, 68, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Nova Face Dynamic Visual States */
+.nova-stage-card[data-state="idle"] .nova-face-circle {
+  border-color: #f43f5e;
+  box-shadow: 0 0 35px rgba(244, 63, 94, 0.35);
+}
+.nova-stage-card[data-state="listening"] .nova-face-circle {
+  border-color: #3b82f6;
+  box-shadow: 0 0 45px rgba(59, 130, 246, 0.55);
+  animation: pulseListen 1.5s infinite ease-in-out;
+}
+.nova-stage-card[data-state="thinking"] .nova-face-circle {
+  border-color: #a855f7;
+  box-shadow: 0 0 45px rgba(168, 85, 247, 0.55);
+  animation: pulseThink 1.8s infinite ease-in-out;
+}
+.nova-stage-card[data-state="speaking"] .nova-face-circle {
+  border-color: #10b981;
+  box-shadow: 0 0 45px rgba(16, 185, 129, 0.55);
+  animation: pulseSpeak 0.9s infinite ease-in-out;
+}
+
+@keyframes pulseListen { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes pulseThink { 0%, 100% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.04) rotate(4deg); } }
+@keyframes pulseSpeak { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+
+.nova-eyes-row {
+  display: flex;
+  gap: 32px;
+  margin-top: 10px;
+}
+
+.nova-eye {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 10px #38bdf8;
+  transition: transform 0.2s;
+}
+
+.nova-cheeks-row {
+  display: flex;
+  gap: 58px;
+  position: absolute;
+  top: 72px;
+}
+
+.nova-blush {
+  width: 12px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(244, 63, 94, 0.65);
+}
+
+.nova-mouth {
+  width: 28px;
+  height: 14px;
+  border-bottom: 3.5px solid #f43f5e;
+  border-radius: 0 0 20px 20px;
+  margin-top: 10px;
+  transition: all 0.2s ease;
+}
+
+.nova-stage-card[data-state="speaking"] .nova-mouth {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid #10b981;
+  background: #0f121a;
+}
+
+.nova-state-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #f43f5e;
+  margin-bottom: 12px;
+}
+
+.nova-loop-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.nova-chat-transcript {
+  width: 100%;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
-.dynamic-prompt-card {
+.nova-bubble {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  padding: 14px 18px;
+  border-radius: 18px;
+  font-size: 14px;
+  color: var(--text);
+  max-width: 85%;
+  line-height: 1.6;
+}
+
+.nova-composer-card {
+  width: 100%;
+  margin-top: 20px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nova-composer-input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 15px;
+  outline: none;
+}
+
+.nova-actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nova-converse-btn {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.nova-converse-btn.listening {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.nova-send-btn {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border: 0;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ========================================================
+   AUXILIARY VIEWS: PROMPTS, ARTIFACTS, ALERTS
+======================================================== */
+.prompts-view, .artifacts-view, .alerts-view {
+  width: min(960px, 100%);
+  margin: auto;
+  padding: 40px 24px 120px;
+}
+
+.fifty-prompts-grid, .artifacts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.dynamic-prompt-card, .artifact-card {
   background: var(--panel);
   border: 1px solid var(--border);
   padding: 16px;
   border-radius: 16px;
   cursor: pointer;
-  transition: .2s;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  transition: transform 0.2s, background 0.2s;
 }
-
-.dynamic-prompt-card:hover {
+.dynamic-prompt-card:hover, .artifact-card:hover {
   background: var(--panel2);
-  border-color: rgba(139,92,246,.5);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0,0,0,.15);
-}
-
-.dynamic-prompt-text {
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--text);
-}
-
-.dynamic-prompt-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 14px;
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.dynamic-prompt-badge {
-  background: var(--panel2);
-  padding: 3px 8px;
-  border-radius: 6px;
-}
-
-/* Artifacts View Layout */
-.artifacts-view {
-  width: min(1000px, 100%);
-  margin: auto;
-  padding: 40px 25px 120px;
-}
-
-.artifacts-header-flex {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.artifacts-view h1 {
-  font-size: 28px;
-  margin: 0 0 6px 0;
-  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.artifacts-view p {
-  color: var(--muted);
-  font-size: 14px;
-  margin: 0;
-}
-
-.artifacts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
-}
-
-.artifact-card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 18px;
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: transform .2s, border-color .2s;
-}
-
-.artifact-card:hover {
-  border-color: rgba(139,92,246,0.4);
-  transform: translateY(-2px);
-}
-
-.artifact-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.artifact-card-title {
-  font-weight: 600;
-  color: var(--text);
-  font-size: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 200px;
-}
-
-.artifact-card-body {
-  background: var(--panel2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px;
-  font-family: monospace;
-  font-size: 12px;
-  max-height: 140px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--text);
-  margin-bottom: 12px;
-}
-
-.artifact-card-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.artifact-action-btn {
-  flex: 1;
-  background: var(--panel2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background .18s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-}
-
-.artifact-action-btn:hover {
-  background: var(--panel3);
-}
-
-/* Nova Tab View Layout */
-.nova-view {
-  width: min(900px, 100%);
-  margin: auto;
-  padding: 40px 25px 120px;
-}
-
-.nova-view h1 {
-  font-size: 28px;
-  margin: 0 0 6px 0;
-  background: linear-gradient(90deg, #4285f4, #8b5cf6, #ec4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.nova-view p {
-  color: var(--muted);
-  font-size: 14px;
-  margin-bottom: 24px;
-}
-
-.nova-card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 24px;
-  margin-bottom: 20px;
-  box-shadow: var(--shadow);
-}
-
-.nova-card h3 {
-  margin-top: 0;
-  font-size: 18px;
-  color: var(--text);
-}
-
-/* Alerts Tab View Layout */
-.alerts-view {
-  width: min(900px, 100%);
-  margin: auto;
-  padding: 40px 25px 120px;
-}
-
-.alerts-header-flex {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.alerts-view h1 {
-  font-size: 28px;
-  margin: 0 0 6px 0;
-  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.alerts-view p {
-  color: var(--muted);
-  font-size: 14px;
-  margin: 0;
-}
-
-.clear-alerts-btn {
-  background: var(--panel2);
-  color: var(--muted);
-  border: 1px solid var(--border);
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: .18s;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.clear-alerts-btn:hover {
-  background: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
-  border-color: rgba(239, 68, 68, 0.3);
 }
 
 .alerts-feed {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-top: 20px;
 }
 
 .alert-card {
@@ -1261,2700 +919,318 @@ button:active svg,
   padding: 16px 20px;
   display: flex;
   gap: 14px;
-  align-items: flex-start;
-  box-shadow: var(--shadow);
 }
-
-.alert-card.info { border-left: 4px solid var(--accent2); }
-.alert-card.warning { border-left: 4px solid #f59e0b; }
+.alert-card.info { border-left: 4px solid var(--accent); }
 .alert-card.error { border-left: 4px solid #ef4444; }
-.alert-card.success { border-left: 4px solid var(--green); }
 
-.alert-info-container { flex: 1; }
-.alert-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-.alert-title { font-size: 14px; font-weight: 600; color: var(--text); }
-.alert-time { font-size: 11px; color: var(--muted); }
-.alert-message { font-size: 13px; line-height: 1.5; color: var(--muted); margin: 0; }
-.alert-empty-state { text-align: center; padding: 50px 20px; color: var(--muted); font-size: 14px; }
-
-/* Sidebar Badges */
-.sidebar-badge {
-  margin-left: auto;
-  background: var(--pink);
-  color: white;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 999px;
-  display: none;
-}
-.sidebar-badge.active { display: inline-block; }
-
-/* ================================
-   WELCOME
-================================ */
-
-.welcome {
-  min-height: 65vh;
-
-  display: flex;
-  flex-direction: column;
-
-  justify-content: center;
-  align-items: center;
-
-  text-align: center;
-}
-
-.welcome-sparkle-svg {
-  width: 44px;
-  height: 44px;
-  margin-bottom: 18px;
-  color: #8b5cf6;
-  animation: welcomeSparklePulse 3.5s infinite ease-in-out;
-}
-
-@keyframes welcomeSparklePulse {
-  0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4)); }
-  50% { transform: scale(1.15) rotate(15deg); filter: drop-shadow(0 0 16px rgba(236, 72, 153, 0.6)); }
-}
-
-.welcome h1 {
-  margin: 0;
-
-  font-size: clamp(34px, 5vw, 52px);
-
-  letter-spacing: -.055em;
-
-  line-height: 1.15;
-
-  font-weight: 500;
-  color: var(--text);
-}
-
-.welcome-gradient {
-  background:
-    linear-gradient(
-      90deg,
-      #ec4899,
-      #8b5cf6,
-      #3b82f6
-    );
-
-  -webkit-background-clip: text;
-  background-clip: text;
-
-  color: transparent;
-}
-
-.welcome p {
-  margin: 14px 0 0;
-
-  color: var(--muted);
-
-  font-size: 16px;
-}
-
-/* Prompt cards */
-
-.prompt-grid {
-  width: min(720px, 100%);
-
-  margin-top: 36px;
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(2, 1fr);
-
-  gap: 11px;
-}
-
-.prompt-card {
-  min-height: 92px;
-
-  padding: 17px;
-
-  border: 1px solid var(--border);
-
-  border-radius: 20px;
-
-  background: var(--panel);
-
-  color: var(--text);
-
-  text-align: left;
-
-  cursor: pointer;
-
-  transition: .2s;
-}
-
-.prompt-card:hover {
-  background: var(--panel2);
-
-  border-color:
-    rgba(139,92,246,.4);
-
-  transform: translateY(-2px);
-
-  box-shadow:
-    0 10px 35px rgba(0,0,0,.15);
-}
-
-.prompt-icon {
-  width: 25px;
-  height: 25px;
-
-  margin-bottom: 9px;
-
-  color: var(--accent);
-}
-
-.prompt-icon svg {
-  width: 23px;
-  height: 23px;
-}
-
-.prompt-title {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.prompt-description {
-  margin-top: 5px;
-
-  color: var(--muted);
-
-  font-size: 12px;
-}
-
-/* ================================
-   MESSAGES & DUAL-PANE WORKSPACE
-================================ */
-
-.message {
-  display: flex;
-
-  gap: 12px;
-
-  margin: 28px 0;
-
-  animation:
-    messageIn .22s ease;
-}
-
-@keyframes messageIn {
-
-  from {
-    opacity: 0;
-    transform: translateY(7px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-}
-
-.message.user {
-  justify-content: flex-end;
-}
-
-.avatar {
-  width: 33px;
-  height: 33px;
-
-  flex: 0 0 33px;
-
-  border-radius: 50%;
-
-  display: grid;
-  place-items: center;
-
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.ai-avatar {
-  color: white;
-
-  background:
-    linear-gradient(
-      135deg,
-      #ec4899,
-      #8b5cf6,
-      #3b82f6
-    );
-}
-
-.user-avatar {
-  background: var(--panel3);
-}
-
-.message-content {
-  max-width: 82%;
-
-  line-height: 1.7;
-
-  font-size: 15px;
-}
-
-.user .message-content {
-  color: white;
-
-  background:
-    linear-gradient(
-      135deg,
-      #4f46e5,
-      #7c3aed
-    );
-
-  padding: 12px 16px;
-
-  border-radius:
-    20px
-    20px
-    6px
-    20px;
-
-  white-space: pre-wrap;
-}
-
-.ai .message-content {
-  padding: 2px 0;
-}
-
-.message-content p {
-  margin-top: 0;
-}
-
-/* Dual-Pane Code Container */
-.dual-pane-card {
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: var(--panel);
-  margin: 12px 0;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-
-.dual-pane-header {
-  background: var(--panel2);
-  padding: 8px 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
-  border-bottom: 1px solid var(--border);
-}
-
-.dual-pane-body {
-  padding: 16px;
-}
-
-.message-content pre {
-  overflow-x: auto;
-  padding: 17px;
-  background: #090b10;
-  border: 1px solid var(--border);
-  border-radius: 13px;
-  margin: 0;
-}
-
-.message-content code {
-  font-family:
-    "SFMono-Regular",
-    Consolas,
-    monospace;
-
-  font-size: 13px;
-}
-
-.message-content :not(pre) > code {
-  padding: 2px 5px;
-
-  border-radius: 5px;
-
-  background: var(--panel2);
-}
-
-.message-actions {
-  display: flex;
-
-  gap: 4px;
-
-  margin-top: 8px;
-}
-
-.message-action {
-  border: 0;
-
-  background: transparent;
-
-  color: var(--muted);
-
-  cursor: pointer;
-
-  border-radius: 8px;
-
-  padding: 5px 8px;
-
-  font-size: 11px;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.message-action:hover {
-  background: var(--panel2);
-  color: var(--text);
-}
-
-/* ================================
-   COMPOSER
-================================ */
-
-.composer-area {
-  position: fixed;
-
-  left: 275px;
-  right: 0;
-  bottom: 0;
-
-  padding:
-    18px
-    24px
-    20px;
-
-  background:
-    linear-gradient(
-      transparent,
-      var(--bg) 34%
-    );
-
-  z-index: 30;
-
-  transition: .25s;
-}
-
-.sidebar.collapsed ~ .main .composer-area {
-  left: 0;
-}
-
-.composer {
-  width: min(920px, 100%);
-
-  margin: auto;
-
-  border: 1px solid var(--border);
-
-  border-radius: 27px;
-
-  padding:
-    11px
-    13px
-    10px;
-
-  background:
-    rgba(17,20,27,.94);
-
-  backdrop-filter: blur(22px);
-
-  box-shadow: var(--shadow);
-
-  transition: .2s;
-}
-
-[data-theme="light"] .composer {
-  background: rgba(255,255,255,.94);
-}
-
-.composer:focus-within {
-  border-color:
-    rgba(139,92,246,.45);
-
-  box-shadow:
-    0 0 0 3px rgba(139,92,246,.07),
-    var(--shadow);
-}
-
-.input {
-  width: 100%;
-
-  max-height: 150px;
-
-  min-height: 32px;
-
-  resize: none;
-
-  border: 0;
-
-  outline: none;
-
-  background: transparent;
-
-  color: var(--text);
-
-  padding: 5px 4px;
-
-  line-height: 1.5;
-
-  font-size: 15px;
-}
-
-.input::placeholder {
-  color: var(--muted);
-}
-
-.composer-bottom {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  border-top:
-    1px solid var(--border);
-
-  padding-top: 9px;
-
-  margin-top: 5px;
-}
-
-.composer-left {
-  display: flex;
-
-  align-items: center;
-
-  gap: 7px;
-}
-
-.tool-btn {
-  height: 34px;
-
-  padding: 0 11px;
-
-  border: 0;
-
-  border-radius: 999px;
-
-  background: transparent;
-
-  color: var(--muted);
-
-  cursor: pointer;
-
-  font-size: 12px;
-
-  display: inline-flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 7px;
-
-  transition: .18s;
-}
-
-.tool-btn:hover {
-  color: var(--text);
-
-  background: var(--panel2);
-}
-
-.button-icon {
-  width: 17px;
-  height: 17px;
-}
-
-.send-btn {
-  width: 42px;
-  height: 42px;
-
-  border: 0;
-
-  border-radius: 50%;
-
-  background:
-    linear-gradient(
-      135deg,
-      #ec4899,
-      #8b5cf6
-    );
-
-  color: white;
-
-  cursor: pointer;
-
-  display: grid;
-  place-items: center;
-
-  box-shadow:
-    0 5px 20px rgba(139,92,246,.25);
-
-  transition: .18s;
-}
-
-.send-btn:hover {
-  transform: scale(1.06);
-
-  box-shadow:
-    0 8px 28px rgba(139,92,246,.35);
-}
-
-.send-btn svg {
-  width: 19px;
-  height: 19px;
-}
-
-.send-btn.stop {
-  background: #ef4444;
-}
-
-/* Attached File Preview Chip */
-.file-chip {
-  display: none;
-  align-items: center;
-  gap: 8px;
-  width: fit-content;
-  margin: 8px 0 2px 4px;
-  padding: 6px 12px;
-  border-radius: 12px;
-  background: var(--panel2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-size: 12px;
-}
-
-.file-chip.show {
-  display: flex;
-}
-
-.file-chip img {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  object-fit: cover;
-}
-
-.file-chip-remove {
-  background: transparent;
-  border: 0;
-  color: var(--muted);
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  padding: 2px;
-}
-
-.file-chip-remove:hover {
-  color: #ef4444;
-}
-
-.disclaimer {
-  text-align: center;
-
-  margin-top: 8px;
-
-  color: var(--muted);
-
-  font-size: 10px;
-}
-
-/* ================================
-   DRAWER
-================================ */
-
+/* Drawers */
 .drawer {
   position: fixed;
-
   inset: 0;
-
-  background:
-    rgba(0,0,0,.55);
-
+  background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(8px);
-
   display: none;
-
   justify-content: flex-end;
-
   z-index: 100;
 }
+.drawer.show { display: flex; }
 
-.drawer.show {
-  display: flex;
-}
-
-.settings,
-.user-drawer {
-  width: min(400px, 94vw);
-
+.settings, .user-drawer {
+  width: min(380px, 94vw);
   height: 100%;
-
-  overflow-y: auto;
-
   background: var(--panel);
-
-  border-left:
-    1px solid var(--border);
-
+  border-left: 1px solid var(--border);
   padding: 24px;
+  overflow-y: auto;
 }
-
-.settings-header {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-}
-
-.settings h2 {
-  margin: 0;
-
-  font-size: 20px;
-}
-
-.setting {
-  padding: 20px 0;
-
-  border-bottom:
-    1px solid var(--border);
-}
-
-.setting label {
-  display: block;
-
-  margin-bottom: 8px;
-
-  font-size: 13px;
-
-  font-weight: 600;
-}
-
-.setting-description {
-  color: var(--muted);
-
-  font-size: 12px;
-
-  line-height: 1.5;
-}
-
-.setting-input,
-.setting-select {
-  width: 100%;
-
-  height: 42px;
-
-  border:
-    1px solid var(--border);
-
-  border-radius: 13px;
-
-  outline: none;
-
-  padding: 0 11px;
-
-  background: var(--panel2);
-
-  color: var(--text);
-}
-
-.setting-input:focus,
-.setting-select:focus {
-  border-color:
-    rgba(139,92,246,.45);
-
-  box-shadow:
-    0 0 0 3px rgba(139,92,246,.07);
-}
-
-/* Toggle */
-
-.toggle-row {
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: center;
-}
-
-.toggle {
-  width: 45px;
-  height: 25px;
-
-  padding: 3px;
-
-  border: 0;
-
-  border-radius: 999px;
-
-  background: var(--panel3);
-
-  cursor: pointer;
-}
-
-.toggle span {
-  display: block;
-
-  width: 19px;
-
-  height: 19px;
-
-  border-radius: 50%;
-
-  background: white;
-
-  transition: .2s;
-}
-
-.toggle.active {
-  background:
-    linear-gradient(
-      135deg,
-      #ec4899,
-      #8b5cf6
-    );
-}
-
-.toggle.active span {
-  transform:
-    translateX(20px);
-}
-
-/* ================================
-   USERS
-================================ */
-
-.user-drawer-header {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  margin-bottom: 22px;
-}
-
-.user-drawer-header h2 {
-  margin: 0;
-
-  font-size: 20px;
-}
-
-.add-user {
-  width: 100%;
-
-  height: 44px;
-
-  border: 0;
-
-  border-radius: 999px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #ec4899,
-      #8b5cf6
-    );
-
-  color: white;
-
-  cursor: pointer;
-
-  font-weight: 600;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 7px;
-
-  margin-bottom: 18px;
-}
-
-.add-user:hover {
-  filter: brightness(1.08);
-}
-
-.users-list {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 7px;
-}
-
-.user-item {
-  width: 100%;
-
-  min-height: 62px;
-
-  padding: 9px 11px;
-
-  border: 1px solid transparent;
-
-  border-radius: 15px;
-
-  background: var(--panel2);
-
-  color: var(--text);
-
-  cursor: pointer;
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 10px;
-
-  text-align: left;
-
-  transition: .18s;
-}
-
-.user-item:hover {
-  background: var(--panel3);
-}
-
-.user-item.active {
-  border-color:
-    rgba(139,92,246,.35);
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(236,72,153,.08),
-      rgba(139,92,246,.10)
-    );
-}
-
-.user-item-avatar {
-  width: 37px;
-  height: 37px;
-
-  flex: 0 0 37px;
-
-  border-radius: 50%;
-
-  display: grid;
-  place-items: center;
-
-  background:
-    linear-gradient(
-      135deg,
-      #ec4899,
-      #8b5cf6
-    );
-
-  color: white;
-
-  font-size: 11px;
-  font-weight: 650;
-}
-
-.user-item-info {
-  min-width: 0;
-
-  flex: 1;
-}
-
-.user-item-name {
-  font-size: 13px;
-
-  font-weight: 600;
-
-  white-space: nowrap;
-
-  overflow: hidden;
-
-  text-overflow: ellipsis;
-}
-
-.user-item-email {
-  margin-top: 2px;
-
-  font-size: 10px;
-
-  color: var(--muted);
-
-  white-space: nowrap;
-
-  overflow: hidden;
-
-  text-overflow: ellipsis;
-}
-
-.user-delete {
-  width: 30px;
-  height: 30px;
-
-  border: 0;
-
-  border-radius: 50%;
-
-  background: transparent;
-
-  color: var(--muted);
-
-  cursor: pointer;
-
-  display: grid;
-  place-items: center;
-}
-
-.user-delete:hover {
-  color: #ef4444;
-
-  background:
-    rgba(239,68,68,.08);
-}
-
-.user-empty {
-  padding: 25px 10px;
-
-  text-align: center;
-
-  color: var(--muted);
-
-  font-size: 13px;
-}
-
-/* ================================
-   MOBILE
-================================ */
-
-.mobile-menu {
-  display: none;
-}
-
-@media(max-width: 800px) {
-
-  .sidebar {
-    position: fixed;
-
-    left: 0;
-    top: 0;
-    bottom: 0;
-
-    box-shadow: var(--shadow);
-  }
-
-  .sidebar.collapsed {
-    transform:
-      translateX(-100%);
-
-    width: 275px;
-  }
-
-  .mobile-menu {
-    display: grid;
-  }
-
-  .status {
-    display: none;
-  }
-
-  .composer-area {
-    left: 0;
-
-    padding: 12px;
-  }
-
-  .chat-inner {
-    padding:
-      20px
-      14px
-      165px;
-  }
-
-  .welcome {
-    min-height: 62vh;
-  }
-
-  .welcome h1 {
-    font-size: 34px;
-  }
-
-  .prompt-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .message-content {
-    max-width: 90%;
-  }
-
-  .composer-left {
-    gap: 2px;
-  }
-
-  .tool-btn {
-    padding: 0 8px;
-  }
-
-}
-
-/* Scrollbars */
-
-* {
-  scrollbar-width: thin;
-
-  scrollbar-color:
-    rgba(255,255,255,.13)
-    transparent;
-}
-
-*::-webkit-scrollbar {
-  width: 7px;
-}
-
-*::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-*::-webkit-scrollbar-thumb {
-  background:
-    rgba(255,255,255,.13);
-
-  border-radius: 99px;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background:
-    rgba(255,255,255,.22);
-}
-
 </style>
 </head>
 
 <body>
-
-<!-- Background Neural Canvas -->
 <canvas id="neural-canvas"></canvas>
-
-<!-- Rainbow Loading Bar -->
 <div class="loading-bar" id="loadingBar"></div>
 
 <div class="app">
 
-<!-- ================= SIDEBAR ================= -->
+<!-- ================= SIDEBAR RAIL ================= -->
+<aside class="sidebar collapsed" id="sidebar">
 
-<aside class="sidebar" id="sidebar">
-
-  <div class="brand">
-
-    <img
-      src="icon-new.png"
-      alt="Rainbow AI"
-    >
-
-    <span class="brand-name">
-      Rainbow AI
-    </span>
-
-  </div>
-
-  <button
-    class="nav-tab-btn"
-    id="newChat"
-    type="button"
-  >
-    <div class="morph-icon-box">
-      <!-- Default: Clean Plus Icon -->
-      <svg class="newchat-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M12 5v14M5 12h14"/>
-      </svg>
-      <!-- Hover: Cute Animated Pencil on Paper -->
-      <svg class="newchat-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 3l4 4L7 18H3v-4L14 3z"/>
-        <path class="paper-line" d="M13 21h8"/>
+  <div class="brand-container" id="brandToggleBtn" title="Toggle Sidebar">
+    <div class="brand-icon-box">
+      <img src="icon-new.png" alt="Rainbow AI">
+      <!-- Gemini-Style Sidebar SVG displayed when hovering collapsed rail icon -->
+      <svg class="rail-toggle-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+        <line x1="9" y1="3" x2="9" y2="21"/>
       </svg>
     </div>
+    <span class="brand-text rainbow-title-gradient">Rainbow AI</span>
+  </div>
+
+  <button class="nav-tab-btn" id="newChat" type="button" title="New Chat">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"/>
+      <line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
     <span>New chat</span>
   </button>
 
-  <button
-    class="nav-tab-btn"
-    id="promptsTabBtn"
-    type="button"
-  >
-    <svg class="tab-svg-book" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-      <path d="M8 7h8M8 11h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  <button class="nav-tab-btn active" id="chatTabBtn" type="button" title="Chat Workspace">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+    <span>Chat</span>
+  </button>
+
+  <button class="nav-tab-btn" id="promptsTabBtn" type="button" title="Prompts Library">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+      <path d="M8 7h8M8 11h6"/>
     </svg>
     <span>Prompts Library</span>
   </button>
 
-  <button
-    class="nav-tab-btn"
-    id="artifactsTabBtn"
-    type="button"
-  >
-    <svg class="tab-svg-archive" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M19 11H5m14 0a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2m14 0V9a2 2 0 0 0-2-2M5 11V9a2 2 0 0 1 2-2m0 0V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2M7 7h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <button class="nav-tab-btn" id="artifactsTabBtn" type="button" title="Artifacts">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 11H5m14 0a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2m14 0V9a2 2 0 0 0-2-2M5 11V9a2 2 0 0 1 2-2m0 0V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2M7 7h10"/>
     </svg>
     <span>Artifacts</span>
-    <span class="sidebar-badge" id="artifactsCountBadge">0</span>
   </button>
 
-  <button
-    class="nav-tab-btn"
-    id="novaTabBtn"
-    type="button"
-  >
-    <svg class="tab-svg-sparkle" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M12 2l2.4 7.2h7.6l-6.2 4.8 2.4 7.2-6.2-4.8-6.2 4.8 2.4-7.2-6.2-4.8h7.6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+  <button class="nav-tab-btn" id="novaTabBtn" type="button" title="Nova Voice Companion">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M8 12h.01M16 12h.01"/>
+      <path d="M10 16c1 .5 3 .5 4 0"/>
     </svg>
     <span>Nova</span>
   </button>
 
-  <button
-    class="nav-tab-btn"
-    id="alertsTabBtn"
-    type="button"
-  >
-    <svg class="tab-svg-bell" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  <button class="nav-tab-btn" id="alertsTabBtn" type="button" title="Alerts & Status">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
     </svg>
     <span>Alerts</span>
-    <span class="sidebar-badge" id="alertsCountBadge">0</span>
   </button>
 
-  <input
-    class="search"
-    id="search"
-    placeholder="Search conversations"
-  >
+  <input class="search" id="search" placeholder="Search conversations...">
 
-  <div class="section-title">
-    Recent
-  </div>
-
-  <div
-    class="history"
-    id="history"
-  ></div>
+  <div class="section-title">Recent</div>
+  <div class="history" id="history"></div>
 
   <!-- Users -->
-
-  <button
-    class="users-tab"
-    id="usersButton"
-    type="button"
-  >
-
-    <div
-      class="current-user-avatar"
-      id="currentUserAvatar"
-    >
-      H
-    </div>
-
+  <button class="users-tab" id="usersButton" type="button">
+    <div class="current-user-avatar" id="currentUserAvatar">H</div>
     <div class="current-user-info">
-
-      <div
-        class="current-user-name"
-        id="currentUserName"
-      >
-        Herish
-      </div>
-
-      <div
-        class="current-user-email"
-        id="currentUserEmail"
-      >
-        Personal account
-      </div>
-
+      <div class="current-user-name" id="currentUserName">Herish</div>
+      <div class="current-user-email" id="currentUserEmail">Personal account</div>
     </div>
-
-    <div class="user-chevron">
-
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="m9 6 6 6-6 6"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
-
-    </div>
-
   </button>
 
   <div class="sidebar-bottom">
-
-    <button
-      id="themeButton"
-      type="button"
-    >
-      <div class="morph-icon-box">
-        <!-- Sun (visible in Dark Mode by default) -->
-        <svg class="theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-          <circle cx="12" cy="12" r="4"/>
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
-        </svg>
-        <!-- Moon (animates in when hovering) -->
-        <svg class="theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-      </div>
-      <span>Theme</span>
-    </button>
-
-    <button
-      id="settingsButton"
-      type="button"
-    >
-
-      <svg
-        class="settings-btn-svg"
-        width="17"
-        height="17"
-        viewBox="0 0 24 24"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"
-          stroke="currentColor"
-          stroke-width="1.7"
-        />
-
-        <path
-          d="M19.1 13.1a7.8 7.8 0 0 0 0-2.2l2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.9-1.1L14.5 3h-5l-.3 2.9a8 8 0 0 0-1.9 1.1l-2.4-1-2 3.4 2 1.5a7.8 7.8 0 0 0 0 2.2l-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.9 1.1l.3 2.9h5l.3-2.9a8 8 0 0 0 1.9-1.1l2.4 1 2-3.4-2-1.5Z"
-          stroke="currentColor"
-          stroke-width="1.25"
-          stroke-linejoin="round"
-        />
-      </svg>
-
-      Settings
-
-    </button>
-
+    <button id="themeButton" type="button">Theme</button>
+    <button id="settingsButton" type="button">Settings</button>
   </div>
-
 </aside>
 
-<!-- ================= MAIN ================= -->
-
+<!-- ================= MAIN VIEWPORT ================= -->
 <main class="main">
-
-<header class="topbar">
-
-  <div class="top-left">
-
-    <button
-      class="icon-btn mobile-menu"
-      id="mobileMenu"
-      type="button"
-      aria-label="Open menu"
-    >
-
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-      >
-        <path
-          d="M4 7h16M4 12h16M4 17h16"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-        />
-      </svg>
-
-    </button>
-
-    <button
-      class="icon-btn"
-      id="sidebarButton"
-      type="button"
-      aria-label="Toggle sidebar"
-    >
-
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-      >
-        <path
-          d="M4 7h16M4 12h10M4 17h16"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-        />
-      </svg>
-
-    </button>
-
-    <select
-      class="model-selector"
-      id="model"
-    >
-
-      <option value="coder">
-        Rainbow Specialist • Coder
-      </option>
-
-      <option value="vision">
-        Rainbow Specialist • Vision
-      </option>
-
-    </select>
-
-  </div>
-
-  <div class="top-right">
-
-    <!-- Export Chat Button with Morphing Animation -->
-    <button
-      class="tool-btn"
-      id="downloadChatBtn"
-      type="button"
-      title="Download conversation"
-    >
-      <div class="morph-icon-box">
-        <svg
-          class="export-download"
-          viewBox="0 0 24 24"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-        <svg
-          class="export-filecheck"
-          viewBox="0 0 24 24"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          <polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="m9 15 2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <span>Export Chat</span>
-    </button>
-
-    <span
-      class="status"
-      id="status"
-    >
-      Gateway Ready
-    </span>
-
-    <button
-      class="icon-btn"
-      id="topSettings"
-      type="button"
-      aria-label="Settings"
-    >
-
-      <svg
-        class="settings-btn-svg"
-        viewBox="0 0 24 24"
-        fill="none"
-      >
-        <path
-          d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"
-          stroke="currentColor"
-          stroke-width="1.7"
-        />
-
-        <path
-          d="M19.1 13.1a7.8 7.8 0 0 0 0-2.2l2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.9-1.1L14.5 3h-5l-.3 2.9a8 8 0 0 0-1.9 1.1l-2.4-1-2 3.4 2 1.5a7.8 7.8 0 0 0 0 2.2l-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.9 1.1l.3 2.9h5l.3-2.9a8 8 0 0 0 1.9-1.1l2.4 1 2-3.4-2-1.5Z"
-          stroke="currentColor"
-          stroke-width="1.25"
-          stroke-linejoin="round"
-        />
-      </svg>
-
-    </button>
-
-  </div>
-
-</header>
-
-<!-- ================= VIEWS CONTAINER ================= -->
-
-<div class="view-container" id="viewContainer">
-
-  <!-- DRAG AND DROP OVERLAY -->
-  <div class="drop-overlay" id="dropOverlay">
-    <div class="drop-overlay-content">
-      <div class="drop-overlay-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <path d="M4 16v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1m-4-8-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h2>Drop your files here</h2>
-      <p>Release to attach code files or vision images to Rainbow AI</p>
-    </div>
-  </div>
-
-  <!-- CHAT VIEW -->
-  <section class="chat" id="chatView">
-    <div class="chat-inner">
-
-      <div
-        class="welcome"
-        id="welcome"
-      >
-
-        <svg class="welcome-sparkle-svg" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2l2.4 7.2h7.6l-6.2 4.8 2.4 7.2-6.2-4.8-6.2 4.8 2.4-7.2-6.2-4.8h7.6z"/>
-        </svg>
-
-        <h1>
-          Your move,
-          <span
-            class="welcome-gradient"
-            id="welcomeUserName"
-          >
-            Herish
-          </span>!
-        </h1>
-
-        <div class="prompt-grid">
-
-          <button
-            class="prompt-card"
-            data-prompt="Build a modern responsive website for an AI assistant."
-          >
-
-            <div class="prompt-icon">
-
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <path
-                  d="M12 3l1.7 6.3L20 11l-6.3 1.7L12 19l-1.7-6.3L4 11l6.3-1.7L12 3Z"
-                  stroke="currentColor"
-                  stroke-width="1.7"
-                  stroke-linejoin="round"
-                />
-
-                <path
-                  d="m19 4 .5 1.5L21 6l-1.5.5L19 8l-.5-1.5L17 6l1.5-.5L19 4Z"
-                  stroke="currentColor"
-                  stroke-width="1.3"
-                  stroke-linejoin="round"
-                />
-              </svg>
-
-            </div>
-
-            <div class="prompt-title">
-              Build something
-            </div>
-
-            <div class="prompt-description">
-              Create websites, apps and projects
-            </div>
-
-          </button>
-
-          <button
-            class="prompt-card"
-            data-prompt="Explain a difficult topic to me step by step with simple examples."
-          >
-
-            <div class="prompt-icon">
-
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <path
-                  d="M9.2 19.5h5.6M9.8 22h4.4M8.2 15.8C6.2 14.5 5 12.3 5 9.9a7 7 0 0 1 14 0c0 2.4-1.2 4.6-3.2 5.9-.8.5-1.2 1.2-1.2 2.2H9.4c0-1-.4-1.7-1.2-2.2Z"
-                  stroke="currentColor"
-                  stroke-width="1.6"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-
-            </div>
-
-            <div class="prompt-title">
-              Learn something
-            </div>
-
-            <div class="prompt-description">
-              Understand difficult topics easily
-            </div>
-
-          </button>
-
-          <button
-            class="prompt-card"
-            data-prompt="Write a complete HTML, CSS and JavaScript project for me."
-          >
-
-            <div class="prompt-icon">
-
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <rect
-                  x="3.5"
-                  y="4.5"
-                  width="17"
-                  height="12"
-                  rx="2"
-                  stroke="currentColor"
-                  stroke-width="1.6"
-                />
-
-                <path
-                  d="M8 20h8M12 16.5V20M8.5 9.5l2.5 2.5-2.5 2.5M13.5 14.5h3"
-                  stroke="currentColor"
-                  stroke-width="1.6"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-
-            </div>
-
-            <div class="prompt-title">
-              Write code
-            </div>
-
-            <div class="prompt-description">
-              Build and debug your code
-            </div>
-
-          </button>
-
-          <button
-            class="prompt-card"
-            data-prompt="Give me 10 creative ideas for a new AI project."
-          >
-
-            <div class="prompt-icon">
-
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <path
-                  d="M9 18h6M10 21h4M8.2 14.8C7 13.7 6.2 12.1 6.2 10.3a5.8 5.8 0 1 1 11.6 0c0 1.8-.8 3.4-2 4.5-.9.8-1.4 1.4-1.4 3.2h-4.8c0-1.8-.5-2.4-1.4-3.2Z"
-                  stroke="currentColor"
-                  stroke-width="1.6"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-
-            </div>
-
-            <div class="prompt-title">
-              Brainstorm
-            </div>
-
-            <div class="prompt-description">
-              Explore ideas and possibilities
-            </div>
-
-          </button>
-
-        </div>
-
-      </div>
-
-      <div id="messages"></div>
-
-    </div>
-  </section>
-
-  <!-- PROMPTS TAB VIEW -->
-  <section class="prompts-view" id="promptsView" style="display: none;">
-    <div class="prompts-header-flex">
-      <div>
-        <h1>Rainbow Prompts Library</h1>
-        <p>50 hand-crafted inspiration prompts that shuffle automatically on every refresh!</p>
-      </div>
-      <button class="refresh-prompts-btn" id="shufflePromptsBtn" type="button">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="23 4 23 10 17 10"/>
-          <polyline points="1 20 1 14 7 14"/>
-          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-        </svg>
-        <span>Shuffle Prompts</span>
-      </button>
-    </div>
-    <div class="fifty-prompts-grid" id="fiftyPromptsGrid"></div>
-  </section>
-
-  <!-- ARTIFACTS TAB VIEW -->
-  <section class="artifacts-view" id="artifactsView" style="display: none;">
-    <div class="artifacts-header-flex">
-      <div>
-        <h1>Saved Artifacts & Snippets</h1>
-        <p>Access your pinned code blocks, stories, and generated snippets instantly.</p>
-      </div>
-      <button class="clear-alerts-btn" id="clearArtifactsBtn" type="button">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="3 6 5 6 21 6"/>
-          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-        </svg>
-        <span>Clear All</span>
-      </button>
-    </div>
-    <div class="artifacts-grid" id="artifactsGrid"></div>
-  </section>
-
-  <!-- NOVA TAB VIEW -->
-  <section class="nova-view" id="novaView" style="display: none;">
-    <h1>Nova Assistant</h1>
-    <p>Your specialized sub-module workspace for experimental features and advanced workflows.</p>
-    <div class="nova-card">
-      <h3>Nova Features</h3>
-      <p style="color: var(--muted); margin: 0;">Nova is fully integrated into Rainbow AI!</p>
-    </div>
-  </section>
-
-  <!-- ALERTS TAB VIEW -->
-  <section class="alerts-view" id="alertsView" style="display: none;">
-    <div class="alerts-header-flex">
-      <div>
-        <h1>System Alerts & Notifications</h1>
-        <p>Stay informed about system health, model status, and runtime logs.</p>
-      </div>
-      <div class="alerts-actions">
-        <button class="clear-alerts-btn" id="clearAlertsBtn" type="button">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3 6 5 6 21 6"/>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-          </svg>
-          <span>Clear All</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="alerts-feed" id="alertsFeed">
-      <!-- Dynamic alert items will render here -->
-    </div>
-  </section>
-
-</div>
-
-</main>
-
-<!-- ================= COMPOSER ================= -->
-
-<div class="composer-area" id="composerArea">
-
-  <div class="composer">
-
-    <textarea
-      id="input"
-      class="input"
-      rows="1"
-      placeholder="Message Rainbow AI..."
-    ></textarea>
-
-    <!-- Attached File Preview Chip -->
-    <div class="file-chip" id="fileChip">
-      <img id="fileChipImg" src="" alt="" style="display:none;">
-      <span id="fileChipName"></span>
-      <button class="file-chip-remove" id="removeFileBtn" type="button" title="Remove attachment">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"/>
-          <line x1="6" y1="6" x2="18" y2="18"/>
-        </svg>
-      </button>
-    </div>
-
-    <div class="composer-bottom">
-
-      <div class="composer-left">
-
-        <label class="tool-btn">
-
-          <svg
-            class="button-icon paperclip-svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="m8.5 12.5 6.7-6.7a3.2 3.2 0 0 1 4.5 4.5l-7.9 7.9a5 5 0 0 1-7.1-7.1l7.6-7.6"
-              stroke="currentColor"
-              stroke-width="1.7"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-
-          Attach
-
-          <input
-            type="file"
-            id="fileInput"
-            hidden
-            accept=".txt,.md,.js,.ts,.py,.html,.css,.json,.csv,image/*"
-          >
-
-        </label>
-
-        <button
-          class="tool-btn"
-          id="clearButton"
-          type="button"
-        >
-          <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-          </svg>
-          Clear
-        </button>
-
-      </div>
-
-      <button
-        class="send-btn"
-        id="sendButton"
-        type="button"
-        aria-label="Send message"
-      >
-
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          aria-hidden="true"
-        >
-
-          <path
-            d="M4 5.5 20 12 4 18.5l2.2-5.7L15 12l-8.8-.8L4 5.5Z"
-            fill="currentColor"
-          />
-
-        </svg>
-
-      </button>
-
-    </div>
-
-  </div>
-
-  <div class="disclaimer">
-    Rainbow AI can make mistakes. Check important information.
-  </div>
-
-</div>
-
-</div>
-
-<!-- ================= SETTINGS ================= -->
-
-<div
-  class="drawer"
-  id="drawer"
->
-
-  <div class="settings">
-
-    <div class="settings-header">
-
-      <h2>
-        Rainbow AI Settings
-      </h2>
-
-      <button
-        class="icon-btn"
-        id="closeSettings"
-        type="button"
-        aria-label="Close settings"
-      >
-
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-        >
-
-          <path
-            d="M6 6l12 12M18 6 6 18"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-          />
-
-        </svg>
-
-      </button>
-
-    </div>
-
-    <div class="setting">
-
-      <div class="toggle-row">
-
-        <div>
-
-          <label>
-            Dark mode
-          </label>
-
-          <div class="setting-description">
-            Use Rainbow AI's dark workspace.
-          </div>
-
-        </div>
-
-        <button
-          class="toggle"
-          id="themeToggle"
-          type="button"
-        >
-
-          <span></span>
-
-        </button>
-
-      </div>
-
-    </div>
-
-    <div class="setting">
-
-      <label>
-        AI Persona
-      </label>
-
-      <select
-        class="setting-select"
-        id="persona"
-      >
-
-        <option value="balanced">
-          Balanced Assistant
-        </option>
-
-        <option value="coder">
-          Expert Coder
-        </option>
-
-        <option value="creative">
-          Creative Assistant
-        </option>
-
+  <header class="topbar">
+    <div class="top-left">
+      <select class="model-selector" id="model">
+        <option value="coder">Rainbow Specialist • Coder</option>
+        <option value="vision">Rainbow Specialist • Vision</option>
       </select>
-
     </div>
-
-    <div class="setting">
-
-      <label>
-        About Rainbow AI
-      </label>
-
-      <div class="setting-description">
-        Rainbow AI is your intelligent AI assistant for
-        coding, writing, brainstorming, learning and
-        everyday tasks with vision and code support.
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-<!-- ================= USERS ================= -->
-
-<div
-  class="drawer"
-  id="userDrawer"
->
-
-  <div class="user-drawer">
-
-    <div class="user-drawer-header">
-
-      <h2>
-        Users
-      </h2>
-
-      <button
-        class="icon-btn"
-        id="closeUserDrawer"
-        type="button"
-        aria-label="Close users"
-      >
-
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-        >
-
-          <path
-            d="M6 6l12 12M18 6 6 18"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-          />
-
+    <div class="top-right">
+      <span class="status" id="status">Gateway Ready</span>
+      <button class="icon-btn" id="topSettings" type="button" aria-label="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
         </svg>
-
       </button>
-
     </div>
+  </header>
 
-    <button
-      class="add-user"
-      id="addUserButton"
-      type="button"
-    >
+  <div class="view-container" id="viewContainer">
+    <!-- CHAT VIEW -->
+    <section class="chat" id="chatView">
+      <div class="chat-inner">
+        <div class="welcome" id="welcome">
+          <h1 class="rainbow-title-gradient">Your move, <span id="welcomeUserName">Herish</span>!</h1>
+          <p>Ask anything, brainstorm code, or converse via live voice.</p>
+        </div>
+        <div id="messages"></div>
+      </div>
+    </section>
 
-      <div class="morph-icon-box">
-        <svg
-          class="useradd-single"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-          <circle cx="8.5" cy="7" r="4"/>
-          <line x1="20" y1="8" x2="20" y2="14"/>
-          <line x1="23" y1="11" x2="17" y2="11"/>
-        </svg>
-        <svg
-          class="useradd-group"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-          <circle cx="9" cy="7" r="4"/>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-        </svg>
+    <!-- NOVA WORKSPACE VIEW -->
+    <section class="nova-view" id="novaView" style="display: none;">
+      <div class="nova-stage-card" id="novaStageCard" data-state="idle">
+        <div class="nova-face-wrapper">
+          <div class="nova-face-circle">
+            <div class="nova-eyes-row">
+              <div class="nova-eye"></div>
+              <div class="nova-eye"></div>
+            </div>
+            <div class="nova-cheeks-row">
+              <div class="nova-blush"></div>
+              <div class="nova-blush"></div>
+            </div>
+            <div class="nova-mouth" id="novaMouth"></div>
+          </div>
+        </div>
+
+        <div class="nova-state-label" id="novaStateLabel">IDLE • READY TO CHAT</div>
+        <label class="nova-loop-checkbox-label">
+          <input type="checkbox" id="novaAutoListenLoop">
+          <span>Hands-Free Auto-Listen Loop</span>
+        </label>
       </div>
 
-      <span>Add user</span>
+      <div class="nova-chat-transcript" id="novaChatTranscript">
+        <div class="nova-bubble">Hi friend! I'm Nova! Ask me anything or talk to me out loud!</div>
+      </div>
 
-    </button>
+      <div class="nova-composer-card">
+        <input type="text" class="nova-composer-input" id="novaInput" placeholder="Ask Nova a question or talk via voice...">
+        <div class="nova-actions-row">
+          <button class="nova-converse-btn" id="novaVoiceBtn" type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+            <span id="novaVoiceBtnText">Voice Converse</span>
+          </button>
+          <button class="nova-send-btn" id="novaSendBtn" type="button">
+            <span>Speak to Nova</span>
+          </button>
+        </div>
+      </div>
+    </section>
 
-    <div
-      class="users-list"
-      id="usersList"
-    ></div>
+    <!-- PROMPTS LIBRARY VIEW -->
+    <section class="prompts-view" id="promptsView" style="display: none;">
+      <h1 class="rainbow-title-gradient">Rainbow Prompts Library</h1>
+      <p style="color:var(--muted); margin:0;">50 hand-crafted inspiration prompts to supercharge your workflow.</p>
+      <div class="fifty-prompts-grid" id="fiftyPromptsGrid"></div>
+    </section>
 
+    <!-- ARTIFACTS VIEW -->
+    <section class="artifacts-view" id="artifactsView" style="display: none;">
+      <h1 class="rainbow-title-gradient">Saved Artifacts</h1>
+      <p style="color:var(--muted); margin:0;">Your collection of pinned snippets and assistant outputs.</p>
+      <div class="artifacts-grid" id="artifactsGrid"></div>
+    </section>
+
+    <!-- ALERTS VIEW -->
+    <section class="alerts-view" id="alertsView" style="display: none;">
+      <h1 class="rainbow-title-gradient">System Alerts & Notifications</h1>
+      <div class="alerts-feed" id="alertsFeed"></div>
+    </section>
   </div>
 
+  <!-- COMPOSER AREA -->
+  <div class="composer-area" id="composerArea">
+    <div class="composer">
+      <textarea id="input" class="input" rows="1" placeholder="Message Rainbow AI..."></textarea>
+      <div class="composer-bottom">
+        <div class="composer-left">
+          <button class="tool-btn" id="micBtn" type="button" title="Voice Input">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+            <span id="micStatusText">Voice</span>
+          </button>
+          <button class="tool-btn" id="clearButton" type="button">Clear</button>
+        </div>
+        <button class="send-btn" id="sendButton" type="button" aria-label="Send">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 5.5 20 12 4 18.5l2.2-5.7L15 12l-8.8-.8L4 5.5Z" fill="currentColor"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Suggested Inspiration Pills below Composer -->
+    <div class="suggested-pills-bar" id="suggestedPillsBar"></div>
+  </div>
+</main>
 </div>
 
+<!-- ================= JAVASCRIPT ================= -->
 <script>
-
-/* ============================================
-   NEURAL PARTICLES BACKGROUND ANIMATION
-============================================ */
-
-const canvas = document.getElementById('neural-canvas');
-const ctx = canvas.getContext('2d');
-
-let particles = [];
-const numParticles = 45;
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-class Particle {
-  constructor() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
-    this.vx = (Math.random() - 0.5) * 0.7;
-    this.vy = (Math.random() - 0.5) * 0.7;
-    this.radius = Math.random() * 2 + 1;
-  }
-  update() {
-    this.x += this.vx;
-    this.y += this.vy;
-    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-  }
-  draw() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(147, 197, 253, 0.45)';
-    ctx.fill();
-  }
-}
-
-for (let i = 0; i < numParticles; i++) {
-  particles.push(new Particle());
-}
-
-function animateParticles() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  for (let i = 0; i < particles.length; i++) {
-    particles[i].update();
-    particles[i].draw();
-    
-    for (let j = i + 1; j < particles.length; j++) {
-      let dx = particles[i].x - particles[j].x;
-      let dy = particles[i].y - particles[j].y;
-      let dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 130) {
-        ctx.beginPath();
-        ctx.moveTo(particles[i].x, particles[i].y);
-        ctx.lineTo(particles[j].x, particles[j].y);
-        ctx.strokeStyle = `rgba(168, 85, 247, ${0.14 * (1 - dist / 130)})`;
-        ctx.lineWidth = 0.8;
-        ctx.stroke();
-      }
-    }
-  }
-  requestAnimationFrame(animateParticles);
-}
-animateParticles();
-
-
-/* ============================================
-   HELPERS & GLOBAL SWITCH TAB LOGIC
-============================================ */
-
 const $ = id => document.getElementById(id);
 
 const sidebar = $("sidebar");
-const viewContainer = $("viewContainer");
+const brandToggleBtn = $("brandToggleBtn");
 const chatView = $("chatView");
+const novaView = $("novaView");
 const promptsView = $("promptsView");
 const artifactsView = $("artifactsView");
-const novaView = $("novaView");
 const alertsView = $("alertsView");
 const composerArea = $("composerArea");
 const messages = $("messages");
-const welcome = $("welcome");
 const input = $("input");
 const sendButton = $("sendButton");
-const status = $("status");
-const dropOverlay = $("dropOverlay");
-const loadingBar = $("loadingBar");
 
 let generating = false;
-let abortController = null;
 
-let attachedFilePayload = null;
+// Cloudflare Tunnel Gateway URL
+const baseUrl = "https://agrees-offers-flashing-rocky.trycloudflare.com";
 
-function switchTab(tabName) {
-  const promptsBtn = $("promptsTabBtn");
-  const artifactsBtn = $("artifactsTabBtn");
-  const novaBtn = $("novaTabBtn");
-  const alertsTabBtn = $("alertsTabBtn");
+/* ========================================================
+   GEMINI-STYLE SIDEBAR RAIL TOGGLE
+======================================================== */
+brandToggleBtn.onclick = () => {
+  sidebar.classList.toggle("collapsed");
+};
 
+function switchTab(tab) {
   chatView.style.display = "none";
-  promptsView.style.display = "none";
-  if (artifactsView) artifactsView.style.display = "none";
   novaView.style.display = "none";
-  if (alertsView) alertsView.style.display = "none";
+  promptsView.style.display = "none";
+  artifactsView.style.display = "none";
+  alertsView.style.display = "none";
 
-  if (promptsBtn) promptsBtn.classList.remove("active");
-  if (artifactsBtn) artifactsBtn.classList.remove("active");
-  if (novaBtn) novaBtn.classList.remove("active");
-  if (alertsTabBtn) alertsTabBtn.classList.remove("active");
+  $("chatTabBtn").classList.remove("active");
+  $("novaTabBtn").classList.remove("active");
+  $("promptsTabBtn").classList.remove("active");
+  $("artifactsTabBtn").classList.remove("active");
+  $("alertsTabBtn").classList.remove("active");
 
-  if (tabName === 'prompts') {
+  if (tab === "nova") {
+    novaView.style.display = "flex";
+    composerArea.style.display = "none";
+    $("novaTabBtn").classList.add("active");
+  } else if (tab === "prompts") {
     promptsView.style.display = "block";
     composerArea.style.display = "none";
-    if (promptsBtn) promptsBtn.classList.add("active");
-  } else if (tabName === 'artifacts') {
-    if (artifactsView) artifactsView.style.display = "block";
+    $("promptsTabBtn").classList.add("active");
+    renderFiftyPrompts();
+  } else if (tab === "artifacts") {
+    artifactsView.style.display = "block";
     composerArea.style.display = "none";
-    if (artifactsBtn) artifactsBtn.classList.add("active");
-    renderArtifactsFeed();
-  } else if (tabName === 'nova') {
-    novaView.style.display = "block";
+    $("artifactsTabBtn").classList.add("active");
+    renderArtifacts();
+  } else if (tab === "alerts") {
+    alertsView.style.display = "block";
     composerArea.style.display = "none";
-    if (novaBtn) novaBtn.classList.add("active");
-  } else if (tabName === 'alerts') {
-    if (alertsView) alertsView.style.display = "block";
-    composerArea.style.display = "none";
-    if (alertsTabBtn) alertsTabBtn.classList.add("active");
-    renderAlertsFeed();
+    $("alertsTabBtn").classList.add("active");
+    renderAlerts();
   } else {
     chatView.style.display = "block";
     composerArea.style.display = "block";
+    $("chatTabBtn").classList.add("active");
   }
 }
 
+$("chatTabBtn").onclick = () => switchTab("chat");
+$("novaTabBtn").onclick = () => switchTab("nova");
+$("promptsTabBtn").onclick = () => switchTab("prompts");
+$("artifactsTabBtn").onclick = () => switchTab("artifacts");
+$("alertsTabBtn").onclick = () => switchTab("alerts");
 
-/* ============================================
-   DRAG AND DROP VISION & FILE ATTACHMENTS
-============================================ */
-
-function handleFileAttachment(file) {
-  if (!file) return;
-
-  const reader = new FileReader();
-  const isImage = file.type.startsWith("image/");
-
-  if (isImage) {
-    reader.onload = e => {
-      attachedFilePayload = {
-        name: file.name,
-        type: 'image',
-        data: e.target.result
-      };
-      
-      const chip = $("fileChip");
-      const chipImg = $("fileChipImg");
-      const chipName = $("fileChipName");
-
-      chipImg.src = e.target.result;
-      chipImg.style.display = "block";
-      chipName.textContent = file.name;
-      chip.classList.add("show");
-    };
-    reader.readAsDataURL(file);
-  } else {
-    reader.onload = e => {
-      attachedFilePayload = {
-        name: file.name,
-        type: 'text',
-        data: e.target.result
-      };
-
-      const chip = $("fileChip");
-      const chipImg = $("fileChipImg");
-      const chipName = $("fileChipName");
-
-      chipImg.style.display = "none";
-      chipName.textContent = file.name;
-      chip.classList.add("show");
-    };
-    reader.readAsText(file);
-  }
-}
-
-$("fileInput").onchange = event => {
-  const file = event.target.files[0];
-  handleFileAttachment(file);
-};
-
-$("removeFileBtn").onclick = () => {
-  attachedFilePayload = null;
-  $("fileChip").classList.remove("show");
-  $("fileInput").value = "";
-};
-
-let dragCounter = 0;
-
-viewContainer.addEventListener("dragenter", e => {
-  e.preventDefault();
-  dragCounter++;
-  dropOverlay.classList.add("active");
-});
-
-viewContainer.addEventListener("dragleave", e => {
-  e.preventDefault();
-  dragCounter--;
-  if (dragCounter === 0) {
-    dropOverlay.classList.remove("active");
-  }
-});
-
-viewContainer.addEventListener("dragover", e => {
-  e.preventDefault();
-});
-
-viewContainer.addEventListener("drop", e => {
-  e.preventDefault();
-  dragCounter = 0;
-  dropOverlay.classList.remove("active");
-
-  const file = e.dataTransfer.files[0];
-  if (file) {
-    switchTab('chat');
-    handleFileAttachment(file);
-  }
-});
-
-
-/* ============================================
-   ARTIFACTS & PINNED CONTENT MANAGER
-============================================ */
-
-const artifactsTabBtn = $("artifactsTabBtn");
-const artifactsGrid = $("artifactsGrid");
-const artifactsCountBadge = $("artifactsCountBadge");
-
-let artifactsList = JSON.parse(localStorage.getItem("rainbow_ai_artifacts") || "[]");
-
-if (artifactsTabBtn) {
-  artifactsTabBtn.onclick = () => switchTab('artifacts');
-}
-
-const clearArtifactsBtn = $("clearArtifactsBtn");
-if (clearArtifactsBtn) {
-  clearArtifactsBtn.onclick = () => {
-    artifactsList = [];
-    localStorage.setItem("rainbow_ai_artifacts", JSON.stringify(artifactsList));
-    renderArtifactsFeed();
-    updateArtifactsBadge();
-  };
-}
-
-function updateArtifactsBadge() {
-  if (!artifactsCountBadge) return;
-  if (artifactsList.length > 0) {
-    artifactsCountBadge.textContent = artifactsList.length;
-    artifactsCountBadge.classList.add("active");
-  } else {
-    artifactsCountBadge.classList.remove("active");
-  }
-}
-
-function renderArtifactsFeed() {
-  if (!artifactsGrid) return;
-  artifactsGrid.innerHTML = "";
-
-  if (!artifactsList.length) {
-    artifactsGrid.innerHTML = `
-      <div class="alert-empty-state" style="grid-column: 1 / -1;">
-        No saved artifacts or code chunks yet. Click "Pin Artifact" on any AI response to store it here.
-      </div>
-    `;
-    return;
-  }
-
-  artifactsList.forEach(item => {
-    const card = document.createElement("div");
-    card.className = "artifact-card";
-    card.innerHTML = `
-      <div>
-        <div class="artifact-card-header">
-          <span class="artifact-card-title">${item.title}</span>
-          <span>${item.time}</span>
-        </div>
-        <div class="artifact-card-body">${item.content.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
-      </div>
-      <div class="artifact-card-actions">
-        <button class="artifact-action-btn copy-art">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-          </svg>
-          <span>Copy</span>
-        </button>
-        <button class="artifact-action-btn delete-art">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-          <span>Remove</span>
-        </button>
-      </div>
-    `;
-
-    card.querySelector(".copy-art").onclick = () => {
-      navigator.clipboard?.writeText(item.content);
-    };
-
-    card.querySelector(".delete-art").onclick = () => {
-      artifactsList = artifactsList.filter(a => a.id !== item.id);
-      localStorage.setItem("rainbow_ai_artifacts", JSON.stringify(artifactsList));
-      renderArtifactsFeed();
-      updateArtifactsBadge();
-    };
-
-    artifactsGrid.appendChild(card);
-  });
-}
-
-window.pinArtifact = function(title, content) {
-  const artifact = {
-    id: Date.now().toString(),
-    title: title || "Generated Artifact",
-    content,
-    time: new Date().toLocaleDateString()
-  };
-  artifactsList.unshift(artifact);
-  localStorage.setItem("rainbow_ai_artifacts", JSON.stringify(artifactsList));
-  updateArtifactsBadge();
-  window.pushAlert("Artifact Saved", "Successfully pinned snippet to your Artifacts collection.", "success");
-};
-
-updateArtifactsBadge();
-
-
-/* ============================================
-   ALERTS TAB LOGIC
-============================================ */
-
-const alertsTabBtn = $("alertsTabBtn");
-const alertsFeed = $("alertsFeed");
-const alertsCountBadge = $("alertsCountBadge");
-
-let alertsList = JSON.parse(localStorage.getItem("rainbow_ai_alerts") || "[]");
-
-if (alertsTabBtn) {
-  alertsTabBtn.onclick = () => switchTab('alerts');
-}
-
-const clearAlertsBtn = $("clearAlertsBtn");
-if (clearAlertsBtn) {
-  clearAlertsBtn.onclick = () => {
-    alertsList = [];
-    localStorage.setItem("rainbow_ai_alerts", JSON.stringify(alertsList));
-    renderAlertsFeed();
-    updateAlertsBadge();
-  };
-}
-
-function updateAlertsBadge() {
-  if (!alertsCountBadge) return;
-  if (alertsList.length > 0) {
-    alertsCountBadge.textContent = alertsList.length;
-    alertsCountBadge.classList.add("active");
-  } else {
-    alertsCountBadge.classList.remove("active");
-  }
-}
-
-function renderAlertsFeed() {
-  if (!alertsFeed) return;
-  alertsFeed.innerHTML = "";
-
-  if (!alertsList.length) {
-    alertsFeed.innerHTML = `
-      <div class="alert-empty-state">
-        No active notifications or alerts. Everything is running smoothly.
-      </div>
-    `;
-    return;
-  }
-
-  alertsList.forEach(item => {
-    const card = document.createElement("div");
-    card.className = `alert-card ${item.type || 'info'}`;
-    card.innerHTML = `
-      <div class="alert-info-container">
-        <div class="alert-title-row">
-          <span class="alert-title">${item.title}</span>
-          <span class="alert-time">${item.time}</span>
-        </div>
-        <p class="alert-message">${item.message}</p>
-      </div>
-    `;
-    alertsFeed.appendChild(card);
-  });
-}
-
-window.pushAlert = function(title, message, type = "info") {
-  const alertItem = {
-    id: Date.now().toString(),
-    title,
-    message,
-    type,
-    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  };
-
-  alertsList.unshift(alertItem);
-  localStorage.setItem("rainbow_ai_alerts", JSON.stringify(alertsList));
-  updateAlertsBadge();
-
-  if (alertsView && alertsView.style.display === "block") {
-    renderAlertsFeed();
-  }
-};
-
-updateAlertsBadge();
-
-
-/* ============================================
-   50 PROMPTS MASTER LIST & REFRESH LOGIC
-============================================ */
-
-const masterPrompts = [
-  "Refactor this React component to use custom hooks for better reusability.",
-  "Write a robust custom debounce hook in TypeScript with proper typing.",
-  "Debug this CSS Grid layout issue where items are overflowing on mobile screens.",
-  "Create a sleek glassmorphism card component using Tailwind CSS.",
-  "Explain how Event Bubbling and Event Capturing work with a quick code example.",
-  "Write a Python script to scrape daily manga release schedules from a web page.",
-  "Optimize this SQL query that is causing heavy latency on the user dashboard.",
-  "Build a lightweight state management store using JavaScript Proxies.",
-  "Write unit tests using Jest and React Testing Library for a modal component.",
-  "Implement dark mode toggle persistence using localStorage and CSS variables.",
-  "Write a regex expression to validate complex passwords with special characters.",
-  "Create an infinite scroll hook using the Intersection Observer API.",
-  "How do I set up a secure JWT authentication middleware in Node.js/Express?",
-  "Write a Web Audio API snippet to play a subtle notification chime.",
-  "Build a draggable kanban board column using native HTML Drag and Drop API.",
-  "Draft a dynamic battle shonen manga panel layout focusing on high-speed action lines.",
-  "How do I sketch expressive shojo manga eyes with dramatic lighting highlights?",
-  "Design a cyberpunk mecha character sheet sketch concept with futuristic armor.",
-  "Give me a step-by-step tutorial for inking clean line art digitally using Clip Studio Paint.",
-  "What are the best techniques for creating soft, atmospheric screentone gradients in manga?",
-  "Draw a dramatic low-angle perspective shot of a hero standing atop a crumbling skyscraper.",
-  "Sketch a cute slice-of-life chibi character enjoying a steaming bowl of ramen.",
-  "How do I shade intricate flowing hair using dramatic cel-shading techniques?",
-  "Design a mystical fantasy beast companion for a young manga protagonist.",
-  "Create a storyboard thumbnail sequence for a thrilling plot-twist scene.",
-  "Practice drawing dynamic hands gripping a traditional katana sword.",
-  "How can I use cross-hatching to create a gritty, noir manga aesthetic?",
-  "Design an ornate fantasy guild emblem badge for a webtoon series.",
-  "Sketch a melancholic rainy-day background scene with detailed reflections.",
-  "Explore different panel pacing techniques for a high-tension suspense chapter.",
-  "What is the exact biomechanics technique for generating lethal power in a jump smash?",
-  "Drills to improve explosive footwork speed around the four corners of the badminton court.",
-  "How to disguise a deception drop shot effectively from the rear court.",
-  "Tactics for maintaining high stamina and court coverage during a grueling 3-set singles match.",
-  "What is the optimal racket string tension for maximizing control versus power?",
-  "How to execute a fast, aggressive low backhand serve in doubles play.",
-  "Explain the rotational rotation and positioning strategies in mixed doubles badminton.",
-  "Pre-match dynamic warm-up routine specifically designed for badminton players.",
-  "How to read your opponent's racket angle early to intercept cross-court drives.",
-  "Recovery drills to transition instantly from a net kill back to base position.",
-  "Summarize the latest breakthroughs in WebAssembly and browser performance trends.",
-  "What are the core principles of building lightning-fast Progressive Web Apps (PWAs)?",
-  "Explore the evolution of modern CSS features like container queries and nesting.",
-  "How to optimize core web vitals for a content-heavy web application.",
-  "Write a compelling blog post outline about the future of AI-assisted web development.",
-  "Research innovative UI/UX micro-interactions that elevate user engagement.",
-  "How do modern browsers handle rendering pipelines during heavy JavaScript execution?",
-  "Analyze the impact of Server-Side Rendering (SSR) vs. Static Site Generation (SSG).",
-  "Design a playful, interactive 404 error page concept with hidden easter eggs.",
-  "What are the best practices for implementing accessible keyboard navigation in web apps?"
-];
-
-function renderFiftyPrompts() {
-  const grid = $("fiftyPromptsGrid");
-  if (!grid) return;
-  grid.innerHTML = "";
-
-  const shuffled = [...masterPrompts].sort(() => 0.5 - Math.random()).slice(0, 50);
-
-  shuffled.forEach((promptText, index) => {
-    const card = document.createElement("div");
-    card.className = "dynamic-prompt-card";
-    card.innerHTML = `
-      <div class="dynamic-prompt-text">"${promptText}"</div>
-      <div class="dynamic-prompt-footer">
-        <span class="dynamic-prompt-badge">Prompt #${index + 1}</span>
-        <span style="color: var(--accent); font-weight:600; display:inline-flex; align-items:center; gap:4px;">
-          Use Prompt
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
-        </span>
-      </div>
-    `;
-    card.onclick = () => {
-      switchTab('chat');
-      input.value = promptText;
-      resizeInput();
-      input.focus();
-    };
-    grid.appendChild(card);
-  });
-}
-
-$("promptsTabBtn").onclick = () => {
-  switchTab('prompts');
-  renderFiftyPrompts();
-};
-
-$("novaTabBtn").onclick = () => {
-  switchTab('nova');
-};
-
-$("shufflePromptsBtn").onclick = () => {
-  renderFiftyPrompts();
-};
-
-
-/* ============================================
-   SESSIONS & USERS
-============================================ */
-
+/* ========================================================
+   CHAT SESSIONS & EDITABLE CHAT TITLES
+======================================================== */
 let sessions = JSON.parse(localStorage.getItem("rainbow_ai_chats") || "[]");
 let currentSession = null;
-
-const defaultUsers = [
-  { id: "default-herish", name: "Herish", email: "Personal account" }
-];
-
-let users = JSON.parse(localStorage.getItem("rainbow_ai_users") || "null");
-if (!Array.isArray(users) || !users.length) {
-  users = defaultUsers;
-  localStorage.setItem("rainbow_ai_users", JSON.stringify(users));
-}
-
-let currentUserId = localStorage.getItem("rainbow_ai_current_user");
-if (!users.some(user => user.id === currentUserId)) {
-  currentUserId = users[0].id;
-  localStorage.setItem("rainbow_ai_current_user", currentUserId);
-}
-
-function getCurrentUser() {
-  return users.find(user => user.id === currentUserId) || users[0];
-}
-
-function getInitials(name) {
-  const parts = String(name).trim().split(/\s+/).filter(Boolean);
-  if (!parts.length) return "U";
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
-
-function saveUsers() {
-  localStorage.setItem("rainbow_ai_users", JSON.stringify(users));
-  localStorage.setItem("rainbow_ai_current_user", currentUserId);
-}
-
-function updateCurrentUserUI() {
-  const user = getCurrentUser();
-  if (!user) return;
-  $("currentUserName").textContent = user.name;
-  $("currentUserEmail").textContent = user.email || "Personal account";
-  $("currentUserAvatar").textContent = getInitials(user.name);
-  const welcomeUserName = $("welcomeUserName");
-  if (welcomeUserName) {
-    welcomeUserName.textContent = user.name;
-  }
-}
-
-function renderUsers() {
-  const list = $("usersList");
-  if (!list) return;
-  list.innerHTML = "";
-  users.forEach(user => {
-    const item = document.createElement("div");
-    item.className = "user-item " + (user.id === currentUserId ? "active" : "");
-    
-    const avatar = document.createElement("div");
-    avatar.className = "user-item-avatar";
-    avatar.textContent = getInitials(user.name);
-    
-    const info = document.createElement("div");
-    info.className = "user-item-info";
-    
-    const name = document.createElement("div");
-    name.className = "user-item-name";
-    name.textContent = user.name;
-    
-    const email = document.createElement("div");
-    email.className = "user-item-email";
-    email.textContent = user.email || "Personal account";
-    
-    info.append(name, email);
-    
-    const deleteButton = document.createElement("button");
-    deleteButton.className = "user-delete";
-    deleteButton.type = "button";
-    deleteButton.innerHTML = `
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"/>
-        <line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-    `;
-    deleteButton.onclick = event => {
-      event.stopPropagation();
-      deleteUser(user.id);
-    };
-
-    item.append(avatar, info, deleteButton);
-    item.onclick = () => {
-      currentUserId = user.id;
-      saveUsers();
-      updateCurrentUserUI();
-      renderUsers();
-      closeUsers();
-    };
-    list.appendChild(item);
-  });
-}
-
-function addUser() {
-  const name = prompt("Enter the user's name:");
-  if (!name || !name.trim()) return;
-  const email = prompt("Enter an email or description (optional):");
-  const user = {
-    id: "user-" + Date.now().toString(),
-    name: name.trim(),
-    email: email?.trim() || "Personal account"
-  };
-  users.push(user);
-  currentUserId = user.id;
-  saveUsers();
-  updateCurrentUserUI();
-  renderUsers();
-}
-
-function deleteUser(id) {
-  if (users.length <= 1) {
-    alert("At least one user must remain.");
-    return;
-  }
-  users = users.filter(item => item.id !== id);
-  if (currentUserId === id) {
-    currentUserId = users[0].id;
-  }
-  saveUsers();
-  updateCurrentUserUI();
-  renderUsers();
-}
-
-
-/* ============================================
-   PERSONAS & SYSTEM PROMPT
-============================================ */
-
-const personas = {
-  balanced: "You are Rainbow AI, a friendly, intelligent and helpful assistant.",
-  coder: "You are Rainbow AI in Expert Coder mode. Write clean, complete, maintainable code.",
-  creative: "You are Rainbow AI in Creative mode. Be imaginative and engaging."
-};
-
-function systemMessage() {
-  const persona = personas[$("persona").value] || personas.balanced;
-  return {
-    role: "system",
-    content: persona + "\nCurrent date: " + new Date().toLocaleDateString()
-  };
-}
-
-
-/* ============================================
-   CHAT STORAGE & SESSIONS
-============================================ */
 
 function saveSessions() {
   localStorage.setItem("rainbow_ai_chats", JSON.stringify(sessions));
@@ -3962,7 +1238,7 @@ function saveSessions() {
 }
 
 function createSession() {
-  switchTab('chat');
+  switchTab("chat");
   currentSession = {
     id: Date.now().toString(),
     title: "New chat",
@@ -3971,458 +1247,365 @@ function createSession() {
   sessions.unshift(currentSession);
   saveSessions();
   messages.innerHTML = "";
-  welcome.style.display = "flex";
-  const user = getCurrentUser();
-  if (user) {
-    $("welcomeUserName").textContent = user.name;
-  }
+  $("welcome").style.display = "flex";
 }
 
-function saveMessage(role, content) {
-  if (!currentSession) {
-    createSession();
-  }
-  currentSession.messages.push({ role, content });
-  if (role === "user" && currentSession.title === "New chat") {
-    currentSession.title = content.replace(/\s+/g, " ").slice(0, 30) + (content.length > 30 ? "…" : "");
-  }
-  saveSessions();
-}
-
-function renderHistory(search = "") {
+function renderHistory() {
   const history = $("history");
-  if (!history) return;
   history.innerHTML = "";
-  const filtered = sessions.filter(session => session.title.toLowerCase().includes(search.toLowerCase()));
-
-  if (!filtered.length) {
-    history.innerHTML = `<div style="padding:12px; color:var(--muted); font-size:12px">No conversations yet</div>`;
-    return;
-  }
-
-  filtered.forEach(session => {
+  sessions.forEach(sess => {
     const item = document.createElement("div");
-    item.className = "history-item " + (currentSession?.id === session.id ? "active" : "");
+    item.className = "history-item " + (currentSession?.id === sess.id ? "active" : "");
 
-    const title = document.createElement("div");
-    title.className = "history-title";
-    title.textContent = session.title;
+    const titleSpan = document.createElement("span");
+    titleSpan.className = "history-title";
+    titleSpan.textContent = sess.title;
 
-    const deleteButton = document.createElement("button");
-    deleteButton.className = "delete-chat";
-    deleteButton.type = "button";
-    deleteButton.innerHTML = `
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"/>
-        <line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-    `;
-    deleteButton.onclick = event => {
-      event.stopPropagation();
-      sessions = sessions.filter(s => s.id !== session.id);
-      if (currentSession?.id === session.id) {
-        createSession();
+    // Edit chat title pencil button
+    const editBtn = document.createElement("button");
+    editBtn.className = "history-action-btn";
+    editBtn.title = "Rename Chat";
+    editBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>`;
+    editBtn.onclick = (e) => {
+      e.stopPropagation();
+      const newTitle = prompt("Enter new title for conversation:", sess.title);
+      if (newTitle && newTitle.trim()) {
+        sess.title = newTitle.trim();
+        saveSessions();
       }
+    };
+
+    // Delete button
+    const delBtn = document.createElement("button");
+    delBtn.className = "history-action-btn delete";
+    delBtn.title = "Delete Chat";
+    delBtn.innerHTML = `&times;`;
+    delBtn.onclick = (e) => {
+      e.stopPropagation();
+      sessions = sessions.filter(s => s.id !== sess.id);
+      if (currentSession?.id === sess.id) createSession();
       saveSessions();
     };
 
-    item.append(title, deleteButton);
-    item.onclick = () => loadSession(session.id);
+    item.append(titleSpan, editBtn, delBtn);
+    item.onclick = () => loadSession(sess.id);
     history.appendChild(item);
   });
 }
 
 function loadSession(id) {
-  switchTab('chat');
-  const session = sessions.find(s => s.id === id);
-  if (!session) return;
-  currentSession = session;
+  switchTab("chat");
+  const s = sessions.find(item => item.id === id);
+  if (!s) return;
+  currentSession = s;
   messages.innerHTML = "";
-  welcome.style.display = session.messages.length ? "none" : "flex";
-
-  session.messages.forEach(message => {
-    addMessage(message.role === "user" ? "user" : "ai", message.content, false);
-  });
+  $("welcome").style.display = s.messages.length ? "none" : "flex";
+  s.messages.forEach(m => addMessage(m.role === "assistant" ? "ai" : "user", m.content, false));
   renderHistory();
-  chatView.scrollTop = chatView.scrollHeight;
 }
 
-
-/* ============================================
-   EXPORT CURRENT CHAT TO FILE
-============================================ */
-
-function exportCurrentChat() {
-  if (!currentSession || !currentSession.messages.length) {
-    alert("No messages to export in this conversation.");
-    return;
-  }
-
-  const currentUser = getCurrentUser();
-  const userName = currentUser ? currentUser.name : "User";
-
-  let exportContent = `# ${currentSession.title}\n`;
-  exportContent += `Exported on: ${new Date().toLocaleString()}\n`;
-  exportContent += `----------------------------------------\n\n`;
-
-  currentSession.messages.forEach(msg => {
-    const sender = msg.role === "assistant" ? "Rainbow AI" : userName;
-    exportContent += `### ${sender}\n${msg.content}\n\n`;
-  });
-
-  const blob = new Blob([exportContent], { type: "text/markdown;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-
-  const safeTitle = currentSession.title
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "-")
-    .replace(/-+/g, "-")
-    .slice(0, 30);
-
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `${safeTitle || "chat-export"}.md`;
-  document.body.appendChild(link);
-  link.click();
-
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-}
-
-$("downloadChatBtn").onclick = exportCurrentChat;
-
-
-/* ============================================
-   MARKDOWN & DUAL-PANE CODE FORMATTING
-============================================ */
-
-function markdown(text) {
-  if (window.marked) {
-    let html = marked.parse(text);
-    html = html.replace(/<pre><code([^>]*)>([\s\S]*?)<\/code><\/pre>/gi, (match, attr, codeContent) => {
-      return `
-        <div class="dual-pane-card">
-          <div class="dual-pane-header">
-            <span>Code Synthesizer Output</span>
-            <button class="artifact-action-btn" style="width:auto; padding:3px 10px;" onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText)">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-              </svg>
-              <span>Copy Code</span>
-            </button>
-          </div>
-          <div class="dual-pane-body">
-            <pre><code${attr}>${codeContent}</code></pre>
-          </div>
-        </div>
-      `;
-    });
-    return html;
-  }
-  return text.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
-}
-
+/* ========================================================
+   FAVICON-POWERED AI CHAT BUBBLES
+======================================================== */
 function addMessage(role, text, save = true) {
-  welcome.style.display = "none";
-  const message = document.createElement("div");
-  message.className = "message " + role;
+  $("welcome").style.display = "none";
+  const msg = document.createElement("div");
+  msg.className = "message " + role;
 
   const avatar = document.createElement("div");
   avatar.className = "avatar " + (role === "ai" ? "ai-avatar" : "user-avatar");
-  const currentUser = getCurrentUser();
-  avatar.textContent = role === "ai" ? "R" : getInitials(currentUser?.name || "U");
+
+  if (role === "ai") {
+    const img = document.createElement("img");
+    img.src = "icon-new.png";
+    img.alt = "Rainbow AI";
+    avatar.appendChild(img);
+  } else {
+    avatar.textContent = "H";
+  }
 
   const content = document.createElement("div");
   content.className = "message-content";
-  content.dataset.raw = text;
+  content.innerHTML = role === "ai" && window.marked ? marked.parse(text) : text;
 
-  if (role === "ai") {
-    if (text.trim().startsWith("<")) {
-      content.innerHTML = text;
-    } else {
-      content.innerHTML = markdown(text);
+  msg.append(avatar, content);
+  messages.appendChild(msg);
+  $("viewContainer").scrollTop = $("viewContainer").scrollHeight;
+
+  if (save && currentSession) {
+    currentSession.messages.push({ role: role === "ai" ? "assistant" : "user", content: text });
+    if (role === "user" && currentSession.title === "New chat") {
+      currentSession.title = text.slice(0, 28) + (text.length > 28 ? "…" : "");
     }
-  } else {
-    content.textContent = text;
-  }
-
-  message.append(avatar, content);
-
-  if (role === "ai") {
-    const actions = document.createElement("div");
-    actions.className = "message-actions";
-
-    const copy = document.createElement("button");
-    copy.className = "message-action";
-    copy.type = "button";
-    copy.innerHTML = `
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-      </svg>
-      <span>Copy</span>
-    `;
-    copy.onclick = () => navigator.clipboard?.writeText(content.dataset.raw);
-
-    const pin = document.createElement("button");
-    pin.className = "message-action";
-    pin.type = "button";
-    pin.innerHTML = `
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="17" x2="12" y2="22"/>
-        <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.89A2 2 0 0 1 15 10.77V5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5.77a2 2 0 0 1-1.11 1.79l-1.78.89A2 2 0 0 0 5 15.24Z"/>
-      </svg>
-      <span>Pin Artifact</span>
-    `;
-    pin.onclick = () => window.pinArtifact(currentSession?.title || "Artifact", content.dataset.raw);
-
-    const speak = document.createElement("button");
-    speak.className = "message-action";
-    speak.type = "button";
-    speak.innerHTML = `
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
-      </svg>
-      <span>Speak</span>
-    `;
-    speak.onclick = () => {
-      const speech = new SpeechSynthesisUtterance(content.dataset.raw);
-      speechSynthesis.speak(speech);
-    };
-
-    actions.append(copy, pin, speak);
-    content.appendChild(actions);
-  }
-
-  messages.appendChild(message);
-  chatView.scrollTop = chatView.scrollHeight;
-
-  if (save) {
-    saveMessage(role === "ai" ? "assistant" : "user", text);
+    saveSessions();
   }
   return content;
 }
 
+/* ========================================================
+   SUGGESTED PROMPT PILLS BELOW CHAT
+======================================================== */
+const samplePrompts = [
+  "Build a modern responsive website for an AI assistant",
+  "Explain neural networks simply with examples",
+  "Write clean Python debounce logic",
+  "Give me 5 creative AI game concepts",
+  "Debug this SQL query performance issue"
+];
 
-/* ============================================
-   TEXTAREA & SEND (VISION & CLOUD GATEWAY)
-============================================ */
+const pillsBar = $("suggestedPillsBar");
+samplePrompts.forEach(p => {
+  const pill = document.createElement("button");
+  pill.className = "prompt-pill";
+  pill.textContent = p;
+  pill.onclick = () => {
+    input.value = p;
+    sendMessage();
+  };
+  pillsBar.appendChild(pill);
+});
 
-function resizeInput() {
-  input.style.height = "auto";
-  input.style.height = Math.min(input.scrollHeight, 150) + "px";
+/* ========================================================
+   DUAL VOICE INPUT (WEB SPEECH API)
+======================================================== */
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+// 1. Rainbow Main Chat Voice Recognition
+if (SpeechRecognition) {
+  const mainRec = new SpeechRecognition();
+  mainRec.continuous = false;
+  let listeningMain = false;
+
+  $("micBtn").onclick = () => {
+    if (!listeningMain) {
+      mainRec.start();
+      listeningMain = true;
+      $("micBtn").classList.add("listening");
+      $("micStatusText").textContent = "Listening...";
+    } else {
+      mainRec.stop();
+      listeningMain = false;
+      $("micBtn").classList.remove("listening");
+      $("micStatusText").textContent = "Voice";
+    }
+  };
+
+  mainRec.onresult = e => {
+    input.value = e.results[0][0].transcript;
+    $("micBtn").classList.remove("listening");
+    $("micStatusText").textContent = "Voice";
+    listeningMain = false;
+  };
 }
 
-input.addEventListener("input", resizeInput);
+/* ========================================================
+   NOVA INTERACTIVE AVATAR & VOICE CONVERSATION
+======================================================== */
+const novaStage = $("novaStageCard");
+const novaStateLabel = $("novaStateLabel");
 
-async function sendMessage() {
-  let text = input.value.trim();
-  if (!text && !attachedFilePayload) return;
-  if (generating) return;
+function setNovaState(state) {
+  novaStage.setAttribute("data-state", state);
+  const labels = {
+    idle: "IDLE • READY TO CHAT",
+    listening: "LISTENING • SPEAK NOW",
+    thinking: "THINKING • PROCESSING",
+    speaking: "SPEAKING • NOVA IS ANSWERING"
+  };
+  novaStateLabel.textContent = labels[state] || "IDLE";
+}
 
-  if (!currentSession) {
-    createSession();
-  }
+let novaRec = SpeechRecognition ? new SpeechRecognition() : null;
+let isNovaListening = false;
 
-  let displayMessage = text;
-  let filePayloadToSend = null;
-
-  if (attachedFilePayload) {
-    if (attachedFilePayload.type === 'image') {
-      displayMessage = `[Attached Image: ${attachedFilePayload.name}]\n` + text;
-      filePayloadToSend = attachedFilePayload.data;
+if (novaRec) {
+  novaRec.continuous = false;
+  $("novaVoiceBtn").onclick = () => {
+    if (!isNovaListening) {
+      novaRec.start();
+      isNovaListening = true;
+      setNovaState("listening");
+      $("novaVoiceBtn").classList.add("listening");
+      $("novaVoiceBtnText").textContent = "Listening...";
     } else {
-      displayMessage = `[Attached File: ${attachedFilePayload.name}]\n\`\`\`text\n${attachedFilePayload.data.slice(0, 15000)}\n\`\`\`\n` + text;
+      novaRec.stop();
+      isNovaListening = false;
+      setNovaState("idle");
+      $("novaVoiceBtn").classList.remove("listening");
+      $("novaVoiceBtnText").textContent = "Voice Converse";
     }
-  }
+  };
 
-  addMessage("user", displayMessage);
-  input.value = "";
-  $("fileChip").classList.remove("show");
-  const tempFilePayload = filePayloadToSend;
-  attachedFilePayload = null;
-  $("fileInput").value = "";
-  resizeInput();
+  novaRec.onresult = e => {
+    const speech = e.results[0][0].transcript;
+    $("novaInput").value = speech;
+    isNovaListening = false;
+    $("novaVoiceBtn").classList.remove("listening");
+    $("novaVoiceBtnText").textContent = "Voice Converse";
+    sendNovaMessage();
+  };
+}
 
-  generating = true;
-  sendButton.classList.add("stop");
-  sendButton.innerHTML = `<svg viewBox="0 0 24 24" width="17" height="17" fill="none"><rect x="7" y="7" width="10" height="10" rx="1.5" fill="currentColor"/></svg>`;
+async function sendNovaMessage() {
+  const query = $("novaInput").value.trim();
+  if (!query) return;
 
-  abortController = new AbortController();
-  status.textContent = "Processing...";
-  loadingBar.classList.add("active");
+  const userBub = document.createElement("div");
+  userBub.className = "nova-bubble";
+  userBub.style.alignSelf = "flex-end";
+  userBub.style.background = "var(--panel3)";
+  userBub.textContent = query;
+  $("novaChatTranscript").appendChild(userBub);
+  $("novaInput").value = "";
 
-  const responseBubble = addMessage("ai", `
-    <div class="gemini-thinking">
-      <div class="gemini-orb-loader">
-        <div class="gemini-orb"></div>
-        <div class="gemini-orb"></div>
-        <div class="gemini-orb"></div>
-      </div>
-      <span class="shimmer-text">Rainbow AI is thinking...</span>
-    </div>
-  `, false);
-
-  let answer = "";
-  let firstChunkReceived = false;
+  setNovaState("thinking");
 
   try {
-    const history = currentSession.messages.slice(-1000);
-    const payload = [systemMessage(), ...history];
+    const res = await fetch(`${baseUrl}/call/predict`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data: [query, "nova"] })
+    });
+    const json = await res.json();
+    const reply = json.data && json.data[0] ? json.data[0] : "I didn't catch that.";
 
-    await cloudGatewayChat(
-      payload,
-      tempFilePayload,
-      chunk => {
-        if (!generating) return;
-        if (!firstChunkReceived) {
-          answer = "";
-          firstChunkReceived = true;
-        }
-        answer += chunk;
-        responseBubble.dataset.raw = answer;
-        responseBubble.innerHTML = markdown(answer);
-        chatView.scrollTop = chatView.scrollHeight;
-      },
-      abortController.signal
-    );
+    const aiBub = document.createElement("div");
+    aiBub.className = "nova-bubble";
+    aiBub.textContent = reply;
+    $("novaChatTranscript").appendChild(aiBub);
 
-    if (answer) {
-      responseBubble.dataset.raw = answer;
-      responseBubble.innerHTML = markdown(answer);
-      saveMessage("assistant", answer);
+    setNovaState("speaking");
+    const utterance = new SpeechSynthesisUtterance(reply);
+    utterance.onend = () => {
+      setNovaState("idle");
+      if ($("novaAutoListenLoop").checked && novaRec) {
+        setTimeout(() => {
+          novaRec.start();
+          isNovaListening = true;
+          setNovaState("listening");
+        }, 500);
+      }
+    };
+    speechSynthesis.speak(utterance);
+  } catch (err) {
+    setNovaState("idle");
+  }
+}
+
+$("novaSendBtn").onclick = sendNovaMessage;
+
+/* ========================================================
+   MAIN CHAT SEND & GATEWAY INFERENCE
+======================================================== */
+async function sendMessage() {
+  const text = input.value.trim();
+  if (!text || generating) return;
+
+  if (!currentSession) createSession();
+
+  addMessage("user", text);
+  input.value = "";
+
+  generating = true;
+  $("status").textContent = "Processing...";
+  $("loadingBar").classList.add("active");
+
+  const bubble = addMessage("ai", "Rainbow AI is thinking...", false);
+
+  try {
+    const res = await fetch(`${baseUrl}/call/predict`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data: [text, $("model").value] })
+    });
+
+    if (!res.ok) throw new Error("Status " + res.status);
+
+    const json = await res.json();
+    const reply = json.data && json.data[0] ? json.data[0] : "No response.";
+    bubble.innerHTML = window.marked ? marked.parse(reply) : reply;
+    if (currentSession) {
+      currentSession.messages.push({ role: "assistant", content: reply });
+      saveSessions();
     }
-  } catch (error) {
-    if (error.name !== "AbortError") {
-      responseBubble.textContent = "Error: " + error.message;
-      window.pushAlert("Gateway Error", error.message, "error");
-    }
+  } catch (err) {
+    bubble.textContent = "Error: " + err.message;
   } finally {
     generating = false;
-    sendButton.classList.remove("stop");
-    sendButton.innerHTML = `<svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5 20 12 4 18.5l2.2-5.7L15 12l-8.8-.8L4 5.5Z" fill="currentColor"/></svg>`;
-    status.textContent = "Gateway Ready";
-    loadingBar.classList.remove("active");
-    abortController = null;
+    $("status").textContent = "Gateway Ready";
+    $("loadingBar").classList.remove("active");
   }
 }
 
-async function cloudGatewayChat(messagesArray, imageBase64, onChunk, signal) {
-    const selectedModel = $("model").value;
-    const latestMessage = messagesArray[messagesArray.length - 1]?.content || "";
-
-    const baseUrl = "https://agrees-offers-flashing-rocky.trycloudflare.com";
-
-    try {
-        const response = await fetch(`${baseUrl}/call/predict`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            signal,
-            body: JSON.stringify({
-                data: [latestMessage, selectedModel]
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error("Server error status: " + response.status);
-        }
-
-        const jsonRes = await response.json();
-        const outputText = jsonRes.data && jsonRes.data[0] ? jsonRes.data[0] : "No response generated.";
-
-        for (let i = 0; i < outputText.length; i += 4) {
-            if (signal.aborted) break;
-            onChunk(outputText.slice(i, i + 4));
-            await new Promise(resolve => setTimeout(resolve, 8));
-        }
-
-    } catch (err) {
-        window.pushAlert("Gateway Connection Error", err.message, "warning");
-        throw err;
-    }
-}
-
-/* ============================================
-   EVENT HANDLERS & INITIALIZATION
-============================================ */
+sendButton.onclick = sendMessage;
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
 
 $("newChat").onclick = createSession;
+$("clearButton").onclick = () => { input.value = ""; };
 
-$("sidebarButton").onclick = () => sidebar.classList.toggle("collapsed");
-$("mobileMenu").onclick = () => sidebar.classList.toggle("collapsed");
+/* ========================================================
+   PROMPTS, ARTIFACTS & ALERTS RENDERING
+======================================================== */
+const masterPrompts = [
+  "Refactor this React component to use custom hooks",
+  "Write a robust custom debounce hook in TypeScript",
+  "Create a sleek card component using CSS Grid",
+  "Explain Event Bubbling and Capturing with code",
+  "Optimize this SQL query causing heavy dashboard latency",
+  "Build a lightweight state store using JavaScript Proxies",
+  "Write unit tests using Jest for a modal component"
+];
 
-$("search").oninput = event => renderHistory(event.target.value);
+function renderFiftyPrompts() {
+  const grid = $("fiftyPromptsGrid");
+  grid.innerHTML = "";
+  masterPrompts.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "dynamic-prompt-card";
+    card.textContent = `"${p}"`;
+    card.onclick = () => {
+      switchTab("chat");
+      input.value = p;
+      input.focus();
+    };
+    grid.appendChild(card);
+  });
+}
 
-sendButton.onclick = () => {
-  if (generating) {
-    generating = false;
-    abortController?.abort();
-  } else {
-    sendMessage();
-  }
-};
+function renderArtifacts() {
+  const grid = $("artifactsGrid");
+  grid.innerHTML = `<div style="color:var(--muted); font-size:14px; grid-column:1/-1;">No pinned artifacts yet.</div>`;
+}
 
-input.addEventListener("keydown", event => {
-  if (event.key === "Enter" && !event.shiftKey) {
-    event.preventDefault();
-    sendMessage();
-  }
-});
+function renderAlerts() {
+  const feed = $("alertsFeed");
+  feed.innerHTML = `
+    <div class="alert-card info">
+      <div>
+        <div style="font-weight:600; font-size:14px;">Gateway Connected</div>
+        <div style="font-size:12px; color:var(--muted);">Cloudflare Tunnel is active on ${baseUrl}</div>
+      </div>
+    </div>
+  `;
+}
 
-document.querySelectorAll(".prompt-card").forEach(card => {
-  card.onclick = () => {
-    input.value = card.dataset.prompt;
-    resizeInput();
-    input.focus();
-  };
-});
-
-$("clearButton").onclick = () => {
-  input.value = "";
-  attachedFilePayload = null;
-  $("fileChip").classList.remove("show");
-  $("fileInput").value = "";
-  resizeInput();
-};
-
-function openSettings() { $("drawer").classList.add("show"); }
-function closeSettings() { $("drawer").classList.remove("show"); }
-$("settingsButton").onclick = openSettings;
-$("topSettings").onclick = openSettings;
-$("closeSettings").onclick = closeSettings;
-$("drawer").onclick = event => { if (event.target.id === "drawer") closeSettings(); };
-
-function openUsers() { renderUsers(); $("userDrawer").classList.add("show"); }
-function closeUsers() { $("userDrawer").classList.remove("show"); }
-$("usersButton").onclick = openUsers;
-$("closeUserDrawer").onclick = closeUsers;
-$("addUserButton").onclick = addUser;
-$("userDrawer").onclick = event => { if (event.target.id === "userDrawer") closeUsers(); };
-
+/* ========================================================
+   THEME SWITCHER
+======================================================== */
 function setTheme(dark) {
   document.documentElement.dataset.theme = dark ? "dark" : "light";
-  $("themeToggle").classList.toggle("active", dark);
   localStorage.setItem("rainbow_theme", dark ? "dark" : "light");
 }
 setTheme(localStorage.getItem("rainbow_theme") !== "light");
 $("themeButton").onclick = () => setTheme(document.documentElement.dataset.theme !== "dark");
-$("themeToggle").onclick = () => setTheme(document.documentElement.dataset.theme !== "dark");
 
-updateCurrentUserUI();
-renderUsers();
-renderHistory();
-renderFiftyPrompts();
-renderArtifactsFeed();
-
-if (sessions.length) {
-  loadSession(sessions[0].id);
-} else {
-  createSession();
-}
-
+if (sessions.length) loadSession(sessions[0].id);
+else createSession();
 </script>
-
 </body>
 </html>
