@@ -30,6 +30,7 @@
   --panel3: #1a1e27;
   --text: #ffffff;
   --muted: #8e95a5;
+  --gemini-gray: #9aa0a6;
   --border: rgba(255, 255, 255, 0.08);
 
   --rainbow-gradient: linear-gradient(135deg, #ef4444, #f97316, #eab308, #10b981, #06b6d4, #3b82f6, #8b5cf6, #ec4899);
@@ -47,6 +48,7 @@
   --panel3: #e2e8f0;
   --text: #000000;
   --muted: #64748b;
+  --gemini-gray: #5f6368;
   --border: rgba(0, 0, 0, 0.09);
   --shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
 }
@@ -125,62 +127,115 @@ button {
   to { background-position: 200% center; }
 }
 
-/* Interactive SVG Hover Bounce Animations */
-button:hover svg:not(.no-anim),
-.nav-tab-btn:hover svg:not(.no-anim),
-.tool-btn:hover svg:not(.no-anim),
-.history-action-btn:hover svg:not(.no-anim) {
-  transform: scale(1.18) rotate(4deg);
+/* ========================================================
+   DESIGNATED ANIMATIONS FOR EACH & EVERY SVG
+======================================================== */
+/* New chat icon */
+#newChat:hover .newchat-svg {
+  transform: rotate(90deg) scale(1.15);
+  color: var(--accent);
 }
 
-button:active svg {
-  transform: scale(0.92) rotate(-2deg);
+/* Prompts book */
+.nav-tab-btn:hover .tab-svg-book {
+  transform: translateY(-3px) scale(1.12);
+  filter: drop-shadow(0 2px 5px rgba(234, 179, 8, 0.5));
 }
 
-/* Morphing Vectors Container */
-.morph-icon-box {
-  position: relative;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+/* Artifacts box */
+.nav-tab-btn:hover .tab-svg-archive {
+  transform: translateY(-2px) rotate(-6deg) scale(1.15);
+  filter: drop-shadow(0 2px 5px rgba(16, 185, 129, 0.5));
 }
 
-.morph-icon-box svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 18px;
-  height: 18px;
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.28s ease;
+/* Nova sparkle */
+.nav-tab-btn:hover .tab-svg-sparkle {
+  transform: scale(1.22) rotate(18deg);
+  filter: drop-shadow(0 0 7px #a855f7);
 }
 
-/* Theme Morphing Animation */
+/* Alerts bell */
+.nav-tab-btn:hover .tab-svg-bell {
+  transform-origin: top center;
+  animation: bellWiggle 0.6s ease-in-out;
+}
+@keyframes bellWiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(15deg); }
+  50% { transform: rotate(-15deg); }
+  75% { transform: rotate(8deg); }
+}
+
+/* Top settings gear */
+.top-settings-btn:hover .settings-gear-svg {
+  transform: rotate(90deg) scale(1.12);
+}
+
+/* Bottom settings gear */
+#settingsButton:hover .settings-gear-svg {
+  transform: rotate(90deg) scale(1.12);
+}
+
+/* Theme morphing */
 .theme-sun { opacity: 1; transform: scale(1) rotate(0deg); }
 .theme-moon { opacity: 0; transform: scale(0.35) rotate(-45deg); }
 #themeButton:hover .theme-sun { opacity: 0; transform: scale(0.3) rotate(90deg); }
 #themeButton:hover .theme-moon { opacity: 1; transform: scale(1.15) rotate(0deg); }
 
-/* New Chat Morphing Animation */
-.newchat-plus { opacity: 1; transform: scale(1) rotate(0deg); }
-.newchat-pencil { opacity: 0; transform: scale(0.35) translate(-4px, 4px) rotate(-20deg); }
-#newChat:hover .newchat-plus { opacity: 0; transform: scale(0.3) rotate(90deg); }
-#newChat:hover .newchat-pencil { opacity: 1; transform: scale(1.15) translate(0, 0) rotate(0deg); }
+/* Microphone */
+#micBtn:hover .mic-svg {
+  transform: scale(1.2) translateY(-1px);
+  filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.6));
+}
 
-/* Tab SVGs Animated Reactions */
-.nav-tab-btn:hover .tab-svg-book { transform: translateY(-2px) scale(1.15); }
-.nav-tab-btn:hover .tab-svg-archive { transform: translateY(-2px) scale(1.15); }
-.nav-tab-btn:hover .tab-svg-sparkle { transform: scale(1.22) rotate(14deg); filter: drop-shadow(0 0 6px #8b5cf6); }
-.nav-tab-btn:hover .tab-svg-bell { transform-origin: top center; animation: cuteBell 0.6s ease-in-out; }
+/* Clear trash can */
+#clearButton:hover .clear-svg {
+  transform: rotate(-12deg) scale(1.15);
+  color: #ef4444;
+}
 
-@keyframes cuteBell {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(14deg); }
-  50% { transform: rotate(-12deg); }
-  75% { transform: rotate(6deg); }
-  100% { transform: rotate(0deg); }
+/* Send arrow */
+#sendButton:hover .send-svg {
+  transform: translate(2px, -2px) scale(1.15);
+}
+
+/* Export chat */
+#exportChatBtn:hover .export-svg {
+  transform: translateY(2px) scale(1.15);
+  color: var(--green);
+}
+
+/* Edit pencil */
+.history-action-btn:hover .edit-svg {
+  transform: rotate(25deg) scale(1.2);
+  color: var(--accent);
+}
+
+/* Delete cross/trash */
+.history-action-btn:hover .delete-svg {
+  transform: scale(1.25) rotate(90deg);
+  color: #ef4444;
+}
+
+/* Copy button */
+.copy-btn:hover .copy-svg {
+  transform: scale(1.2) rotate(-5deg);
+}
+
+/* Close drawer */
+.close-drawer-btn:hover svg {
+  transform: rotate(90deg) scale(1.15);
+}
+
+/* Pin artifact */
+.pin-btn:hover svg {
+  transform: translateY(-2px) scale(1.15);
+  color: var(--accent);
+}
+
+/* Sidebar toggle */
+.brand-icon-box:hover .rail-toggle-svg {
+  transform: scale(1.15);
 }
 
 /* ========================================================
@@ -216,11 +271,17 @@ button:active svg {
 .brand-container {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
   padding: 4px 6px 18px;
-  cursor: pointer;
   border-radius: 12px;
   user-select: none;
+}
+
+.brand-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
 }
 
 .brand-icon-box {
@@ -248,12 +309,12 @@ button:active svg {
   color: var(--text);
 }
 
-.sidebar.collapsed .brand-container:hover .brand-icon-box img {
+.sidebar.collapsed .brand-left:hover .brand-icon-box img {
   opacity: 0;
   transform: scale(0.4) rotate(-15deg);
 }
 
-.sidebar.collapsed .brand-container:hover .brand-icon-box .rail-toggle-svg {
+.sidebar.collapsed .brand-left:hover .brand-icon-box .rail-toggle-svg {
   opacity: 1;
   transform: scale(1.1) rotate(0deg);
 }
@@ -265,9 +326,28 @@ button:active svg {
   transition: opacity 0.2s ease;
 }
 
+.sidebar-collapse-toggle {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+}
+.sidebar-collapse-toggle:hover {
+  background: var(--panel2);
+  color: var(--text);
+}
+.sidebar.collapsed .sidebar-collapse-toggle {
+  display: none;
+}
+
 .sidebar.collapsed .brand-text {
   opacity: 0;
   pointer-events: none;
+  display: none;
 }
 
 .nav-tab-btn {
@@ -439,11 +519,16 @@ button:active svg {
 .current-user-name { font-size: 13px; font-weight: 700; }
 .current-user-email { font-size: 11px; color: var(--muted); }
 
+/* Sidebar Bottom (No overlap in collapsed rail) */
 .sidebar-bottom {
   display: flex;
   gap: 6px;
   padding-top: 10px;
   flex-shrink: 0;
+}
+
+.sidebar.collapsed .sidebar-bottom {
+  flex-direction: column;
 }
 
 .sidebar-bottom button {
@@ -461,10 +546,16 @@ button:active svg {
   font-size: 12px;
 }
 .sidebar-bottom button:hover { background: var(--panel3); color: var(--text); }
+.sidebar.collapsed .sidebar-bottom button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: auto;
+}
 .sidebar.collapsed .sidebar-bottom button span { display: none; }
 
 /* ========================================================
-   MAIN VIEWPORT & TOPBAR
+   MAIN VIEWPORT & TOPBAR (NO CUTOFFS)
 ======================================================== */
 .main {
   min-width: 0;
@@ -522,9 +613,10 @@ button:active svg {
   box-shadow: 0 0 8px currentColor;
 }
 
-.icon-btn {
-  width: 38px;
-  height: 38px;
+/* Gear Icon Cutoff Fixed */
+.top-settings-btn {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 0;
   background: transparent;
@@ -532,11 +624,17 @@ button:active svg {
   cursor: pointer;
   display: grid;
   place-items: center;
+  overflow: visible !important;
+  padding: 0;
 }
-.icon-btn:hover { background: var(--panel2); }
+.top-settings-btn:hover { background: var(--panel2); }
+
+.top-settings-btn svg {
+  overflow: visible;
+}
 
 /* ========================================================
-   CHAT & COMPOSER
+   CHAT & COMPOSER (GEMINI FONT ONLY)
 ======================================================== */
 .view-container {
   flex: 1;
@@ -568,7 +666,7 @@ button:active svg {
   letter-spacing: -0.04em;
 }
 
-.welcome p { color: var(--muted); font-size: 15px; margin: 0; }
+.welcome p { color: var(--gemini-gray); font-size: 15px; margin: 0; }
 
 .message {
   display: flex;
@@ -675,6 +773,7 @@ button:active svg {
   border-color: rgba(59, 130, 246, 0.5);
 }
 
+/* Chat Input: Pure Gemini Gray font and typography */
 .input {
   width: 100%;
   max-height: 140px;
@@ -684,8 +783,13 @@ button:active svg {
   outline: none;
   background: transparent;
   color: var(--text);
+  font-family: "Google Sans Flex", "Google Sans", "Google Sans Text", sans-serif !important;
   font-size: 15px;
   line-height: 1.5;
+}
+.input::placeholder {
+  color: var(--gemini-gray);
+  font-family: "Google Sans Flex", "Google Sans", "Google Sans Text", sans-serif !important;
 }
 
 .composer-bottom {
@@ -730,7 +834,6 @@ button:active svg {
 }
 .send-btn:hover { transform: scale(1.06); }
 
-/* Inspiration pills below Composer */
 .suggested-pills-bar {
   width: min(900px, 100%);
   margin: 10px auto 0;
@@ -745,7 +848,7 @@ button:active svg {
   flex-shrink: 0;
   background: var(--panel2);
   border: 1px solid var(--border);
-  color: var(--muted);
+  color: var(--gemini-gray);
   padding: 6px 14px;
   border-radius: 999px;
   font-size: 12px;
@@ -1132,6 +1235,7 @@ button:active svg {
 .user-item-info { flex: 1; min-width: 0; }
 .user-item-name { font-size: 13px; font-weight: 700; }
 .user-item-email { font-size: 11px; color: var(--muted); }
+.user-item-actions { display: flex; gap: 4px; }
 </style>
 </head>
 
@@ -1144,32 +1248,33 @@ button:active svg {
 <!-- ================= SIDEBAR RAIL ================= -->
 <aside class="sidebar collapsed" id="sidebar">
 
-  <div class="brand-container" id="brandToggleBtn" title="Toggle Sidebar">
-    <div class="brand-icon-box">
-      <img src="icon-new.png" alt="Rainbow AI">
-      <svg class="rail-toggle-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-        <line x1="9" y1="3" x2="9" y2="21"/>
-      </svg>
+  <div class="brand-container">
+    <div class="brand-left" id="brandToggleBtn" title="Toggle Sidebar">
+      <div class="brand-icon-box">
+        <img src="icon-new.png" alt="Rainbow AI">
+        <svg class="rail-toggle-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+          <line x1="9" y1="3" x2="9" y2="21"/>
+        </svg>
+      </div>
+      <span class="brand-text rainbow-title-gradient">Rainbow AI</span>
     </div>
-    <span class="brand-text rainbow-title-gradient">Rainbow AI</span>
+    <button class="sidebar-collapse-toggle" id="sidebarCloseBtn" type="button" title="Close Sidebar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
   </div>
 
   <button class="nav-tab-btn" id="newChat" type="button" title="New Chat">
-    <div class="morph-icon-box">
-      <svg class="newchat-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M12 5v14M5 12h14"/>
-      </svg>
-      <svg class="newchat-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 3l4 4L7 18H3v-4L14 3z"/>
-        <path d="M13 21h8"/>
-      </svg>
-    </div>
+    <svg class="newchat-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M12 5v14M5 12h14"/>
+    </svg>
     <span>New chat</span>
   </button>
 
   <button class="nav-tab-btn active" id="chatTabBtn" type="button" title="Chat Workspace">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <svg class="tab-svg-chat" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
     </svg>
     <span>Chat</span>
@@ -1214,16 +1319,17 @@ button:active svg {
   <!-- Users Drawer Trigger -->
   <button class="users-tab" id="usersButton" type="button">
     <div class="current-user-avatar" id="currentUserAvatar">
-      <span id="currentUserInitials">H</span>
+      <span id="currentUserInitials">G</span>
     </div>
     <div class="current-user-info">
-      <div class="current-user-name" id="currentUserName">Herish</div>
-      <div class="current-user-email" id="currentUserEmail">Personal account</div>
+      <div class="current-user-name" id="currentUserName">Guest</div>
+      <div class="current-user-email" id="currentUserEmail">Guest account</div>
     </div>
   </button>
 
+  <!-- Sidebar Bottom (Theme & Settings) -->
   <div class="sidebar-bottom">
-    <button id="themeButton" type="button">
+    <button id="themeButton" type="button" title="Toggle Theme">
       <div class="morph-icon-box">
         <svg class="theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
           <circle cx="12" cy="12" r="4"/>
@@ -1235,8 +1341,8 @@ button:active svg {
       </div>
       <span>Theme</span>
     </button>
-    <button id="settingsButton" type="button">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+    <button id="settingsButton" type="button" title="Settings">
+      <svg class="settings-gear-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
         <circle cx="12" cy="12" r="3"/>
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
       </svg>
@@ -1255,11 +1361,19 @@ button:active svg {
       </select>
     </div>
     <div class="top-right">
+      <button class="tool-btn" id="exportChatBtn" type="button" title="Export Chat">
+        <svg class="export-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>Export</span>
+      </button>
       <span class="status" id="status">Gateway Ready</span>
-      <button class="icon-btn" id="topSettings" type="button" aria-label="Settings">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <button class="top-settings-btn" id="topSettings" type="button" aria-label="Settings">
+        <svg class="settings-gear-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
           <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
         </svg>
       </button>
     </div>
@@ -1270,7 +1384,7 @@ button:active svg {
     <section class="chat" id="chatView">
       <div class="chat-inner">
         <div class="welcome" id="welcome">
-          <h1 class="rainbow-title-gradient">Your move, <span id="welcomeUserName">Herish</span>!</h1>
+          <h1 class="rainbow-title-gradient">Your move, <span id="welcomeUserName">Guest</span>!</h1>
           <p>Ask anything, brainstorm code, or converse via live voice.</p>
         </div>
         <div id="messages"></div>
@@ -1309,7 +1423,7 @@ button:active svg {
         <input type="text" class="nova-composer-input" id="novaInput" placeholder="Ask Nova a question or talk via voice...">
         <div class="nova-actions-row">
           <button class="nova-converse-btn" id="novaVoiceBtn" type="button">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+            <svg class="mic-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
             <span id="novaVoiceBtnText">Voice Converse</span>
           </button>
           <button class="nova-send-btn" id="novaSendBtn" type="button">
@@ -1324,7 +1438,7 @@ button:active svg {
       <div class="view-header-flex">
         <div>
           <h1 class="rainbow-title-gradient">Rainbow Prompts Library</h1>
-          <p style="color:var(--muted); margin:0;">50 hand-crafted inspiration prompts ready for use.</p>
+          <p style="color:var(--gemini-gray); margin:0;">50 hand-crafted inspiration prompts ready for use.</p>
         </div>
         <button class="tool-btn" id="shufflePromptsBtn" style="border:1px solid var(--border);" type="button">Shuffle</button>
       </div>
@@ -1336,7 +1450,7 @@ button:active svg {
       <div class="view-header-flex">
         <div>
           <h1 class="rainbow-title-gradient">Saved Artifacts</h1>
-          <p style="color:var(--muted); margin:0;">Your collection of pinned snippets and assistant outputs.</p>
+          <p style="color:var(--gemini-gray); margin:0;">Your collection of pinned snippets and assistant outputs.</p>
         </div>
         <button class="tool-btn" id="clearArtifactsBtn" style="border:1px solid var(--border);" type="button">Clear All</button>
       </div>
@@ -1348,7 +1462,7 @@ button:active svg {
       <div class="view-header-flex">
         <div>
           <h1 class="rainbow-title-gradient">System Alerts & Notifications</h1>
-          <p style="color:var(--muted); margin:0;">Monitor system health and runtime gateway logs.</p>
+          <p style="color:var(--gemini-gray); margin:0;">Monitor system health and runtime gateway logs.</p>
         </div>
         <button class="tool-btn" id="clearAlertsBtn" style="border:1px solid var(--border);" type="button">Clear All</button>
       </div>
@@ -1363,13 +1477,16 @@ button:active svg {
       <div class="composer-bottom">
         <div class="composer-left">
           <button class="tool-btn" id="micBtn" type="button" title="Voice Input">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+            <svg class="mic-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
             <span id="micStatusText">Voice</span>
           </button>
-          <button class="tool-btn" id="clearButton" type="button">Clear</button>
+          <button class="tool-btn" id="clearButton" type="button">
+            <svg class="clear-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span>Clear</span>
+          </button>
         </div>
         <button class="send-btn" id="sendButton" type="button" aria-label="Send">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 5.5 20 12 4 18.5l2.2-5.7L15 12l-8.8-.8L4 5.5Z" fill="currentColor"/></svg>
+          <svg class="send-svg" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 5.5 20 12 4 18.5l2.2-5.7L15 12l-8.8-.8L4 5.5Z" fill="currentColor"/></svg>
         </button>
       </div>
     </div>
@@ -1385,7 +1502,9 @@ button:active svg {
   <div class="settings">
     <div class="drawer-header">
       <h2>Rainbow AI Settings</h2>
-      <button class="icon-btn" id="closeSettingsBtn" type="button">&times;</button>
+      <button class="icon-btn close-drawer-btn" id="closeSettingsBtn" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
 
     <div class="setting-item">
@@ -1409,7 +1528,9 @@ button:active svg {
   <div class="user-drawer">
     <div class="drawer-header">
       <h2>Manage Users</h2>
-      <button class="icon-btn" id="closeUserDrawerBtn" type="button">&times;</button>
+      <button class="icon-btn close-drawer-btn" id="closeUserDrawerBtn" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
 
     <button class="add-user-btn" id="addUserBtn" type="button">
@@ -1427,6 +1548,7 @@ const $ = id => document.getElementById(id);
 
 const sidebar = $("sidebar");
 const brandToggleBtn = $("brandToggleBtn");
+const sidebarCloseBtn = $("sidebarCloseBtn");
 const chatView = $("chatView");
 const novaView = $("novaView");
 const promptsView = $("promptsView");
@@ -1447,10 +1569,16 @@ $("gatewayUrlInput").onchange = (e) => {
 };
 
 /* ========================================================
-   GEMINI-STYLE RAIL TOGGLE & TABS
+   RELIABLE SIDEBAR OPEN & CLOSE TOGGLE
 ======================================================== */
-brandToggleBtn.onclick = () => {
+brandToggleBtn.onclick = (e) => {
+  e.stopPropagation();
   sidebar.classList.toggle("collapsed");
+};
+
+sidebarCloseBtn.onclick = (e) => {
+  e.stopPropagation();
+  sidebar.classList.add("collapsed");
 };
 
 function switchTab(tab) {
@@ -1499,18 +1627,27 @@ $("artifactsTabBtn").onclick = () => switchTab("artifacts");
 $("alertsTabBtn").onclick = () => switchTab("alerts");
 
 /* ========================================================
-   USERS ENGINE WITH CUSTOM PROFILE PICTURES
+   USERS ENGINE: DEFAULT GUEST & EDITABLE ACCOUNTS
 ======================================================== */
-let users = JSON.parse(localStorage.getItem("rainbow_ai_users") || "null") || [
-  { id: "default-herish", name: "Herish", email: "Personal account", avatar: "" }
-];
+const defaultGuestUser = { id: "default-guest", name: "Guest", email: "Guest account", avatar: "" };
+let users = JSON.parse(localStorage.getItem("rainbow_ai_users") || "null");
+
+if (!Array.isArray(users) || !users.length) {
+  users = [defaultGuestUser];
+  localStorage.setItem("rainbow_ai_users", JSON.stringify(users));
+}
+
 let currentUserId = localStorage.getItem("rainbow_ai_current_user") || users[0].id;
+if (!users.some(u => u.id === currentUserId)) {
+  currentUserId = users[0].id;
+}
 
 function saveUsers() {
   localStorage.setItem("rainbow_ai_users", JSON.stringify(users));
   localStorage.setItem("rainbow_ai_current_user", currentUserId);
   updateCurrentUserUI();
   renderUsersList();
+  renderHistory();
 }
 
 function getCurrentUser() {
@@ -1553,21 +1690,50 @@ function renderUsersList() {
       <div class="user-item-email">${u.email}</div>
     `;
 
-    const del = document.createElement("button");
-    del.className = "history-action-btn delete";
-    del.innerHTML = "&times;";
-    del.onclick = (e) => {
+    const actions = document.createElement("div");
+    actions.className = "user-item-actions";
+
+    // Edit user button
+    const editBtn = document.createElement("button");
+    editBtn.className = "history-action-btn";
+    editBtn.title = "Edit User";
+    editBtn.style.opacity = "1";
+    editBtn.innerHTML = `<svg class="edit-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>`;
+    editBtn.onclick = (e) => {
       e.stopPropagation();
-      if (users.length <= 1) return alert("Must keep at least one account!");
-      users = users.filter(usr => usr.id !== u.id);
-      if (currentUserId === u.id) currentUserId = users[0].id;
+      const newName = prompt("Edit account name:", u.name);
+      if (newName && newName.trim()) u.name = newName.trim();
+      const newEmail = prompt("Edit email or description:", u.email);
+      if (newEmail !== null) u.email = newEmail.trim() || "Account";
+      const newAvatar = prompt("Edit profile image URL:", u.avatar);
+      if (newAvatar !== null) u.avatar = newAvatar.trim();
       saveUsers();
     };
 
-    item.append(av, info, del);
+    // Delete user button
+    const del = document.createElement("button");
+    del.className = "history-action-btn delete";
+    del.title = "Delete User";
+    del.style.opacity = "1";
+    del.innerHTML = `<svg class="delete-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+    del.onclick = (e) => {
+      e.stopPropagation();
+      if (users.length <= 1) {
+        users = [defaultGuestUser];
+        currentUserId = defaultGuestUser.id;
+      } else {
+        users = users.filter(usr => usr.id !== u.id);
+        if (currentUserId === u.id) currentUserId = users[0].id;
+      }
+      saveUsers();
+    };
+
+    actions.append(editBtn, del);
+    item.append(av, info, actions);
     item.onclick = () => {
       currentUserId = u.id;
       saveUsers();
+      loadUserChats();
       $("userDrawer").classList.remove("show");
     };
     list.appendChild(item);
@@ -1595,6 +1761,7 @@ $("addUserBtn").onclick = () => {
   users.push(newUser);
   currentUserId = newUser.id;
   saveUsers();
+  loadUserChats();
 };
 
 /* ========================================================
@@ -1605,24 +1772,38 @@ $("topSettings").onclick = () => $("settingsDrawer").classList.add("show");
 $("closeSettingsBtn").onclick = () => $("settingsDrawer").classList.remove("show");
 
 /* ========================================================
-   CHAT SESSIONS & DELETION REPAIRED
+   CHAT SESSIONS PER USER & DELETION REPAIRED
 ======================================================== */
-let sessions = JSON.parse(localStorage.getItem("rainbow_ai_chats") || "[]");
+let allSessions = JSON.parse(localStorage.getItem("rainbow_ai_chats") || "[]");
 let currentSession = null;
 
 function saveSessions() {
-  localStorage.setItem("rainbow_ai_chats", JSON.stringify(sessions));
+  localStorage.setItem("rainbow_ai_chats", JSON.stringify(allSessions));
   renderHistory();
+}
+
+function getUserSessions() {
+  return allSessions.filter(s => s.userId === currentUserId);
+}
+
+function loadUserChats() {
+  const userChats = getUserSessions();
+  if (userChats.length) {
+    loadSession(userChats[0].id);
+  } else {
+    createSession();
+  }
 }
 
 function createSession() {
   switchTab("chat");
   currentSession = {
     id: Date.now().toString(),
+    userId: currentUserId,
     title: "New chat",
     messages: []
   };
-  sessions.unshift(currentSession);
+  allSessions.unshift(currentSession);
   saveSessions();
   messages.innerHTML = "";
   $("welcome").style.display = "flex";
@@ -1631,7 +1812,14 @@ function createSession() {
 function renderHistory() {
   const history = $("history");
   history.innerHTML = "";
-  sessions.forEach(sess => {
+  const userChats = getUserSessions();
+
+  if (!userChats.length) {
+    history.innerHTML = `<div style="padding:10px; color:var(--gemini-gray); font-size:12px;">No chats yet</div>`;
+    return;
+  }
+
+  userChats.forEach(sess => {
     const item = document.createElement("div");
     item.className = "history-item " + (currentSession?.id === sess.id ? "active" : "");
 
@@ -1642,7 +1830,7 @@ function renderHistory() {
     const editBtn = document.createElement("button");
     editBtn.className = "history-action-btn";
     editBtn.title = "Rename Chat";
-    editBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>`;
+    editBtn.innerHTML = `<svg class="edit-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>`;
     editBtn.onclick = (e) => {
       e.stopPropagation();
       const newTitle = prompt("Enter new title for conversation:", sess.title);
@@ -1655,15 +1843,15 @@ function renderHistory() {
     const delBtn = document.createElement("button");
     delBtn.className = "history-action-btn delete";
     delBtn.title = "Delete Chat";
-    delBtn.innerHTML = `&times;`;
+    delBtn.innerHTML = `<svg class="delete-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
     delBtn.onclick = (e) => {
       e.stopPropagation();
-      sessions = sessions.filter(s => s.id !== sess.id);
+      allSessions = allSessions.filter(s => s.id !== sess.id);
+      saveSessions();
       if (currentSession?.id === sess.id) {
-        if (sessions.length) loadSession(sessions[0].id);
+        const remaining = getUserSessions();
+        if (remaining.length) loadSession(remaining[0].id);
         else createSession();
-      } else {
-        saveSessions();
       }
     };
 
@@ -1675,7 +1863,7 @@ function renderHistory() {
 
 function loadSession(id) {
   switchTab("chat");
-  const s = sessions.find(item => item.id === id);
+  const s = allSessions.find(item => item.id === id);
   if (!s) return;
   currentSession = s;
   messages.innerHTML = "";
@@ -1713,8 +1901,8 @@ function addMessage(role, text, save = true) {
     const act = document.createElement("div");
     act.className = "message-actions";
     const pin = document.createElement("button");
-    pin.className = "message-action-btn";
-    pin.innerHTML = `Pin to Artifacts`;
+    pin.className = "message-action-btn pin-btn";
+    pin.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Pin Artifact`;
     pin.onclick = () => pinArtifact(currentSession?.title || "Artifact", text);
     act.appendChild(pin);
     content.appendChild(act);
@@ -1734,7 +1922,30 @@ function addMessage(role, text, save = true) {
 }
 
 /* ========================================================
-   ARTIFACTS ENGINE (FULLY FUNCTIONAL)
+   EXPORT CHAT (WITH ACTIVE USERNAME METADATA)
+======================================================== */
+$("exportChatBtn").onclick = () => {
+  if (!currentSession || !currentSession.messages.length) return alert("No messages to export!");
+  const u = getCurrentUser();
+  let markdownText = `# ${currentSession.title}\n`;
+  markdownText += `Exported on: ${new Date().toLocaleString()}\n`;
+  markdownText += `User: ${u.name} (${u.email})\n`;
+  markdownText += `----------------------------------------\n\n`;
+
+  currentSession.messages.forEach(m => {
+    const sender = m.role === "assistant" ? "Rainbow AI" : u.name;
+    markdownText += `### ${sender}\n${m.content}\n\n`;
+  });
+
+  const blob = new Blob([markdownText], { type: "text/markdown;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `${currentSession.title.replace(/[^a-z0-9]/gi, '_')}.md`;
+  a.click();
+};
+
+/* ========================================================
+   ARTIFACTS ENGINE
 ======================================================== */
 let artifacts = JSON.parse(localStorage.getItem("rainbow_ai_artifacts") || "[]");
 
@@ -1765,7 +1976,7 @@ function renderArtifacts() {
   const grid = $("artifactsGrid");
   grid.innerHTML = "";
   if (!artifacts.length) {
-    grid.innerHTML = `<div style="color:var(--muted); font-size:14px; grid-column:1/-1;">No pinned artifacts yet. Click "Pin to Artifacts" under any AI response.</div>`;
+    grid.innerHTML = `<div style="color:var(--gemini-gray); font-size:14px; grid-column:1/-1;">No pinned artifacts yet.</div>`;
     return;
   }
   artifacts.forEach(a => {
@@ -1774,10 +1985,10 @@ function renderArtifacts() {
     card.innerHTML = `
       <div>
         <div style="font-weight:700; margin-bottom:8px;">${a.title}</div>
-        <div style="font-family:'Google Sans Code', monospace; font-size:12px; max-height:100px; overflow:hidden; color:var(--muted);">${a.content.slice(0, 150)}...</div>
+        <div style="font-family:'Google Sans Code', monospace; font-size:12px; max-height:100px; overflow:hidden; color:var(--gemini-gray);">${a.content.slice(0, 150)}...</div>
       </div>
       <div style="display:flex; justify-content:space-between; margin-top:12px;">
-        <button class="tool-btn" style="border:1px solid var(--border);" onclick="navigator.clipboard.writeText(\`${a.content.replace(/`/g, "\\`")}\`)">Copy</button>
+        <button class="tool-btn copy-btn" style="border:1px solid var(--border);" onclick="navigator.clipboard.writeText(\`${a.content.replace(/`/g, "\\`")}\`)">Copy</button>
         <button class="tool-btn" style="color:#ef4444;" onclick="deleteArtifact('${a.id}')">Delete</button>
       </div>
     `;
@@ -2084,11 +2295,10 @@ function setTheme(dark) {
 setTheme(localStorage.getItem("rainbow_theme") !== "light");
 $("themeButton").onclick = () => setTheme(document.documentElement.dataset.theme !== "dark");
 
-/* Boot */
+/* Boot Initial Setup */
 updateCurrentUserUI();
 updateArtifactBadge();
-if (sessions.length) loadSession(sessions[0].id);
-else createSession();
+loadUserChats();
 </script>
 </body>
 </html>
