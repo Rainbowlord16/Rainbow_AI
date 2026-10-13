@@ -8,11 +8,11 @@
 
 <link rel="icon" href="icon-new.png">
 
-<!-- Google Fonts -->
+<!-- Google Sans (Gemini Font) System -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link
-  href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,400..700&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,300..900&family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Google+Sans+Code:ital,wght@0,400;0,600;1,400&family=Google+Sans+Text:ital,wght@0,400;0,500;0,700;1,400&display=swap"
   rel="stylesheet"
 >
 
@@ -32,10 +32,8 @@
   --muted: #8e95a5;
   --border: rgba(255, 255, 255, 0.08);
 
-  /* Full Balanced Spectral Rainbow Gradients */
   --rainbow-gradient: linear-gradient(135deg, #ef4444, #f97316, #eab308, #10b981, #06b6d4, #3b82f6, #8b5cf6, #ec4899);
   --rainbow-text: linear-gradient(90deg, #ef4444, #f97316, #eab308, #10b981, #06b6d4, #3b82f6, #8b5cf6, #ec4899);
-  --rainbow-border: linear-gradient(90deg, #ef4444, #eab308, #10b981, #3b82f6, #ec4899);
 
   --accent: #3b82f6;
   --green: #22c55e;
@@ -57,11 +55,23 @@ html, body {
   width: 100%;
   height: 100%;
   margin: 0;
-  font-family: "Google Sans Flex", "Google Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Google Sans Flex", "Google Sans", "Google Sans Text", sans-serif;
+  font-weight: 400;
   background: var(--bg);
   color: var(--text);
   overflow: hidden;
   position: relative;
+}
+
+/* Strict Gemini Font Rules Across Code, Chat & Languages */
+code, pre, kbd, samp {
+  font-family: "Google Sans Code", "Google Sans Flex", monospace !important;
+  font-weight: 400;
+}
+
+strong, b, h1, h2, h3, h4, .brand-text, .section-title, .status {
+  font-family: "Google Sans Flex", "Google Sans", sans-serif;
+  font-weight: 700 !important;
 }
 
 #neural-canvas {
@@ -94,7 +104,7 @@ html, body {
 
 svg {
   display: block;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease, filter 0.25s ease;
 }
 
 button {
@@ -108,15 +118,73 @@ button {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: rainbowTitleFlow 6s linear infinite;
+  animation: rainbowFlow 6s linear infinite;
 }
 
-@keyframes rainbowTitleFlow {
+@keyframes rainbowFlow {
   to { background-position: 200% center; }
 }
 
+/* Interactive SVG Hover Bounce Animations */
+button:hover svg:not(.no-anim),
+.nav-tab-btn:hover svg:not(.no-anim),
+.tool-btn:hover svg:not(.no-anim),
+.history-action-btn:hover svg:not(.no-anim) {
+  transform: scale(1.18) rotate(4deg);
+}
+
+button:active svg {
+  transform: scale(0.92) rotate(-2deg);
+}
+
+/* Morphing Vectors Container */
+.morph-icon-box {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.morph-icon-box svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.28s ease;
+}
+
+/* Theme Morphing Animation */
+.theme-sun { opacity: 1; transform: scale(1) rotate(0deg); }
+.theme-moon { opacity: 0; transform: scale(0.35) rotate(-45deg); }
+#themeButton:hover .theme-sun { opacity: 0; transform: scale(0.3) rotate(90deg); }
+#themeButton:hover .theme-moon { opacity: 1; transform: scale(1.15) rotate(0deg); }
+
+/* New Chat Morphing Animation */
+.newchat-plus { opacity: 1; transform: scale(1) rotate(0deg); }
+.newchat-pencil { opacity: 0; transform: scale(0.35) translate(-4px, 4px) rotate(-20deg); }
+#newChat:hover .newchat-plus { opacity: 0; transform: scale(0.3) rotate(90deg); }
+#newChat:hover .newchat-pencil { opacity: 1; transform: scale(1.15) translate(0, 0) rotate(0deg); }
+
+/* Tab SVGs Animated Reactions */
+.nav-tab-btn:hover .tab-svg-book { transform: translateY(-2px) scale(1.15); }
+.nav-tab-btn:hover .tab-svg-archive { transform: translateY(-2px) scale(1.15); }
+.nav-tab-btn:hover .tab-svg-sparkle { transform: scale(1.22) rotate(14deg); filter: drop-shadow(0 0 6px #8b5cf6); }
+.nav-tab-btn:hover .tab-svg-bell { transform-origin: top center; animation: cuteBell 0.6s ease-in-out; }
+
+@keyframes cuteBell {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(14deg); }
+  50% { transform: rotate(-12deg); }
+  75% { transform: rotate(6deg); }
+  100% { transform: rotate(0deg); }
+}
+
 /* ========================================================
-   GEMINI-STYLE RAIL & SIDEBAR (SMOOTH HOVER MORPH)
+   APP CONTAINER & COLLAPSIBLE SIDEBAR RAIL
 ======================================================== */
 .app {
   width: 100%;
@@ -145,7 +213,6 @@ button {
   padding: 16px 10px;
 }
 
-/* Brand container: Logo morphs to Sidebar Icon on Hover when collapsed */
 .brand-container {
   display: flex;
   align-items: center;
@@ -193,7 +260,6 @@ button {
 
 .brand-text {
   font-size: 19px;
-  font-weight: 700;
   letter-spacing: -0.02em;
   white-space: nowrap;
   transition: opacity 0.2s ease;
@@ -204,7 +270,6 @@ button {
   pointer-events: none;
 }
 
-/* Nav Tab Buttons (Accessible directly in rail or full sidebar) */
 .nav-tab-btn {
   height: 44px;
   border: 0;
@@ -217,7 +282,7 @@ button {
   gap: 12px;
   padding: 0 14px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   transition: background 0.18s, color 0.18s, transform 0.18s;
   margin-bottom: 4px;
   width: 100%;
@@ -263,7 +328,9 @@ button {
   font-weight: 700;
   padding: 2px 7px;
   border-radius: 999px;
+  display: none;
 }
+.sidebar-badge.active { display: inline-block; }
 
 .search {
   width: 100%;
@@ -324,6 +391,9 @@ button {
   padding: 4px;
   border-radius: 6px;
   opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .history-item:hover .history-action-btn { opacity: 1; }
 .history-action-btn:hover { color: var(--text); background: var(--panel3); }
@@ -356,10 +426,17 @@ button {
   font-size: 12px;
   font-weight: 700;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.current-user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .current-user-info { min-width: 0; flex: 1; text-align: left; }
-.current-user-name { font-size: 13px; font-weight: 600; }
+.current-user-name { font-size: 13px; font-weight: 700; }
 .current-user-email { font-size: 11px; color: var(--muted); }
 
 .sidebar-bottom {
@@ -387,7 +464,7 @@ button {
 .sidebar.collapsed .sidebar-bottom button span { display: none; }
 
 /* ========================================================
-   MAIN VIEWPORT & TOPBAR (NO HAMBURGER BUTTON)
+   MAIN VIEWPORT & TOPBAR
 ======================================================== */
 .main {
   min-width: 0;
@@ -421,7 +498,7 @@ button {
   padding: 0 14px;
   outline: none;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
 }
 
@@ -489,7 +566,6 @@ button {
   font-size: clamp(34px, 5.2vw, 50px);
   margin: 0 0 10px 0;
   letter-spacing: -0.04em;
-  font-weight: 600;
 }
 
 .welcome p { color: var(--muted); font-size: 15px; margin: 0; }
@@ -507,7 +583,6 @@ button {
 
 .message.user { justify-content: flex-end; }
 
-/* Favicon-powered AI chat avatar */
 .avatar {
   width: 34px;
   height: 34px;
@@ -547,6 +622,29 @@ button {
 }
 
 .ai .message-content { padding: 4px 0; }
+
+.message-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.message-action-btn {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.message-action-btn:hover {
+  color: var(--text);
+  background: var(--panel3);
+}
 
 .composer-area {
   position: fixed;
@@ -632,7 +730,7 @@ button {
 }
 .send-btn:hover { transform: scale(1.06); }
 
-/* Inspiration pills placed directly below the chat composer */
+/* Inspiration pills below Composer */
 .suggested-pills-bar {
   width: min(900px, 100%);
   margin: 10px auto 0;
@@ -709,7 +807,6 @@ button {
   transition: border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
-/* Nova Face Dynamic Visual States */
 .nova-stage-card[data-state="idle"] .nova-face-circle {
   border-color: #f43f5e;
   box-shadow: 0 0 35px rgba(244, 63, 94, 0.35);
@@ -782,7 +879,6 @@ button {
 
 .nova-state-label {
   font-size: 13px;
-  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #f43f5e;
@@ -869,7 +965,7 @@ button {
   padding: 8px 20px;
   border-radius: 999px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -877,7 +973,7 @@ button {
 }
 
 /* ========================================================
-   AUXILIARY VIEWS: PROMPTS, ARTIFACTS, ALERTS
+   AUXILIARY VIEWS: FULL 50 PROMPTS, ARTIFACTS, ALERTS
 ======================================================== */
 .prompts-view, .artifacts-view, .alerts-view {
   width: min(960px, 100%);
@@ -885,10 +981,17 @@ button {
   padding: 40px 24px 120px;
 }
 
+.view-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
 .fifty-prompts-grid, .artifacts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
+  gap: 14px;
   margin-top: 20px;
 }
 
@@ -898,11 +1001,25 @@ button {
   padding: 16px;
   border-radius: 16px;
   cursor: pointer;
-  transition: transform 0.2s, background 0.2s;
+  transition: transform 0.2s, background 0.2s, border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 .dynamic-prompt-card:hover, .artifact-card:hover {
   background: var(--panel2);
   transform: translateY(-2px);
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+.prompt-badge {
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--panel2);
+  padding: 2px 8px;
+  border-radius: 6px;
+  width: fit-content;
+  margin-top: 10px;
 }
 
 .alerts-feed {
@@ -923,11 +1040,11 @@ button {
 .alert-card.info { border-left: 4px solid var(--accent); }
 .alert-card.error { border-left: 4px solid #ef4444; }
 
-/* Drawers */
+/* Modals & Drawers */
 .drawer {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
   display: none;
   justify-content: flex-end;
@@ -936,13 +1053,85 @@ button {
 .drawer.show { display: flex; }
 
 .settings, .user-drawer {
-  width: min(380px, 94vw);
+  width: min(390px, 94vw);
   height: 100%;
   background: var(--panel);
   border-left: 1px solid var(--border);
   padding: 24px;
   overflow-y: auto;
 }
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.setting-item {
+  margin-bottom: 20px;
+}
+.setting-item label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.setting-input {
+  width: 100%;
+  height: 40px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  padding: 0 12px;
+  outline: none;
+}
+
+.add-user-btn {
+  width: 100%;
+  height: 44px;
+  background: var(--rainbow-gradient);
+  border: 0;
+  border-radius: 999px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.user-item {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+.user-item.active { border-color: var(--accent); }
+
+.user-item-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--panel3);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  font-weight: 700;
+}
+.user-item-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.user-item-info { flex: 1; min-width: 0; }
+.user-item-name { font-size: 13px; font-weight: 700; }
+.user-item-email { font-size: 11px; color: var(--muted); }
 </style>
 </head>
 
@@ -958,7 +1147,6 @@ button {
   <div class="brand-container" id="brandToggleBtn" title="Toggle Sidebar">
     <div class="brand-icon-box">
       <img src="icon-new.png" alt="Rainbow AI">
-      <!-- Gemini-Style Sidebar SVG displayed when hovering collapsed rail icon -->
       <svg class="rail-toggle-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
         <line x1="9" y1="3" x2="9" y2="21"/>
@@ -968,10 +1156,15 @@ button {
   </div>
 
   <button class="nav-tab-btn" id="newChat" type="button" title="New Chat">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="12" y1="5" x2="12" y2="19"/>
-      <line x1="5" y1="12" x2="19" y2="12"/>
-    </svg>
+    <div class="morph-icon-box">
+      <svg class="newchat-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      <svg class="newchat-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 3l4 4L7 18H3v-4L14 3z"/>
+        <path d="M13 21h8"/>
+      </svg>
+    </div>
     <span>New chat</span>
   </button>
 
@@ -983,7 +1176,7 @@ button {
   </button>
 
   <button class="nav-tab-btn" id="promptsTabBtn" type="button" title="Prompts Library">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <svg class="tab-svg-book" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
       <path d="M8 7h8M8 11h6"/>
     </svg>
@@ -991,23 +1184,22 @@ button {
   </button>
 
   <button class="nav-tab-btn" id="artifactsTabBtn" type="button" title="Artifacts">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <svg class="tab-svg-archive" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <path d="M19 11H5m14 0a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2m14 0V9a2 2 0 0 0-2-2M5 11V9a2 2 0 0 1 2-2m0 0V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2M7 7h10"/>
     </svg>
     <span>Artifacts</span>
+    <span class="sidebar-badge" id="artifactsCountBadge">0</span>
   </button>
 
   <button class="nav-tab-btn" id="novaTabBtn" type="button" title="Nova Voice Companion">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="9"/>
-      <path d="M8 12h.01M16 12h.01"/>
-      <path d="M10 16c1 .5 3 .5 4 0"/>
+    <svg class="tab-svg-sparkle" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2l2.4 7.2h7.6l-6.2 4.8 2.4 7.2-6.2-4.8-6.2 4.8 2.4-7.2-6.2-4.8h7.6z"/>
     </svg>
     <span>Nova</span>
   </button>
 
   <button class="nav-tab-btn" id="alertsTabBtn" type="button" title="Alerts & Status">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <svg class="tab-svg-bell" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
       <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
     </svg>
@@ -1019,9 +1211,11 @@ button {
   <div class="section-title">Recent</div>
   <div class="history" id="history"></div>
 
-  <!-- Users -->
+  <!-- Users Drawer Trigger -->
   <button class="users-tab" id="usersButton" type="button">
-    <div class="current-user-avatar" id="currentUserAvatar">H</div>
+    <div class="current-user-avatar" id="currentUserAvatar">
+      <span id="currentUserInitials">H</span>
+    </div>
     <div class="current-user-info">
       <div class="current-user-name" id="currentUserName">Herish</div>
       <div class="current-user-email" id="currentUserEmail">Personal account</div>
@@ -1029,8 +1223,25 @@ button {
   </button>
 
   <div class="sidebar-bottom">
-    <button id="themeButton" type="button">Theme</button>
-    <button id="settingsButton" type="button">Settings</button>
+    <button id="themeButton" type="button">
+      <div class="morph-icon-box">
+        <svg class="theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        </svg>
+        <svg class="theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </div>
+      <span>Theme</span>
+    </button>
+    <button id="settingsButton" type="button">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      <span>Settings</span>
+    </button>
   </div>
 </aside>
 
@@ -1048,7 +1259,7 @@ button {
       <button class="icon-btn" id="topSettings" type="button" aria-label="Settings">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
           <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
         </svg>
       </button>
     </div>
@@ -1108,23 +1319,39 @@ button {
       </div>
     </section>
 
-    <!-- PROMPTS LIBRARY VIEW -->
+    <!-- PROMPTS LIBRARY VIEW (FULL 50 PROMPTS) -->
     <section class="prompts-view" id="promptsView" style="display: none;">
-      <h1 class="rainbow-title-gradient">Rainbow Prompts Library</h1>
-      <p style="color:var(--muted); margin:0;">50 hand-crafted inspiration prompts to supercharge your workflow.</p>
+      <div class="view-header-flex">
+        <div>
+          <h1 class="rainbow-title-gradient">Rainbow Prompts Library</h1>
+          <p style="color:var(--muted); margin:0;">50 hand-crafted inspiration prompts ready for use.</p>
+        </div>
+        <button class="tool-btn" id="shufflePromptsBtn" style="border:1px solid var(--border);" type="button">Shuffle</button>
+      </div>
       <div class="fifty-prompts-grid" id="fiftyPromptsGrid"></div>
     </section>
 
     <!-- ARTIFACTS VIEW -->
     <section class="artifacts-view" id="artifactsView" style="display: none;">
-      <h1 class="rainbow-title-gradient">Saved Artifacts</h1>
-      <p style="color:var(--muted); margin:0;">Your collection of pinned snippets and assistant outputs.</p>
+      <div class="view-header-flex">
+        <div>
+          <h1 class="rainbow-title-gradient">Saved Artifacts</h1>
+          <p style="color:var(--muted); margin:0;">Your collection of pinned snippets and assistant outputs.</p>
+        </div>
+        <button class="tool-btn" id="clearArtifactsBtn" style="border:1px solid var(--border);" type="button">Clear All</button>
+      </div>
       <div class="artifacts-grid" id="artifactsGrid"></div>
     </section>
 
     <!-- ALERTS VIEW -->
     <section class="alerts-view" id="alertsView" style="display: none;">
-      <h1 class="rainbow-title-gradient">System Alerts & Notifications</h1>
+      <div class="view-header-flex">
+        <div>
+          <h1 class="rainbow-title-gradient">System Alerts & Notifications</h1>
+          <p style="color:var(--muted); margin:0;">Monitor system health and runtime gateway logs.</p>
+        </div>
+        <button class="tool-btn" id="clearAlertsBtn" style="border:1px solid var(--border);" type="button">Clear All</button>
+      </div>
       <div class="alerts-feed" id="alertsFeed"></div>
     </section>
   </div>
@@ -1153,6 +1380,47 @@ button {
 </main>
 </div>
 
+<!-- ================= SETTINGS DRAWER ================= -->
+<div class="drawer" id="settingsDrawer">
+  <div class="settings">
+    <div class="drawer-header">
+      <h2>Rainbow AI Settings</h2>
+      <button class="icon-btn" id="closeSettingsBtn" type="button">&times;</button>
+    </div>
+
+    <div class="setting-item">
+      <label>AI Persona</label>
+      <select class="setting-input" id="personaSelect">
+        <option value="balanced">Balanced Assistant</option>
+        <option value="coder">Expert Coder</option>
+        <option value="creative">Creative Assistant</option>
+      </select>
+    </div>
+
+    <div class="setting-item">
+      <label>Base URL Gateway</label>
+      <input type="text" class="setting-input" id="gatewayUrlInput">
+    </div>
+  </div>
+</div>
+
+<!-- ================= USERS DRAWER ================= -->
+<div class="drawer" id="userDrawer">
+  <div class="user-drawer">
+    <div class="drawer-header">
+      <h2>Manage Users</h2>
+      <button class="icon-btn" id="closeUserDrawerBtn" type="button">&times;</button>
+    </div>
+
+    <button class="add-user-btn" id="addUserBtn" type="button">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+      <span>Add New User</span>
+    </button>
+
+    <div class="users-list" id="usersList"></div>
+  </div>
+</div>
+
 <!-- ================= JAVASCRIPT ================= -->
 <script>
 const $ = id => document.getElementById(id);
@@ -1170,12 +1438,16 @@ const input = $("input");
 const sendButton = $("sendButton");
 
 let generating = false;
+let baseUrl = localStorage.getItem("rainbow_gateway_url") || "https://agrees-offers-flashing-rocky.trycloudflare.com";
+$("gatewayUrlInput").value = baseUrl;
 
-// Cloudflare Tunnel Gateway URL
-const baseUrl = "https://agrees-offers-flashing-rocky.trycloudflare.com";
+$("gatewayUrlInput").onchange = (e) => {
+  baseUrl = e.target.value.trim();
+  localStorage.setItem("rainbow_gateway_url", baseUrl);
+};
 
 /* ========================================================
-   GEMINI-STYLE SIDEBAR RAIL TOGGLE
+   GEMINI-STYLE RAIL TOGGLE & TABS
 ======================================================== */
 brandToggleBtn.onclick = () => {
   sidebar.classList.toggle("collapsed");
@@ -1227,7 +1499,113 @@ $("artifactsTabBtn").onclick = () => switchTab("artifacts");
 $("alertsTabBtn").onclick = () => switchTab("alerts");
 
 /* ========================================================
-   CHAT SESSIONS & EDITABLE CHAT TITLES
+   USERS ENGINE WITH CUSTOM PROFILE PICTURES
+======================================================== */
+let users = JSON.parse(localStorage.getItem("rainbow_ai_users") || "null") || [
+  { id: "default-herish", name: "Herish", email: "Personal account", avatar: "" }
+];
+let currentUserId = localStorage.getItem("rainbow_ai_current_user") || users[0].id;
+
+function saveUsers() {
+  localStorage.setItem("rainbow_ai_users", JSON.stringify(users));
+  localStorage.setItem("rainbow_ai_current_user", currentUserId);
+  updateCurrentUserUI();
+  renderUsersList();
+}
+
+function getCurrentUser() {
+  return users.find(u => u.id === currentUserId) || users[0];
+}
+
+function updateCurrentUserUI() {
+  const u = getCurrentUser();
+  $("currentUserName").textContent = u.name;
+  $("currentUserEmail").textContent = u.email;
+  $("welcomeUserName").textContent = u.name;
+
+  const av = $("currentUserAvatar");
+  if (u.avatar) {
+    av.innerHTML = `<img src="${u.avatar}" alt="${u.name}">`;
+  } else {
+    av.innerHTML = `<span>${u.name.slice(0, 1).toUpperCase()}</span>`;
+  }
+}
+
+function renderUsersList() {
+  const list = $("usersList");
+  list.innerHTML = "";
+  users.forEach(u => {
+    const item = document.createElement("div");
+    item.className = "user-item " + (u.id === currentUserId ? "active" : "");
+
+    const av = document.createElement("div");
+    av.className = "user-item-avatar";
+    if (u.avatar) {
+      av.innerHTML = `<img src="${u.avatar}" alt="${u.name}">`;
+    } else {
+      av.textContent = u.name.slice(0, 1).toUpperCase();
+    }
+
+    const info = document.createElement("div");
+    info.className = "user-item-info";
+    info.innerHTML = `
+      <div class="user-item-name">${u.name}</div>
+      <div class="user-item-email">${u.email}</div>
+    `;
+
+    const del = document.createElement("button");
+    del.className = "history-action-btn delete";
+    del.innerHTML = "&times;";
+    del.onclick = (e) => {
+      e.stopPropagation();
+      if (users.length <= 1) return alert("Must keep at least one account!");
+      users = users.filter(usr => usr.id !== u.id);
+      if (currentUserId === u.id) currentUserId = users[0].id;
+      saveUsers();
+    };
+
+    item.append(av, info, del);
+    item.onclick = () => {
+      currentUserId = u.id;
+      saveUsers();
+      $("userDrawer").classList.remove("show");
+    };
+    list.appendChild(item);
+  });
+}
+
+$("usersButton").onclick = () => {
+  renderUsersList();
+  $("userDrawer").classList.add("show");
+};
+$("closeUserDrawerBtn").onclick = () => $("userDrawer").classList.remove("show");
+
+$("addUserBtn").onclick = () => {
+  const name = prompt("Enter account name:");
+  if (!name || !name.trim()) return;
+  const email = prompt("Enter email or description (optional):") || "Personal account";
+  const avatar = prompt("Enter Profile Picture URL (optional image link):") || "";
+
+  const newUser = {
+    id: "user-" + Date.now(),
+    name: name.trim(),
+    email: email.trim(),
+    avatar: avatar.trim()
+  };
+  users.push(newUser);
+  currentUserId = newUser.id;
+  saveUsers();
+};
+
+/* ========================================================
+   SETTINGS DRAWER
+======================================================== */
+$("settingsButton").onclick = () => $("settingsDrawer").classList.add("show");
+$("topSettings").onclick = () => $("settingsDrawer").classList.add("show");
+$("closeSettingsBtn").onclick = () => $("settingsDrawer").classList.remove("show");
+
+/* ========================================================
+   CHAT SESSIONS & DELETION REPAIRED
 ======================================================== */
 let sessions = JSON.parse(localStorage.getItem("rainbow_ai_chats") || "[]");
 let currentSession = null;
@@ -1261,7 +1639,6 @@ function renderHistory() {
     titleSpan.className = "history-title";
     titleSpan.textContent = sess.title;
 
-    // Edit chat title pencil button
     const editBtn = document.createElement("button");
     editBtn.className = "history-action-btn";
     editBtn.title = "Rename Chat";
@@ -1275,7 +1652,6 @@ function renderHistory() {
       }
     };
 
-    // Delete button
     const delBtn = document.createElement("button");
     delBtn.className = "history-action-btn delete";
     delBtn.title = "Delete Chat";
@@ -1283,8 +1659,12 @@ function renderHistory() {
     delBtn.onclick = (e) => {
       e.stopPropagation();
       sessions = sessions.filter(s => s.id !== sess.id);
-      if (currentSession?.id === sess.id) createSession();
-      saveSessions();
+      if (currentSession?.id === sess.id) {
+        if (sessions.length) loadSession(sessions[0].id);
+        else createSession();
+      } else {
+        saveSessions();
+      }
     };
 
     item.append(titleSpan, editBtn, delBtn);
@@ -1304,9 +1684,6 @@ function loadSession(id) {
   renderHistory();
 }
 
-/* ========================================================
-   FAVICON-POWERED AI CHAT BUBBLES
-======================================================== */
 function addMessage(role, text, save = true) {
   $("welcome").style.display = "none";
   const msg = document.createElement("div");
@@ -1321,7 +1698,9 @@ function addMessage(role, text, save = true) {
     img.alt = "Rainbow AI";
     avatar.appendChild(img);
   } else {
-    avatar.textContent = "H";
+    const u = getCurrentUser();
+    if (u.avatar) avatar.innerHTML = `<img src="${u.avatar}">`;
+    else avatar.textContent = u.name.slice(0, 1).toUpperCase();
   }
 
   const content = document.createElement("div");
@@ -1329,6 +1708,18 @@ function addMessage(role, text, save = true) {
   content.innerHTML = role === "ai" && window.marked ? marked.parse(text) : text;
 
   msg.append(avatar, content);
+
+  if (role === "ai") {
+    const act = document.createElement("div");
+    act.className = "message-actions";
+    const pin = document.createElement("button");
+    pin.className = "message-action-btn";
+    pin.innerHTML = `Pin to Artifacts`;
+    pin.onclick = () => pinArtifact(currentSession?.title || "Artifact", text);
+    act.appendChild(pin);
+    content.appendChild(act);
+  }
+
   messages.appendChild(msg);
   $("viewContainer").scrollTop = $("viewContainer").scrollHeight;
 
@@ -1343,18 +1734,154 @@ function addMessage(role, text, save = true) {
 }
 
 /* ========================================================
-   SUGGESTED PROMPT PILLS BELOW CHAT
+   ARTIFACTS ENGINE (FULLY FUNCTIONAL)
 ======================================================== */
-const samplePrompts = [
-  "Build a modern responsive website for an AI assistant",
-  "Explain neural networks simply with examples",
-  "Write clean Python debounce logic",
-  "Give me 5 creative AI game concepts",
-  "Debug this SQL query performance issue"
+let artifacts = JSON.parse(localStorage.getItem("rainbow_ai_artifacts") || "[]");
+
+function pinArtifact(title, content) {
+  const item = {
+    id: Date.now().toString(),
+    title: title || "Snippet",
+    content: content,
+    time: new Date().toLocaleDateString()
+  };
+  artifacts.unshift(item);
+  localStorage.setItem("rainbow_ai_artifacts", JSON.stringify(artifacts));
+  updateArtifactBadge();
+  alert("Pinned to Artifacts!");
+}
+
+function updateArtifactBadge() {
+  const b = $("artifactsCountBadge");
+  if (artifacts.length) {
+    b.textContent = artifacts.length;
+    b.classList.add("active");
+  } else {
+    b.classList.remove("active");
+  }
+}
+
+function renderArtifacts() {
+  const grid = $("artifactsGrid");
+  grid.innerHTML = "";
+  if (!artifacts.length) {
+    grid.innerHTML = `<div style="color:var(--muted); font-size:14px; grid-column:1/-1;">No pinned artifacts yet. Click "Pin to Artifacts" under any AI response.</div>`;
+    return;
+  }
+  artifacts.forEach(a => {
+    const card = document.createElement("div");
+    card.className = "artifact-card";
+    card.innerHTML = `
+      <div>
+        <div style="font-weight:700; margin-bottom:8px;">${a.title}</div>
+        <div style="font-family:'Google Sans Code', monospace; font-size:12px; max-height:100px; overflow:hidden; color:var(--muted);">${a.content.slice(0, 150)}...</div>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-top:12px;">
+        <button class="tool-btn" style="border:1px solid var(--border);" onclick="navigator.clipboard.writeText(\`${a.content.replace(/`/g, "\\`")}\`)">Copy</button>
+        <button class="tool-btn" style="color:#ef4444;" onclick="deleteArtifact('${a.id}')">Delete</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+window.deleteArtifact = (id) => {
+  artifacts = artifacts.filter(a => a.id !== id);
+  localStorage.setItem("rainbow_ai_artifacts", JSON.stringify(artifacts));
+  renderArtifacts();
+  updateArtifactBadge();
+};
+
+$("clearArtifactsBtn").onclick = () => {
+  artifacts = [];
+  localStorage.setItem("rainbow_ai_artifacts", JSON.stringify(artifacts));
+  renderArtifacts();
+  updateArtifactBadge();
+};
+
+/* ========================================================
+   FULL 50 PROMPTS MASTER LIST
+======================================================== */
+const full50Prompts = [
+  "Refactor this React component to use custom hooks for state isolation.",
+  "Write a robust custom debounce hook in TypeScript with strict typing.",
+  "Debug this CSS Grid layout issue where items overflow on mobile screens.",
+  "Create a sleek glassmorphism card component using pure CSS variables.",
+  "Explain how Event Bubbling and Capturing work with interactive code examples.",
+  "Write a Python script to scrape daily release schedules and output clean JSON.",
+  "Optimize this SQL query causing heavy latency on high-volume user dashboards.",
+  "Build a lightweight reactive state store using JavaScript Proxies.",
+  "Write unit tests using Jest and testing-library for an accessible modal dialog.",
+  "Implement dark mode toggle persistence using localStorage and CSS custom properties.",
+  "Write a regex pattern to validate complex passwords with specific entropy rules.",
+  "Create an infinite scroll hook using the browser Intersection Observer API.",
+  "Set up a secure JWT authentication middleware in Node.js and Express.",
+  "Write a Web Audio API snippet that plays subtle, harmonic notification bells.",
+  "Build a draggable kanban board column using native HTML Drag and Drop API.",
+  "Draft a dynamic battle shonen manga panel layout focusing on high-speed action lines.",
+  "How do I sketch expressive shojo manga eyes with dramatic lighting highlights?",
+  "Design a cyberpunk mecha character sheet concept with modular attachments.",
+  "Step-by-step tutorial for inking clean vector line art digitally.",
+  "Techniques for creating soft, atmospheric screentone gradients in webtoons.",
+  "Draw a dramatic low-angle perspective shot of a figure standing atop a rooftop.",
+  "Sketch a cute slice-of-life chibi character holding a steaming bowl of noodles.",
+  "How do I shade intricate hair using dramatic two-tone cel-shading?",
+  "Design a mystical beast companion with glowing runic markings for a fantasy story.",
+  "Create a storyboard thumbnail sequence for an unexpected plot-twist reveal.",
+  "Practice drawing foreshortened hands gripping a complex mechanical handle.",
+  "Techniques to use gritty cross-hatching to create a noir manga aesthetic.",
+  "Design an ornate emblem crest for an ancient adventuring guild.",
+  "Sketch a melancholic rainy-day city street with accurate puddle reflections.",
+  "Explore page pacing techniques for an intense suspense climax chapter.",
+  "What is the exact biomechanics technique for generating lethal power in a jump smash?",
+  "Drills to improve explosive footwork speed around the four corners of the badminton court.",
+  "How to disguise a deception slice drop shot effectively from the rear court.",
+  "Tactics for maintaining court coverage during a grueling 3-set singles match.",
+  "What is the optimal racket string tension for maximizing control versus raw power?",
+  "How to execute a fast, aggressive flat drive in doubles badminton play.",
+  "Explain the rotational coverage strategies in mixed doubles court positioning.",
+  "Pre-match dynamic warm-up routine specifically calibrated for racket sports.",
+  "How to read your opponent's racket angle early to intercept cross-court shots.",
+  "Recovery drills to transition instantly from a net kill back to base stance.",
+  "Summarize breakthroughs in WebAssembly and browser performance execution.",
+  "Core principles of building offline-first Progressive Web Apps (PWAs).",
+  "Explore modern CSS features: Subgrid, Anchor Positioning, and View Transitions.",
+  "How to optimize core web vitals for heavy Single Page Applications.",
+  "Write a compelling technical blog post outline about autonomous AI coding agents.",
+  "Innovative UI/UX micro-interactions that elevate user delight without clutter.",
+  "How browser rendering pipelines handle composite layers during CSS transforms.",
+  "Analyze the trade-offs of Server-Side Rendering (SSR) vs. Client-Side Rendering.",
+  "Design an interactive 404 easter egg canvas mini-game.",
+  "Best practices for accessible keyboard navigation and focus rings in web apps."
 ];
 
+function renderFiftyPrompts() {
+  const grid = $("fiftyPromptsGrid");
+  grid.innerHTML = "";
+  full50Prompts.forEach((p, idx) => {
+    const card = document.createElement("div");
+    card.className = "dynamic-prompt-card";
+    card.innerHTML = `
+      <div style="font-size:14px; line-height:1.5;">"${p}"</div>
+      <div class="prompt-badge">Prompt #${idx + 1}</div>
+    `;
+    card.onclick = () => {
+      switchTab("chat");
+      input.value = p;
+      input.focus();
+    };
+    grid.appendChild(card);
+  });
+}
+
+$("shufflePromptsBtn").onclick = () => {
+  full50Prompts.sort(() => 0.5 - Math.random());
+  renderFiftyPrompts();
+};
+
+/* Suggested Pills below composer */
 const pillsBar = $("suggestedPillsBar");
-samplePrompts.forEach(p => {
+full50Prompts.slice(0, 5).forEach(p => {
   const pill = document.createElement("button");
   pill.className = "prompt-pill";
   pill.textContent = p;
@@ -1366,11 +1893,10 @@ samplePrompts.forEach(p => {
 });
 
 /* ========================================================
-   DUAL VOICE INPUT (WEB SPEECH API)
+   DUAL VOICE SPEECH RECOGNITION (WEB SPEECH API)
 ======================================================== */
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-// 1. Rainbow Main Chat Voice Recognition
 if (SpeechRecognition) {
   const mainRec = new SpeechRecognition();
   mainRec.continuous = false;
@@ -1399,7 +1925,7 @@ if (SpeechRecognition) {
 }
 
 /* ========================================================
-   NOVA INTERACTIVE AVATAR & VOICE CONVERSATION
+   NOVA TAB INTERACTIVE AVATAR
 ======================================================== */
 const novaStage = $("novaStageCard");
 const novaStateLabel = $("novaStateLabel");
@@ -1495,7 +2021,7 @@ async function sendNovaMessage() {
 $("novaSendBtn").onclick = sendNovaMessage;
 
 /* ========================================================
-   MAIN CHAT SEND & GATEWAY INFERENCE
+   MAIN CHAT SEND
 ======================================================== */
 async function sendMessage() {
   const text = input.value.trim();
@@ -1549,52 +2075,6 @@ $("newChat").onclick = createSession;
 $("clearButton").onclick = () => { input.value = ""; };
 
 /* ========================================================
-   PROMPTS, ARTIFACTS & ALERTS RENDERING
-======================================================== */
-const masterPrompts = [
-  "Refactor this React component to use custom hooks",
-  "Write a robust custom debounce hook in TypeScript",
-  "Create a sleek card component using CSS Grid",
-  "Explain Event Bubbling and Capturing with code",
-  "Optimize this SQL query causing heavy dashboard latency",
-  "Build a lightweight state store using JavaScript Proxies",
-  "Write unit tests using Jest for a modal component"
-];
-
-function renderFiftyPrompts() {
-  const grid = $("fiftyPromptsGrid");
-  grid.innerHTML = "";
-  masterPrompts.forEach(p => {
-    const card = document.createElement("div");
-    card.className = "dynamic-prompt-card";
-    card.textContent = `"${p}"`;
-    card.onclick = () => {
-      switchTab("chat");
-      input.value = p;
-      input.focus();
-    };
-    grid.appendChild(card);
-  });
-}
-
-function renderArtifacts() {
-  const grid = $("artifactsGrid");
-  grid.innerHTML = `<div style="color:var(--muted); font-size:14px; grid-column:1/-1;">No pinned artifacts yet.</div>`;
-}
-
-function renderAlerts() {
-  const feed = $("alertsFeed");
-  feed.innerHTML = `
-    <div class="alert-card info">
-      <div>
-        <div style="font-weight:600; font-size:14px;">Gateway Connected</div>
-        <div style="font-size:12px; color:var(--muted);">Cloudflare Tunnel is active on ${baseUrl}</div>
-      </div>
-    </div>
-  `;
-}
-
-/* ========================================================
    THEME SWITCHER
 ======================================================== */
 function setTheme(dark) {
@@ -1604,6 +2084,9 @@ function setTheme(dark) {
 setTheme(localStorage.getItem("rainbow_theme") !== "light");
 $("themeButton").onclick = () => setTheme(document.documentElement.dataset.theme !== "dark");
 
+/* Boot */
+updateCurrentUserUI();
+updateArtifactBadge();
 if (sessions.length) loadSession(sessions[0].id);
 else createSession();
 </script>
