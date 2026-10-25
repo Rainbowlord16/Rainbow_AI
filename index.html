@@ -4050,6 +4050,9 @@
                 <option value="violet">Cosmic Violet</option>
               </select>
             </div>
+            <div class="form-group"><label for="chatBubbleShapeSelect" class="form-label">Chat Bubble Shape</label><select id="chatBubbleShapeSelect" class="form-select"><option value="8px">Compact corners</option><option value="16px" selected>Rounded</option><option value="26px">Extra rounded</option><option value="4px 18px 18px 18px">Chat-tail style</option></select></div>
+            <div class="form-group"><label for="userBubbleColorInput" class="form-label">Your Bubble Color</label><input id="userBubbleColorInput" type="color" class="form-input" value="#263a5c" style="height:42px;padding:4px" /></div>
+            <div class="form-group"><label for="aiBubbleColorInput" class="form-label">AI Bubble Color</label><input id="aiBubbleColorInput" type="color" class="form-input" value="#171923" style="height:42px;padding:4px" /></div>
             <div class="form-group">
               <label for="fontSizeSelect" class="form-label"
                 >Message Typography Scale</label
@@ -5423,6 +5426,9 @@
           document.documentElement.dataset.theme = theme;
           save();
         }
+        const BUBBLE_PREFS_KEY="rainbow_ai_bubble_preferences";
+        function applyBubblePreferences(prefs){let p=prefs; if(!p){try{p=JSON.parse(localStorage.getItem(BUBBLE_PREFS_KEY)||"{}");}catch{p={};}} const root=document.documentElement; if(p.shape)root.style.setProperty("--rainbow-bubble-radius",p.shape); if(p.userColor)root.style.setProperty("--rainbow-user-bubble",p.userColor); if(p.aiColor)root.style.setProperty("--rainbow-ai-bubble",p.aiColor); if($("#chatBubbleShapeSelect")&&p.shape)$("#chatBubbleShapeSelect").value=p.shape; if($("#userBubbleColorInput")&&p.userColor)$("#userBubbleColorInput").value=p.userColor; if($("#aiBubbleColorInput")&&p.aiColor)$("#aiBubbleColorInput").value=p.aiColor; }
+        ["chatBubbleShapeSelect","userBubbleColorInput","aiBubbleColorInput"].forEach(id=>document.getElementById(id)?.addEventListener("input",()=>{const p={shape:$("#chatBubbleShapeSelect")?.value||"16px",userColor:$("#userBubbleColorInput")?.value||"#263a5c",aiColor:$("#aiBubbleColorInput")?.value||"#171923"};try{localStorage.setItem(BUBBLE_PREFS_KEY,JSON.stringify(p));}catch{}applyBubblePreferences(p);}));
 
         function downloadFile(filename, content, type = "text/plain") {
           const blob = new Blob([content], { type });
@@ -6167,6 +6173,7 @@
 
         if (el.gateway) el.gateway.value = state.gateway;
         setTheme(state.theme);
+        applyBubblePreferences();
 
         if (!activeConversation()) newConversation();
         else renderAll();
