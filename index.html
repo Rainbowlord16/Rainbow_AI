@@ -1529,6 +1529,8 @@
 
 
       .global-search-result{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:12px;border:1px solid var(--border-default);border-radius:10px;background:var(--bg-surface-1);color:var(--text-primary);text-align:left;cursor:pointer}.prompt-template-card{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:14px;border:1px solid var(--border-default);border-radius:12px;background:var(--bg-surface-1);color:var(--text-primary)}.prompt-template-actions{display:flex;flex-wrap:wrap;gap:6px}
+
+      .history-item-row{display:flex;align-items:center;gap:3px;width:100%;min-width:0}.history-item-row .history-item{flex:1;min-width:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.history-action-btn{flex:0 0 27px;height:29px;border:1px solid var(--border-subtle);border-radius:7px;background:var(--bg-surface-1);color:var(--text-secondary);cursor:pointer}.history-action-btn.danger:hover{color:#ff6b6b;border-color:#ff6b6b}.assistant-avatar-img{object-fit:cover;border-radius:7px;border:1px solid var(--border-default)}.message-actions{display:flex;gap:6px;opacity:.8}.message-action-btn{font-size:.72rem;padding:3px 8px;border:1px solid var(--border-subtle);border-radius:7px;background:var(--bg-surface-1);color:var(--text-secondary);cursor:pointer}.message-row .message-bubble{border-radius:var(--rainbow-bubble-radius,16px)!important}.user-row .message-bubble{background:var(--rainbow-user-bubble,var(--bg-user-bubble))!important}.assistant-row .message-bubble{padding:10px 14px!important;border:1px solid var(--border-subtle);background:var(--rainbow-ai-bubble,var(--bg-ai-bubble))!important}
       /* ==========================================================================
        9. MESSAGE ROWS, MARKDOWN CONTENT, CODE LAB & ACTIONS
        ========================================================================== */
@@ -5214,34 +5216,19 @@
           return conversation;
         }
 
-        function ensureConversation() {
-          return activeConversation() || newConversation();
-        }
-
+        function ensureConversation() { return activeConversation() || newConversation(); }
+        function renameConversation(id) { const chat=state.conversations.find(c=>c.id===id); if(!chat)return; const title=prompt("Edit chat title:",chat.title||"New Conversation"); if(title===null)return; if(!title.trim())return notify("Chat title cannot be empty."); chat.title=title.trim(); save(); renderAll(); notify("Chat title updated."); }
+        function deleteConversation(id) { const chat=state.conversations.find(c=>c.id===id); if(!chat)return; if(!confirm('Delete the entire chat "'+(chat.title||"New Conversation")+'"? This cannot be undone.'))return; state.conversations=state.conversations.filter(c=>c.id!==id); if(state.activeId===id)state.activeId=state.conversations[0]?.id||null; if(!state.activeId)newConversation();else{save();renderAll();} notify("Chat deleted."); }
         function renderHistory() {
-          if (!el.history) return;
-          el.history.replaceChildren();
-
+          if (!el.history) return; el.history.replaceChildren();
           for (const conversation of state.conversations) {
-            const button = document.createElement("button");
-            button.type = "button";
-            button.className = "history-item";
-            button.textContent = conversation.title || "New Conversation";
-            button.setAttribute(
-              "aria-current",
-              conversation.id === state.activeId ? "true" : "false",
-            );
-
-            if (conversation.id === state.activeId)
-              button.classList.add("active");
-
-            button.addEventListener("click", () => {
-              state.activeId = conversation.id;
-              save();
-              renderAll();
-            });
-
-            el.history.appendChild(button);
+            const row=document.createElement("div"); row.className="history-item-row";
+            const button=document.createElement("button"); button.type="button"; button.className="history-item"; button.textContent=conversation.title||"New Conversation"; button.title=button.textContent;
+            button.setAttribute("aria-current",conversation.id===state.activeId?"true":"false"); if(conversation.id===state.activeId)button.classList.add("active");
+            button.addEventListener("click",()=>{state.activeId=conversation.id;save();renderAll();});
+            const edit=document.createElement("button");edit.type="button";edit.className="history-action-btn";edit.textContent="✎";edit.title="Edit chat title";edit.setAttribute("aria-label","Edit chat title");edit.addEventListener("click",e=>{e.stopPropagation();renameConversation(conversation.id);});
+            const del=document.createElement("button");del.type="button";del.className="history-action-btn danger";del.textContent="×";del.title="Delete entire chat";del.setAttribute("aria-label","Delete entire chat");del.addEventListener("click",e=>{e.stopPropagation();deleteConversation(conversation.id);});
+            row.append(button,edit,del);el.history.appendChild(row);
           }
         }
 
@@ -5263,34 +5250,16 @@
           }
 
           for (const message of conversation?.messages || []) {
-            const article = document.createElement("article");
-            article.className = `message message-${message.role}`;
-
-            const label = document.createElement("div");
-            label.className = "message-role";
-            label.textContent = message.role === "user" ? "You" : "Rainbow AI";
-
-            const content = document.createElement("div");
-            content.className = "message-content";
-
-            // Never insert untrusted model output directly into innerHTML.
-            // If the page loads marked + DOMPurify, use both; otherwise use plain text.
-            if (
-              message.role === "assistant" &&
-              typeof window.marked?.parse === "function" &&
-              typeof window.DOMPurify?.sanitize === "function"
-            ) {
-              content.innerHTML = window.DOMPurify.sanitize(
-                window.marked.parse(String(message.content || "")),
-              );
-            } else {
-              content.textContent = String(message.content || "");
-            }
-
-            article.append(label, content);
-            el.messages.appendChild(article);
+            const row=document.createElement("div");row.className="message-row "+(message.role==="user"?"user-row":"assistant-row");
+            const header=document.createElement("div");header.className="message-header";
+            if(message.role==="assistant"){const avatar=document.createElement("img");avatar.className="message-avatar assistant-avatar-img";avatar.src="./icon-new.png";avatar.alt="Rainbow AI";header.appendChild(avatar);}else{const avatar=document.createElement("div");avatar.className="message-avatar user-avatar";avatar.textContent="Y";header.appendChild(avatar);}
+            const label=document.createElement("span");label.className="message-author";label.textContent=message.role==="user"?"You":"Rainbow AI";header.appendChild(label);
+            const bubble=document.createElement("div");bubble.className="message-bubble";const content=document.createElement("div");content.className="message-content";
+            if(message.role==="assistant"&&typeof window.marked?.parse==="function"&&typeof window.DOMPurify?.sanitize==="function")content.innerHTML=window.DOMPurify.sanitize(window.marked.parse(String(message.content||"")));else content.textContent=String(message.content||"");bubble.appendChild(content);
+            const actions=document.createElement("div");actions.className="message-actions";const copy=document.createElement("button");copy.type="button";copy.className="message-action-btn";copy.textContent="Copy";copy.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(String(message.content||""));notify("Message copied.");}catch{notify("Clipboard access was blocked.");}});actions.appendChild(copy);
+            if(message.role==="user"){const edit=document.createElement("button");edit.type="button";edit.className="message-action-btn";edit.textContent="Edit";edit.addEventListener("click",()=>{if(!el.input)return;el.input.value=String(message.content||"");el.input.dispatchEvent(new Event("input",{bubbles:true}));el.input.focus();notify("Edit the text in the composer, then send it again.");});actions.appendChild(edit);}
+            row.append(header,bubble,actions);el.messages.appendChild(row);
           }
-
           if (el.scroll) el.scrollTop = el.scroll.scrollHeight;
         }
 
