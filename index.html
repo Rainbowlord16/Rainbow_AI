@@ -5603,7 +5603,7 @@
         // Search/filter conversation history.
         $("#sidebarSearchInput")?.addEventListener("input", (event) => {
           const query = event.target.value.trim().toLowerCase();
-          $$$(".history-item", el.history || document).forEach((item) => {
+          $(".history-item", el.history || document).forEach((item) => {
             item.hidden = !item.textContent.toLowerCase().includes(query);
           });
           $("#sidebarSearchClearBtn")?.classList.toggle("hidden", !query);
