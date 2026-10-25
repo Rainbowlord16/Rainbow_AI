@@ -2744,7 +2744,23 @@
           max-height: 120px;
         }
       }
-    </style>
+    
+      /* Friendly trust notice and public-facing backend UI suppression */
+      .ai-accuracy-notice {
+        margin: 8px auto 0;
+        max-width: 900px;
+        padding: 8px 12px;
+        border: 1px solid var(--border, #303341);
+        border-radius: 10px;
+        color: var(--muted, #aab0c0);
+        background: var(--panel, #141620);
+        font-size: 0.78rem;
+        line-height: 1.45;
+        text-align: center;
+      }
+      #quickGatewayConfigBtn, .gateway-status-bar, [data-settings-tab="gateway"],
+      #settingsTabGateway { display: none !important; }
+</style>
   </head>
 
   <body>
@@ -3522,9 +3538,7 @@
                       <span class="welcome-heading-rainbow">Rainbow AI</span>
                     </h2>
                     <p class="welcome-subtext">
-                      Production-grade reasoning powered by
-                      <strong>Rainbow-AI-Unified-12B</strong> via your
-                      Cloudflare Tunnel gateway.
+                      Your helpful AI workspace for writing, learning, coding, and exploring ideas.
                     </p>
                   </div>
 
@@ -3701,10 +3715,11 @@
                     </div>
                   </div>
                 </div>
+                <div class="ai-accuracy-notice" role="note">
+                  Rainbow AI is an AI and can make mistakes. Please make sure to check important info.
+                </div>
                 <div class="composer-footnote">
-                  <span
-                    >Rainbow AI sanitizes output & stores history locally.</span
-                  >
+                  <span>Chat history is stored locally in this browser.</span>
                   <span>Press <kbd>?</kbd> for shortcuts</span>
                 </div>
               </div>
@@ -3891,8 +3906,9 @@
         <div class="modal-body">
           <div
             id="settingsTabGateway"
-            class="settings-tab-pane"
-            style="display: flex; flex-direction: column; gap: var(--space-md)"
+            class="settings-tab-pane hidden"
+            aria-hidden="true"
+            style="display: none; flex-direction: column; gap: var(--space-md)"
           >
             <div class="form-group">
               <label for="gatewayUrlInput" class="form-label"
