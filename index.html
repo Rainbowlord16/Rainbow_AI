@@ -5718,6 +5718,223 @@
           el.model.appendChild(option);
         }
 
+
+        // --- Core interaction repair: wire controls that were present in the UI
+        // but had no handlers in the previous build.
+        const starterItems = [
+          ["Explain a difficult topic", "Explain a difficult topic in simple steps, with an example."],
+          ["Help me write code", "Help me write and debug code. Ask for missing requirements first."],
+          ["Plan a project", "Help me plan a project with milestones, risks, and next actions."],
+          ["Summarize and analyze", "Give me a structured summary, key insights, and open questions."]
+        ];
+
+        function renderStarterPrompts() {
+          const grid = $("#starterPromptsGrid");
+          if (!grid) return;
+          grid.replaceChildren();
+          for (const [label, prompt] of starterItems) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "starter-prompt-btn";
+            button.dataset.prompt = prompt;
+            button.textContent = label;
+            grid.appendChild(button);
+          }
+        }
+
+        function togglePanel(id, show) {
+          const panel = document.getElementById(id);
+          if (panel) panel.classList.toggle("hidden", !show);
+        }
+
+        function showSettingsTab(tabName) {
+          $("[data-settings-tab]").forEach((button) => {
+            const active = button.dataset.settingsTab === tabName;
+            button.classList.toggle("active", active);
+            button.setAttribute("aria-selected", String(active));
+          });
+          $("[data-settings-panel]").forEach((panel) => {
+            panel.classList.toggle("hidden", panel.dataset.settingsPanel !== tabName);
+          });
+        }
+
+        function showPromptCategory(category) {
+          $("[data-prompt-cat]").forEach((button) => {
+            const active = button.dataset.promptCat === category;
+            button.classList.toggle("active", active);
+            button.setAttribute("aria-selected", String(active));
+          });
+          $("[data-prompt-category]").forEach((item) => {
+            item.classList.toggle("hidden", category !== "all" && item.dataset.promptCategory !== category);
+          });
+        }
+
+        // Wire sidebar Canvas entry and visible mode controls.
+        $("#sidebarCanvasBtn")?.addEventListener("click", () => {
+          state.canvasOpen = true;
+          togglePanel("canvasDrawer", true);
+          $("#canvasToggleBtn")?.setAttribute("aria-pressed", "true");
+        });
+        $("#canvasToggleBtn")?.addEventListener("click", () => {
+          state.canvasOpen = !state.canvasOpen;
+          togglePanel("canvasDrawer", state.canvasOpen);
+          $("#canvasToggleBtn")?.setAttribute("aria-pressed", String(state.canvasOpen));
+        });
+        $("#canvasModeEditBtn")?.addEventListener("click", () => {
+          togglePanel("canvasEditorPanel", true);
+          togglePanel("canvasPreviewPanel", false);
+        });
+        $("#canvasModePreviewBtn")?.addEventListener("click", () => {
+          togglePanel("canvasEditorPanel", false);
+          togglePanel("canvasPreviewPanel", true);
+          const preview = $("#canvasPreviewFrame");
+          const editor = $("#canvasEditor");
+          if (preview && editor) {
+            const doc = preview.contentDocument;
+            if (doc) {
+              doc.open();
+              doc.write(editor.value || "");
+              doc.close();
+            }
+          }
+        });
+        $("#canvasCopyBtn")?.addEventListener("click", async () => {
+          const editor = $("#canvasEditor");
+          if (!editor) return notify("Canvas editor is unavailable.");
+          try {
+            await navigator.clipboard.writeText(editor.value);
+            notify("Canvas content copied.");
+          } catch { notify("Clipboard access was blocked by the browser."); }
+        });
+        $("#canvasDownloadBtn")?.addEventListener("click", () => {
+          const editor = $("#canvasEditor");
+          if (editor) downloadFile("rainbow-canvas.md", editor.value, "text/markdown;charset=utf-8");
+          else notify("Canvas editor is unavailable.");
+        });
+        $("#canvasSnapshotBtn")?.addEventListener("click", () => {
+          const editor = $("#canvasEditor");
+          if (!editor) return notify("Canvas editor is unavailable.");
+          try {
+            localStorage.setItem("rainbow_ai_canvas_snapshot", editor.value);
+            notify("Canvas snapshot saved in this browser.");
+          } catch { notify("Could not save the Canvas snapshot."); }
+        });
+        $("#canvasAskAiRefineBtn")?.addEventListener("click", () => {
+          const editor = $("#canvasEditor");
+          const prompt = editor?.value.trim();
+          if (!prompt) return notify("Add some content to Canvas first.");
+          closeModal("canvasDrawer");
+          if (el.input) el.input.value = "Improve and refine the following content. Return the revised version and briefly explain the changes:\n\n" + prompt;
+          sendMessage();
+        });
+
+        // Settings tabs and save action.
+        $("[data-settings-tab]").forEach((button) => button.addEventListener("click", () => showSettingsTab(button.dataset.settingsTab)));
+        $("#saveSettingsBtn")?.addEventListener("click", () => {
+          const theme = $("#themeSelect")?.value;
+          if (theme) setTheme(theme);
+          const gatewayInput = $("#gatewayUrlInput");
+          if (gatewayInput) {
+            try { state.gateway = safeGateway(gatewayInput.value); gatewayInput.value = state.gateway; }
+            catch (error) { notify(error.message); return; }
+          }
+          save();
+          closeModal("settingsModal");
+          notify("Settings saved.");
+        });
+
+        // Prompt Studio category tabs and create-template form visibility.
+        $("[data-prompt-cat]").forEach((button) => button.addEventListener("click", () => showPromptCategory(button.dataset.promptCat)));
+        $("#toggleNewPromptFormBtn")?.addEventListener("click", () => togglePanel("newPromptForm", true));
+        $("#cancelPromptFormBtn")?.addEventListener("click", () => togglePanel("newPromptForm", false));
+        $("#savePromptTemplateBtn")?.addEventListener("click", () => {
+          const name = $("#promptTemplateName")?.value.trim();
+          const prompt = $("#promptTemplateContent")?.value.trim();
+          if (!name || !prompt) return notify("Enter a template name and prompt first.");
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "prompt-template-card";
+          button.dataset.prompt = prompt;
+          button.textContent = name;
+          button.addEventListener("click", () => {
+            if (el.input) { el.input.value = prompt; el.input.dispatchEvent(new Event("input")); }
+            closeModal("promptStudioModal");
+            el.input?.focus();
+          });
+          $("#promptTemplatesGrid")?.appendChild(button);
+          togglePanel("newPromptForm", false);
+          notify("Template added for this session.");
+        });
+
+        // Projects: provide a functional local create/list flow.
+        $("#toggleNewProjectFormBtn")?.addEventListener("click", () => togglePanel("newProjectForm", true));
+        $("#cancelProjectFormBtn")?.addEventListener("click", () => togglePanel("newProjectForm", false));
+        $("#saveProjectBtn")?.addEventListener("click", () => {
+          const name = $("#projectNameInput")?.value.trim();
+          const description = $("#projectDescriptionInput")?.value.trim() || "";
+          if (!name) return notify("Enter a project name first.");
+          const list = $("#projectsList");
+          if (!list) return notify("Project list is unavailable in this build.");
+          const card = document.createElement("div");
+          card.className = "project-card";
+          const heading = document.createElement("strong");
+          heading.textContent = name;
+          const detail = document.createElement("p");
+          detail.textContent = description;
+          card.append(heading, detail);
+          list.appendChild(card);
+          togglePanel("newProjectForm", false);
+          notify("Project added to this session.");
+        });
+
+        // Rename conversation dialog.
+        $("#renameActiveChatBtn")?.addEventListener("click", () => {
+          const conversation = activeConversation();
+          if (!conversation) return notify("Start a conversation first.");
+          $("#promptDialogTitle").textContent = "Rename Conversation";
+          $("#promptDialogMessage").textContent = "Choose a name for this conversation.";
+          const input = $("#promptDialogInput");
+          const select = $("#promptDialogSelect");
+          if (input) { input.value = conversation.title; input.classList.remove("hidden"); }
+          if (select) select.classList.add("hidden");
+          state.dialogAction = "rename";
+          openModal("promptDialogModal");
+        });
+        $("#promptDialogConfirmBtn")?.addEventListener("click", () => {
+          if (state.dialogAction === "rename") {
+            const conversation = activeConversation();
+            const name = $("#promptDialogInput")?.value.trim();
+            if (!conversation || !name) return notify("Enter a conversation name.");
+            conversation.title = name;
+            save(); renderAll(); closeModal("promptDialogModal");
+            state.dialogAction = null;
+            notify("Conversation renamed.");
+          }
+        });
+
+        // History filters and utility buttons.
+        $("[data-filter]").forEach((button) => button.addEventListener("click", () => {
+          const filter = button.dataset.filter;
+          $("[data-filter]").forEach((item) => {
+            const active = item === button;
+            item.classList.toggle("active", active);
+            item.setAttribute("aria-selected", String(active));
+          });
+          $(".history-item", el.history || document).forEach((item) => {
+            const conversation = state.conversations.find((c) => c.title === item.textContent);
+            item.hidden = filter === "pinned" ? !conversation?.pinned : filter === "archived" ? !conversation?.archived : filter === "project" ? !conversation?.projectId : false;
+          });
+        }));
+        $("#scrollToBottomBtn")?.addEventListener("click", () => { if (el.scroll) el.scroll.scrollTop = el.scroll.scrollHeight; });
+        $("#shuffleStartersBtn")?.addEventListener("click", () => {
+          for (let i = starterItems.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [starterItems[i], starterItems[j]] = [starterItems[j], starterItems[i]];
+          }
+          renderStarterPrompts();
+        });
+        renderStarterPrompts();
+
         // Restore saved data and start the interface.
         load();
 
