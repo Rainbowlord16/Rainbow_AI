@@ -5169,10 +5169,18 @@
 
             const saved = JSON.parse(raw);
             if (Array.isArray(saved.conversations)) {
-              state.conversations = saved.conversations.filter(
-                (c) =>
-                  c && typeof c.id === "string" && Array.isArray(c.messages),
-              );
+              // Normalize stored data so malformed or older chats cannot break rendering.
+              state.conversations = saved.conversations
+                .filter((c) => c && typeof c.id === "string" && Array.isArray(c.messages))
+                .map((c) => ({
+                  ...c,
+                  title: typeof c.title === "string" && c.title.trim() ? c.title : "New Conversation",
+                  messages: c.messages
+                    .filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
+                    .map((m) => ({ role: m.role, content: m.content })),
+                  pinned: Boolean(c.pinned),
+                  createdAt: Number.isFinite(c.createdAt) ? c.createdAt : Date.now(),
+                }));
             }
 
             if (typeof saved.activeId === "string")
@@ -6009,7 +6017,19 @@
         const profileGreeting = readProfile().greeting || "random";
         const greetingPool = profileGreeting === "focused" ? ["Let’s make progress.", "What’s the priority today?", "What shall we tackle first?"] : profileGreeting === "friendly" ? ["Hey there! What’s on your mind?", "Ready when you are.", "What would you like to explore?"] : welcomeLines;
         const greetingHeading = $(".welcome-heading");
-        if (greetingHeading) { const rainbowTitle = greetingHeading.querySelector(".welcome-heading-rainbow"); greetingHeading.textContent = greetingPool[Math.floor(Math.random()*greetingPool.length)]; if (rainbowTitle && !greetingHeading.textContent.includes("Rainbow AI")) greetingHeading.append(" "); }
+        if (greetingHeading) {
+          const rainbowTitle = greetingHeading.querySelector(".welcome-heading-rainbow");
+          const greeting = greetingPool[Math.floor(Math.random() * greetingPool.length)];
+          if (rainbowTitle) {
+            // Keep the branded span and its gradient styling when changing the greeting.
+            greetingHeading.replaceChildren(
+              document.createTextNode(greeting + " "),
+              rainbowTitle,
+            );
+          } else {
+            greetingHeading.textContent = greeting;
+          }
+        }
         syncProfile();
         // Restore saved data and start the interface.
         load();
