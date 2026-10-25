@@ -2760,6 +2760,28 @@
       }
       #quickGatewayConfigBtn, .gateway-status-bar, [data-settings-tab="gateway"],
       #settingsTabGateway { display: none !important; }
+
+      @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Google+Sans+Text:wght@400;500;600&display=swap');
+      :root { --font-ui: 'Google Sans', 'Google Sans Text', 'Inter', system-ui, sans-serif; }
+      body, button, input, textarea, select, .message-content, .modal { font-family: var(--font-ui); }
+      button, .sidebar-nav-btn, .icon-btn, .capability-chip { transition: background-color .18s ease, border-color .18s ease, transform .18s ease, opacity .18s ease; }
+      button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--accent, #8ab4f8); outline-offset: 2px; }
+      .welcome-prism-badge svg { animation: rainbow-breathe 5s ease-in-out infinite; }
+      .welcome-prism-badge { animation: soft-float 6s ease-in-out infinite; }
+      @keyframes rainbow-breathe { 0%,100% { filter: drop-shadow(0 0 2px rgba(138,180,248,.12)); } 50% { filter: drop-shadow(0 0 8px rgba(190,140,255,.32)); } }
+      @keyframes soft-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+      #appShell.sidebar-collapsed .brand-logo-btn .brand-name, #appShell.sidebar-collapsed .brand-logo-btn .brand-subtitle { display:none !important; }
+      #appShell.sidebar-collapsed .brand-logo-btn { position:relative; justify-content:center; }
+      #appShell.sidebar-collapsed #sidebarCollapseBtn { opacity:0; pointer-events:none; }
+      #appShell.sidebar-collapsed .sidebar-header:hover #sidebarCollapseBtn { opacity:1; pointer-events:auto; }
+      #appShell.sidebar-collapsed .sidebar-header:hover .brand-logo-btn .brand-mark { opacity:.2; }
+      .profile-avatar { width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#ff9a00,#ef39ba,#4b8dff);color:white;font-weight:700; }
+      .profile-menu { position:absolute;z-index:80;right:14px;bottom:70px;width:230px;padding:8px;border:1px solid var(--border,#303341);border-radius:14px;background:var(--panel,#141620);box-shadow:0 14px 42px #0005; }
+      .profile-menu button { display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:0;border-radius:9px;background:transparent;color:inherit;text-align:left;cursor:pointer; }
+      .profile-menu button:hover { background:var(--hover,#252836); }
+      .profile-menu .profile-summary { display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid var(--border,#303341);margin-bottom:5px; }
+      .profile-menu.hidden { display:none !important; }
 </style>
   </head>
 
@@ -3206,8 +3228,14 @@
             </button>
           </div>
 
+          <div id="profileMenu" class="profile-menu hidden" role="menu" aria-label="Profile menu">
+            <div class="profile-summary"><span class="profile-avatar">R</span><div><strong id="profileDisplayName">Rainbow User</strong><div class="form-help">Saved on this device</div></div></div>
+            <button type="button" id="editProfileBtn" role="menuitem">Edit profile</button>
+            <button type="button" id="profileSettingsBtn" role="menuitem">Profile settings</button>
+          </div>
           <div class="sidebar-footer-actions">
             <button
+              <button id="openProfileBtn" type="button" class="sidebar-nav-btn" title="Profile and profile settings" aria-label="Open profile"><span class="profile-avatar" aria-hidden="true">R</span><span class="sidebar-nav-btn-left">Profile</span></button>
               id="openSettingsBtn"
               type="button"
               class="sidebar-nav-btn"
@@ -5029,6 +5057,15 @@
     <!-- ========================================================================
        TOAST NOTIFICATION CONTAINER (Single Instance)
        ======================================================================== -->
+    <div id="profileModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle" aria-hidden="true">
+      <div class="modal-backdrop" data-close-modal="profileModal"></div><div class="modal-panel">
+        <div class="modal-header"><h2 id="profileModalTitle">Your profile</h2><button type="button" class="icon-btn" data-close-modal="profileModal" aria-label="Close profile settings">×</button></div>
+        <div class="modal-body"><label class="form-label" for="profileNameInput">Display name</label><input id="profileNameInput" class="form-input" maxlength="40" placeholder="What should Rainbow AI call you?"/>
+        <p class="form-help">This profile is saved only in this browser. No account or sign-in is required.</p>
+        <label class="form-label" for="profileGreetingSelect">Welcome greeting</label><select id="profileGreetingSelect" class="form-select"><option value="random">Surprise me each refresh</option><option value="friendly">Friendly and relaxed</option><option value="focused">Focused and productive</option></select></div>
+        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-close-modal="profileModal">Cancel</button><button id="saveProfileBtn" type="button" class="btn btn-primary">Save profile</button></div>
+      </div>
+    </div>
     <div
       id="toastRegion"
       class="toast-region"
@@ -5951,6 +5988,29 @@
         });
         renderStarterPrompts();
 
+
+        const PROFILE_KEY = "rainbow_ai_profile";
+        function readProfile() { try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || "{}"); } catch { return {}; } }
+        function syncProfile() {
+          const profile = readProfile(), name = (profile.name || "").trim();
+          if ($("#profileDisplayName")) $("#profileDisplayName").textContent = name || "Rainbow User";
+          $(".profile-avatar").forEach(node => node.textContent = (name[0] || "R").toUpperCase());
+          if ($("#profileNameInput")) $("#profileNameInput").value = name;
+          if ($("#profileGreetingSelect")) $("#profileGreetingSelect").value = profile.greeting || "random";
+        }
+        $("#openProfileBtn")?.addEventListener("click", () => { $("#profileMenu")?.classList.toggle("hidden"); syncProfile(); });
+        for (const id of ["editProfileBtn","profileSettingsBtn"]) document.getElementById(id)?.addEventListener("click", () => { $("#profileMenu")?.classList.add("hidden"); syncProfile(); openModal("profileModal"); });
+        $("#saveProfileBtn")?.addEventListener("click", () => {
+          localStorage.setItem(PROFILE_KEY, JSON.stringify({name:$("#profileNameInput")?.value.trim() || "", greeting:$("#profileGreetingSelect")?.value || "random"}));
+          syncProfile(); closeModal("profileModal"); notify("Profile settings saved on this device.");
+        });
+        document.addEventListener("click", event => { if (!event.target.closest("#profileMenu") && !event.target.closest("#openProfileBtn")) $("#profileMenu")?.classList.add("hidden"); });
+        const welcomeLines = ["Let’s get started.", "Your move.", "What should we work on?", "What’s on your mind?", "Ready when you are.", "Let’s make something great.", "Where shall we begin?", "What can I help you explore?"];
+        const profileGreeting = readProfile().greeting || "random";
+        const greetingPool = profileGreeting === "focused" ? ["Let’s make progress.", "What’s the priority today?", "What shall we tackle first?"] : profileGreeting === "friendly" ? ["Hey there! What’s on your mind?", "Ready when you are.", "What would you like to explore?"] : welcomeLines;
+        const greetingHeading = $(".welcome-heading");
+        if (greetingHeading) { const rainbowTitle = greetingHeading.querySelector(".welcome-heading-rainbow"); greetingHeading.textContent = greetingPool[Math.floor(Math.random()*greetingPool.length)]; if (rainbowTitle && !greetingHeading.textContent.includes("Rainbow AI")) greetingHeading.append(" "); }
+        syncProfile();
         // Restore saved data and start the interface.
         load();
 
