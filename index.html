@@ -5749,24 +5749,39 @@
             return;
           }
 
-          recognition = new SpeechRecognition();
-          recognition.lang = navigator.language || "en-US";
-          recognition.interimResults = true;
+          try {
+            recognition = new SpeechRecognition();
+            recognition.lang = navigator.language || "en-US";
+            recognition.interimResults = true;
+            recognition.continuous = false;
 
-          recognition.onresult = (event) => {
-            let transcript = "";
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-              transcript += event.results[i][0].transcript;
-            }
-            if (el.input) el.input.value = transcript;
-          };
+            recognition.onresult = (event) => {
+              let transcript = "";
+              for (let i = event.resultIndex; i < event.results.length; i++) {
+                transcript += event.results[i][0].transcript;
+              }
+              if (el.input && transcript) {
+                el.input.value = transcript;
+                el.input.dispatchEvent(new Event("input", { bubbles: true }));
+              }
+            };
 
-          recognition.onerror = () => notify("Voice dictation failed.");
-          recognition.onend = () => {
+            recognition.onerror = (event) => {
+              const reason = event?.error === "not-allowed" || event?.error === "service-not-allowed"
+                ? "Allow microphone access in your browser to use voice dictation."
+                : "Voice dictation failed. Please try again or type your message.";
+              notify(reason);
+            };
+            recognition.onend = () => {
+              recognition = null;
+            };
+            recognition.start();
+            notify("Listening…");
+          } catch (error) {
             recognition = null;
-          };
-          recognition.start();
-          notify("Listening…");
+            console.warn("Rainbow AI voice dictation could not start.", error);
+            notify("Voice dictation couldn't start. Check microphone permission and use HTTPS or localhost.");
+          }
         });
 
         // Keep the model selector limited to the configured model.
@@ -6066,8 +6081,8 @@
         $("#toggleNewPromptFormBtn")?.addEventListener("click", () => togglePanel("newPromptForm", true));
         $("#cancelPromptFormBtn")?.addEventListener("click", () => togglePanel("newPromptForm", false));
         $("#savePromptTemplateBtn")?.addEventListener("click", () => {
-          const name = $("#promptTemplateName")?.value.trim();
-          const prompt = $("#promptTemplateContent")?.value.trim();
+          const name = $("#newPromptTitleInput")?.value.trim();
+          const prompt = $("#newPromptContentInput")?.value.trim();
           if (!name || !prompt) return notify("Enter a template name and prompt first.");
           const button = document.createElement("button");
           button.type = "button";
@@ -6089,9 +6104,9 @@
         $("#cancelProjectFormBtn")?.addEventListener("click", () => togglePanel("newProjectForm", false));
         $("#saveProjectBtn")?.addEventListener("click", () => {
           const name = $("#projectNameInput")?.value.trim();
-          const description = $("#projectDescriptionInput")?.value.trim() || "";
+          const description = $("#projectDescInput")?.value.trim() || "";
           if (!name) return notify("Enter a project name first.");
-          const list = $("#projectsList");
+          const list = $("#projectsGrid");
           if (!list) return notify("Project list is unavailable in this build.");
           const card = document.createElement("div");
           card.className = "project-card";
