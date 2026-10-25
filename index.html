@@ -5830,6 +5830,163 @@
           });
         }
 
+        // Functional handlers for controls that previously had no action.
+        // File attachments: read text-based files locally and add their contents to the composer.
+        $("#attachFileBtn")?.addEventListener("click", () => {
+          let picker = $("#rainbowAttachmentPicker");
+          if (!picker) {
+            picker = document.createElement("input");
+            picker.id = "rainbowAttachmentPicker";
+            picker.type = "file";
+            picker.multiple = true;
+            picker.accept = ".txt,.md,.csv,.json,.html,.css,.js,.py,.xml,.yaml,.yml,.log";
+            picker.hidden = true;
+            document.body.appendChild(picker);
+            picker.addEventListener("change", async () => {
+              const files = Array.from(picker.files || []);
+              if (!files.length) return;
+              const parts = [];
+              for (const file of files) {
+                if (file.size > 1024 * 1024) {
+                  notify(file.name + " is larger than 1 MB and was skipped.");
+                  continue;
+                }
+                try { parts.push("\n\n--- Attached file: " + file.name + " ---\n" + await file.text()); }
+                catch { notify("Could not read " + file.name + "."); }
+              }
+              if (el.input && parts.length) {
+                el.input.value = (el.input.value ? el.input.value + "\n\n" : "") + parts.join("");
+                el.input.dispatchEvent(new Event("input", { bubbles: true }));
+                el.input.focus();
+                notify(files.length + " file(s) added to the message.");
+              }
+              picker.value = "";
+            });
+          }
+          picker.click();
+        });
+
+        // Study mode visibly toggles and persists.
+        $("#studyModeToggleBtn")?.addEventListener("click", () => {
+          state.studyMode = !state.studyMode;
+          $("#studyModeToggleBtn").setAttribute("aria-pressed", String(state.studyMode));
+          document.documentElement.classList.toggle("study-mode", state.studyMode);
+          save();
+          notify("Study Mode " + (state.studyMode ? "enabled" : "disabled") + ".");
+        });
+
+        // Clear active project filter.
+        $("#clearActiveProjectBtn")?.addEventListener("click", () => {
+          $("#activeProjectBanner")?.classList.add("hidden");
+          $(".history-item").forEach(item => item.hidden = false);
+          $("[data-filter]").forEach(item => {
+            item.classList.toggle("active", item.dataset.filter === "all");
+            item.setAttribute("aria-selected", String(item.dataset.filter === "all"));
+          });
+          notify("Project filter cleared.");
+        });
+
+        // Assigning a project opens the projects panel instead of being a dead button.
+        $("#assignProjectToChatBtn")?.addEventListener("click", () => openModal("projectsModal"));
+
+        // Backup and restore local workspace data.
+        $("#exportAllDataBtn")?.addEventListener("click", () => {
+          const payload = {
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            app: "Rainbow AI",
+            state: {
+              conversations: state.conversations,
+              activeId: state.activeId,
+              gateway: state.gateway,
+              theme: state.theme,
+              studyMode: state.studyMode
+            },
+            profile: (() => { try { return JSON.parse(localStorage.getItem("rainbow_ai_profile") || "{}"); } catch { return {}; } })()
+          };
+          downloadFile("rainbow-ai-backup.json", JSON.stringify(payload, null, 2), "application/json;charset=utf-8");
+          notify("Workspace backup prepared.");
+        });
+        $("#importDataBtn")?.addEventListener("click", () => $("#importDataInput")?.click());
+        $("#importDataInput")?.addEventListener("change", async event => {
+          const file = event.target.files?.[0];
+          if (!file) return;
+          try {
+            if (file.size > 5 * 1024 * 1024) throw new Error("Backup file must be 5 MB or smaller.");
+            const parsed = JSON.parse(await file.text());
+            const imported = parsed.state || parsed;
+            if (!Array.isArray(imported.conversations)) throw new Error("This file is not a valid Rainbow AI backup.");
+            const normalized = imported.conversations
+              .filter(c => c && typeof c.id === "string" && Array.isArray(c.messages))
+              .map(c => ({
+                ...c,
+                title: typeof c.title === "string" && c.title.trim() ? c.title : "Imported conversation",
+                messages: c.messages.filter(m => m && ["user","assistant"].includes(m.role) && typeof m.content === "string")
+                  .map(m => ({ role: m.role, content: m.content })),
+                pinned: Boolean(c.pinned),
+                createdAt: Number.isFinite(c.createdAt) ? c.createdAt : Date.now()
+              }));
+            if (!normalized.length) throw new Error("The backup contains no valid conversations.");
+            state.conversations = normalized;
+            state.activeId = normalized.some(c => c.id === imported.activeId) ? imported.activeId : normalized[0].id;
+            if (["dark","midnight","light"].includes(imported.theme)) state.theme = imported.theme;
+            if (typeof imported.gateway === "string") {
+              try { state.gateway = safeGateway(imported.gateway); } catch {}
+            }
+            state.studyMode = Boolean(imported.studyMode);
+            if (parsed.profile && typeof parsed.profile === "object") localStorage.setItem("rainbow_ai_profile", JSON.stringify(parsed.profile));
+            save(); setTheme(state.theme); renderAll(); syncProfile();
+            if (el.gateway) el.gateway.value = state.gateway;
+            notify("Backup imported successfully.");
+          } catch (error) { notify(error.message || "Could not import this backup."); }
+          finally { event.target.value = ""; }
+        });
+
+        // Destructive actions require confirmation.
+        $("#wipeAllStorageBtn")?.addEventListener("click", () => {
+          if (!confirm("Erase Rainbow AI's saved chats, settings, and profile from this browser? This cannot be undone.")) return;
+          try {
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem("rainbow_ai_profile");
+            localStorage.removeItem("rainbow_ai_canvas_snapshot");
+          } catch {}
+          state.conversations = [];
+          state.activeId = null;
+          state.gateway = DEFAULT_GATEWAY;
+          state.theme = "dark";
+          state.studyMode = false;
+          newConversation(); setTheme("dark"); syncProfile();
+          if (el.gateway) el.gateway.value = state.gateway;
+          notify("Local Rainbow AI data erased.");
+        });
+        $("#privacyClearHistoryBtn")?.addEventListener("click", () => {
+          if (!confirm("Delete all conversations from this browser? This cannot be undone.")) return;
+          state.conversations = [];
+          state.activeId = null;
+          save(); newConversation(); closeModal("privacyModal");
+          notify("Chat history deleted.");
+        });
+        $("#clearAllAlertsBtn")?.addEventListener("click", () => {
+          const list = $("#alertsListContainer");
+          if (list) list.replaceChildren();
+          notify("Alerts cleared.");
+        });
+        $("#copyDiagnosticsBtn")?.addEventListener("click", async () => {
+          const diagnostics = {
+            app: "Rainbow AI",
+            theme: state.theme,
+            conversationCount: state.conversations.length,
+            activeConversation: Boolean(activeConversation()),
+            gatewayConfigured: Boolean(state.gateway),
+            online: navigator.onLine,
+            userAgent: navigator.userAgent
+          };
+          try {
+            await navigator.clipboard.writeText(JSON.stringify(diagnostics, null, 2));
+            notify("Sanitized diagnostics copied.");
+          } catch { notify("Clipboard access was blocked by the browser."); }
+        });
+
         // Wire sidebar Canvas entry and visible mode controls.
         $("#sidebarCanvasBtn")?.addEventListener("click", () => {
           state.canvasOpen = true;
