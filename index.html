@@ -5603,7 +5603,7 @@
         // Search/filter conversation history.
         $("#sidebarSearchInput")?.addEventListener("input", (event) => {
           const query = event.target.value.trim().toLowerCase();
-          $$(".history-item", el.history || document).forEach((item) => {
+          $$$(".history-item", el.history || document).forEach((item) => {
             item.hidden = !item.textContent.toLowerCase().includes(query);
           });
           $("#sidebarSearchClearBtn")?.classList.toggle("hidden", !query);
@@ -5824,23 +5824,23 @@
         }
 
         function showSettingsTab(tabName) {
-          $("[data-settings-tab]").forEach((button) => {
+          $$("[data-settings-tab]").forEach((button) => {
             const active = button.dataset.settingsTab === tabName;
             button.classList.toggle("active", active);
             button.setAttribute("aria-selected", String(active));
           });
-          $("[data-settings-panel]").forEach((panel) => {
+          $$("[data-settings-panel]").forEach((panel) => {
             panel.classList.toggle("hidden", panel.dataset.settingsPanel !== tabName);
           });
         }
 
         function showPromptCategory(category) {
-          $("[data-prompt-cat]").forEach((button) => {
+          $$("[data-prompt-cat]").forEach((button) => {
             const active = button.dataset.promptCat === category;
             button.classList.toggle("active", active);
             button.setAttribute("aria-selected", String(active));
           });
-          $("[data-prompt-category]").forEach((item) => {
+          $$("[data-prompt-category]").forEach((item) => {
             item.classList.toggle("hidden", category !== "all" && item.dataset.promptCategory !== category);
           });
         }
@@ -5893,8 +5893,8 @@
         // Clear active project filter.
         $("#clearActiveProjectBtn")?.addEventListener("click", () => {
           $("#activeProjectBanner")?.classList.add("hidden");
-          $(".history-item").forEach(item => item.hidden = false);
-          $("[data-filter]").forEach(item => {
+          $$(".history-item").forEach(item => item.hidden = false);
+          $$("[data-filter]").forEach(item => {
             item.classList.toggle("active", item.dataset.filter === "all");
             item.setAttribute("aria-selected", String(item.dataset.filter === "all"));
           });
@@ -6062,7 +6062,7 @@
         });
 
         // Settings tabs and save action.
-        $("[data-settings-tab]").forEach((button) => button.addEventListener("click", () => showSettingsTab(button.dataset.settingsTab)));
+        $$("[data-settings-tab]").forEach((button) => button.addEventListener("click", () => showSettingsTab(button.dataset.settingsTab)));
         $("#saveSettingsBtn")?.addEventListener("click", () => {
           const theme = $("#themeSelect")?.value;
           if (theme) setTheme(theme);
@@ -6077,7 +6077,7 @@
         });
 
         // Prompt Studio category tabs and create-template form visibility.
-        $("[data-prompt-cat]").forEach((button) => button.addEventListener("click", () => showPromptCategory(button.dataset.promptCat)));
+        $$("[data-prompt-cat]").forEach((button) => button.addEventListener("click", () => showPromptCategory(button.dataset.promptCat)));
         $("#toggleNewPromptFormBtn")?.addEventListener("click", () => togglePanel("newPromptForm", true));
         $("#cancelPromptFormBtn")?.addEventListener("click", () => togglePanel("newPromptForm", false));
         $("#savePromptTemplateBtn")?.addEventListener("click", () => {
@@ -6146,14 +6146,14 @@
         });
 
         // History filters and utility buttons.
-        $("[data-filter]").forEach((button) => button.addEventListener("click", () => {
+        $$("[data-filter]").forEach((button) => button.addEventListener("click", () => {
           const filter = button.dataset.filter;
-          $("[data-filter]").forEach((item) => {
+          $$("[data-filter]").forEach((item) => {
             const active = item === button;
             item.classList.toggle("active", active);
             item.setAttribute("aria-selected", String(active));
           });
-          $(".history-item", el.history || document).forEach((item) => {
+          $$(".history-item", el.history || document).forEach((item) => {
             const conversation = state.conversations.find((c) => c.title === item.textContent);
             item.hidden = filter === "pinned" ? !conversation?.pinned : filter === "archived" ? !conversation?.archived : filter === "project" ? !conversation?.projectId : false;
           });
@@ -6174,7 +6174,7 @@
         function syncProfile() {
           const profile = readProfile(), name = (profile.name || "").trim();
           if ($("#profileDisplayName")) $("#profileDisplayName").textContent = name || "Rainbow User";
-          $(".profile-avatar").forEach(node => node.textContent = (name[0] || "R").toUpperCase());
+          $$(".profile-avatar").forEach(node => node.textContent = (name[0] || "R").toUpperCase());
           if ($("#profileNameInput")) $("#profileNameInput").value = name;
           if ($("#profileGreetingSelect")) $("#profileGreetingSelect").value = profile.greeting || "random";
         }
