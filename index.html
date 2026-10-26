@@ -2849,6 +2849,25 @@
         pointer-events: auto !important;
       }
 
+      /* Dedicated account settings panel, visually distinct from general app settings. */
+      #accountSettingsModal { z-index: 10010 !important; }
+      #accountSettingsModal .account-settings-dialog { width: min(640px, calc(100vw - 32px)); max-height: 88vh; overflow: auto; border: 1px solid var(--border-default, rgba(255,255,255,.14)); border-radius: 22px; background: var(--bg-surface-1, #151824); color: var(--text-primary, #f8fafc); box-shadow: 0 28px 90px rgba(0,0,0,.5); }
+      #accountSettingsModal .account-settings-eyebrow { margin: 0 0 4px; color: var(--text-secondary, #aab0c0); font-size: .72rem; font-weight: 700; letter-spacing: .12em; }
+      #accountSettingsModal .account-settings-body { display: grid; gap: 18px; }
+      #accountSettingsModal .account-settings-identity { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid var(--border-default, rgba(255,255,255,.12)); border-radius: 16px; background: var(--bg-surface-2, rgba(255,255,255,.035)); }
+      #accountSettingsModal .account-settings-avatar { width: 48px; height: 48px; flex: 0 0 48px; }
+      #accountSettingsModal .account-settings-identity-copy { display: grid; gap: 4px; min-width: 0; flex: 1; }
+      #accountSettingsModal .account-settings-identity-copy span, #accountSettingsModal .account-settings-row span { color: var(--text-secondary, #aab0c0); font-size: .86rem; }
+      #accountSettingsModal .account-settings-section { display: grid; gap: 10px; }
+      #accountSettingsModal .account-settings-section h3 { margin: 0; font-size: .98rem; }
+      #accountSettingsModal .account-settings-section > p { margin: 0; color: var(--text-secondary, #aab0c0); font-size: .88rem; line-height: 1.5; }
+      #accountSettingsModal .account-settings-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-default, rgba(255,255,255,.1)); }
+      #accountSettingsModal .account-settings-row > div { display: grid; gap: 4px; min-width: 0; }
+      #accountSettingsModal .secondary-btn { flex: 0 0 auto; border: 1px solid var(--border-default, rgba(255,255,255,.18)); border-radius: 10px; padding: 8px 12px; background: var(--bg-surface-2, rgba(255,255,255,.06)); color: inherit; cursor: pointer; }
+      #accountSettingsModal .secondary-btn:hover { background: var(--bg-surface-3, rgba(255,255,255,.1)); }
+      #accountSettingsModal .account-settings-footnote { margin: 0; color: var(--text-secondary, #aab0c0); font-size: .78rem; }
+      @media (max-width: 520px) { #accountSettingsModal .account-settings-identity { flex-wrap: wrap; } #accountSettingsModal .account-settings-identity-copy { min-width: calc(100% - 72px); } }
+
     </style>
   </head>
 
@@ -3914,6 +3933,43 @@
     <!-- ========================================================================
        MODALS & DIALOGS (Single Unique Instances)
        ======================================================================== -->
+
+    <!-- ACCOUNT SETTINGS MODAL: account-specific controls, separate from app settings. -->
+    <div id="accountSettingsModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="accountSettingsTitle" aria-hidden="true">
+      <section class="modal-dialog account-settings-dialog">
+        <div class="modal-header">
+          <div>
+            <p class="account-settings-eyebrow">YOUR ACCOUNT</p>
+            <h2 id="accountSettingsTitle" class="modal-title">Account Settings</h2>
+          </div>
+          <button type="button" class="icon-btn" data-close-modal="accountSettingsModal" aria-label="Close account settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="modal-body account-settings-body">
+          <div class="account-settings-identity">
+            <div class="profile-avatar account-settings-avatar" id="accountSettingsAvatar">R</div>
+            <div class="account-settings-identity-copy">
+              <strong id="accountSettingsName">Rainbow User</strong>
+              <span>Personal profile · Saved on this device</span>
+            </div>
+            <button type="button" class="secondary-btn" id="accountSettingsEditBtn">Edit profile</button>
+          </div>
+          <div class="account-settings-section">
+            <h3>Profile & personalization</h3>
+            <p>Manage the name and avatar shown in your Rainbow AI workspace, and choose how your welcome message feels.</p>
+            <div class="account-settings-row"><div><strong>Display name</strong><span id="accountSettingsDisplayName">Rainbow User</span></div><button type="button" class="secondary-btn" id="accountSettingsEditNameBtn">Edit</button></div>
+            <div class="account-settings-row"><div><strong>Welcome greeting</strong><span id="accountSettingsGreeting">Random friendly greeting</span></div><button type="button" class="secondary-btn" id="accountSettingsGreetingBtn">Change</button></div>
+          </div>
+          <div class="account-settings-section">
+            <h3>Privacy & storage</h3>
+            <p>Your profile details are stored in this browser's local storage. They are not an online account or cloud-synced profile.</p>
+            <div class="account-settings-row"><div><strong>Profile image</strong><span id="accountSettingsImageStatus">No custom image set</span></div><button type="button" class="secondary-btn" id="accountSettingsImageBtn">Manage image</button></div>
+          </div>
+          <p class="account-settings-footnote">These controls apply to this browser on this device.</p>
+        </div>
+      </section>
+    </div>
 
     <!-- 1. SETTINGS MODAL -->
     <div
@@ -6231,13 +6287,34 @@
           openModal("profileModal");
         });
 
-        // Account Settings opens the main application settings, not the profile editor.
+        // Account Settings has its own dedicated modal and controls.
+        function syncAccountSettings() {
+          const profile = readProfile();
+          const name = (profile.name || "").trim() || "Rainbow User";
+          const greetingLabels = { random: "Random friendly greeting", friendly: "Friendly greeting", focused: "Focused greeting" };
+          $("#accountSettingsName").textContent = name;
+          $("#accountSettingsDisplayName").textContent = name;
+          $("#accountSettingsGreeting").textContent = greetingLabels[profile.greeting || "random"] || greetingLabels.random;
+          $("#accountSettingsImageStatus").textContent = profile.image ? "Custom profile image is set" : "No custom image set";
+          const avatar = $("#accountSettingsAvatar");
+          if (avatar) {
+            avatar.textContent = profile.image ? "" : name.charAt(0).toUpperCase();
+            avatar.style.backgroundImage = profile.image ? "url(" + JSON.stringify(profile.image) + ")" : "";
+            avatar.style.backgroundSize = "cover";
+            avatar.style.backgroundPosition = "center";
+          }
+        }
         $("#profileSettingsBtn")?.addEventListener("click", event => {
           event.preventDefault();
           event.stopPropagation();
           $("#profileMenu")?.classList.add("hidden");
-          openModal("settingsModal");
+          syncAccountSettings();
+          openModal("accountSettingsModal");
         });
+        $("#accountSettingsEditBtn")?.addEventListener("click", () => { closeModal("accountSettingsModal"); syncProfile(); openModal("profileModal"); });
+        $("#accountSettingsEditNameBtn")?.addEventListener("click", () => { closeModal("accountSettingsModal"); syncProfile(); openModal("profileModal"); });
+        $("#accountSettingsGreetingBtn")?.addEventListener("click", () => { closeModal("accountSettingsModal"); syncProfile(); openModal("profileModal"); $("#profileGreetingSelect")?.focus(); });
+        $("#accountSettingsImageBtn")?.addEventListener("click", () => { closeModal("accountSettingsModal"); syncProfile(); openModal("profileModal"); $("#profileImageUrlInput")?.focus(); });
         $("#chooseProfileImageBtn")?.addEventListener("click",()=>$("#profileImageFileInput")?.click());
         $("#profileImageFileInput")?.addEventListener("change",event=>{const file=event.target.files?.[0];if(!file)return;if(!file.type.startsWith("image/")){notify("Choose an image file.");return;}if(file.size>2*1024*1024){notify("Please choose an image under 2 MB.");return;}const reader=new FileReader();reader.onload=()=>{const profile=readProfile();profile.image=String(reader.result||"");try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));syncProfile();}catch{notify("Image is too large to save in this browser.");}};reader.readAsDataURL(file);});
         $("#profileImageUrlInput")?.addEventListener("change",()=>{const input=$("#profileImageUrlInput"),url=input.value.trim();if(!url)return;try{const parsed=new URL(url);if(!["http:","https:"].includes(parsed.protocol))throw new Error();const profile=readProfile();profile.image=parsed.href;localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));syncProfile();}catch{notify("Enter a valid public http or https image URL.");}});
