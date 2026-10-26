@@ -5956,8 +5956,8 @@
         });
 
         // Destructive actions require confirmation.
-        $("#wipeAllStorageBtn")?.addEventListener("click", () => {
-          if (!confirm("Erase Rainbow AI's saved chats, settings, and profile from this browser? This cannot be undone.")) return;
+        $("#wipeAllStorageBtn")?.addEventListener("click", async () => {
+          if (!await window.confirm("Erase Rainbow AI's saved chats, settings, and profile from this browser? This cannot be undone.")) return;
           try {
             localStorage.removeItem(STORAGE_KEY);
             localStorage.removeItem("rainbow_ai_profile");
