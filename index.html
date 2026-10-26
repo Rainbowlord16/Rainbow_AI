@@ -5117,15 +5117,29 @@
           toast: $("#toastRegion"),
         };
 
-        // Replace native alert boxes with an in-app centered dialog.
-        window.alert = function(message) {
-          const existing = document.getElementById("rainbowAlertBackdrop"); existing?.remove();
-          const backdrop=document.createElement("div");backdrop.id="rainbowAlertBackdrop";backdrop.className="rainbow-alert-backdrop";backdrop.setAttribute("role","presentation");
-          const card=document.createElement("section");card.className="rainbow-alert-card";card.setAttribute("role","alertdialog");card.setAttribute("aria-modal","true");card.setAttribute("aria-labelledby","rainbowAlertTitle");
-          const title=document.createElement("h2");title.id="rainbowAlertTitle";title.textContent="Rainbow AI";
-          const body=document.createElement("p");body.textContent=String(message);
-          const actions=document.createElement("div");actions.className="rainbow-alert-actions";const ok=document.createElement("button");ok.type="button";ok.textContent="OK";ok.addEventListener("click",()=>backdrop.remove());actions.appendChild(ok);card.append(title,body,actions);backdrop.appendChild(card);document.body.appendChild(backdrop);ok.focus();backdrop.addEventListener("click",e=>{if(e.target===backdrop)backdrop.remove();});document.addEventListener("keydown",function closeAlert(e){if(e.key==="Escape"&&document.getElementById("rainbowAlertBackdrop")){backdrop.remove();document.removeEventListener("keydown",closeAlert);}}, {once:true});
-        };
+        // Centered Rainbow AI dialogs for alerts, confirmations, and text prompts.
+        function rainbowDialog(message, mode = "alert", defaultValue = "") {
+          return new Promise(resolve => {
+            document.getElementById("rainbowAlertBackdrop")?.remove();
+            const backdrop=document.createElement("div"); backdrop.id="rainbowAlertBackdrop"; backdrop.className="rainbow-alert-backdrop";
+            const card=document.createElement("section"); card.className="rainbow-alert-card"; card.setAttribute("role",mode==="alert"?"alertdialog":"dialog"); card.setAttribute("aria-modal","true");
+            const title=document.createElement("h2"); title.textContent="Rainbow AI";
+            const body=document.createElement("p"); body.textContent=String(message ?? ""); card.append(title,body);
+            let field=null;
+            if(mode==="prompt"){field=document.createElement("input");field.type="text";field.className="form-input";field.value=defaultValue||"";field.style.width="100%";field.style.marginBottom="16px";card.appendChild(field);}
+            const actions=document.createElement("div"); actions.className="rainbow-alert-actions"; let settled=false;
+            const finish=value=>{if(settled)return;settled=true;backdrop.remove();document.removeEventListener("keydown",onKey);resolve(value);};
+            const onKey=e=>{if(e.key==="Escape")finish(mode==="alert"?undefined:mode==="confirm"?false:null);else if(e.key==="Enter"&&mode==="prompt")finish(field.value);};
+            if(mode!=="alert"){const cancel=document.createElement("button");cancel.type="button";cancel.className="btn btn-secondary";cancel.textContent="Cancel";cancel.addEventListener("click",()=>finish(mode==="confirm"?false:null));actions.appendChild(cancel);}
+            const ok=document.createElement("button");ok.type="button";ok.textContent=mode==="confirm"?"Continue":mode==="prompt"?"Save":"OK";ok.addEventListener("click",()=>finish(mode==="prompt"?field.value:mode==="confirm"?true:undefined));actions.appendChild(ok);
+            card.appendChild(actions);backdrop.appendChild(card);document.body.appendChild(backdrop);
+            backdrop.addEventListener("click",e=>{if(e.target===backdrop)finish(mode==="alert"?undefined:mode==="confirm"?false:null);});
+            document.addEventListener("keydown",onKey);(field||ok).focus();
+          });
+        }
+        window.alert = function(message) { void rainbowDialog(message, "alert"); };
+        window.confirm = function(message) { return rainbowDialog(message, "confirm"); };
+        window.prompt = function(message, defaultValue = "") { return rainbowDialog(message, "prompt", defaultValue); };
 
         function notify(message) {
           if (el.toast) {
@@ -5227,8 +5241,8 @@
         }
 
         function ensureConversation() { return activeConversation() || newConversation(); }
-        function renameConversation(id) { const chat=state.conversations.find(c=>c.id===id); if(!chat)return; const title=prompt("Edit chat title:",chat.title||"New Conversation"); if(title===null)return; if(!title.trim())return notify("Chat title cannot be empty."); chat.title=title.trim(); save(); renderAll(); notify("Chat title updated."); }
-        function deleteConversation(id) { const chat=state.conversations.find(c=>c.id===id); if(!chat)return; if(!confirm('Delete the entire chat "'+(chat.title||"New Conversation")+'"? This cannot be undone.'))return; state.conversations=state.conversations.filter(c=>c.id!==id); if(state.activeId===id)state.activeId=state.conversations[0]?.id||null; if(!state.activeId)newConversation();else{save();renderAll();} notify("Chat deleted."); }
+        async function renameConversation(id) { const chat=state.conversations.find(c=>c.id===id); if(!chat)return; const title=await window.prompt("Edit chat title:",chat.title||"New Conversation"); if(title===null)return; if(!title.trim())return notify("Chat title cannot be empty."); chat.title=title.trim(); save(); renderAll(); notify("Chat title updated."); }
+        async function deleteConversation(id) { const chat=state.conversations.find(c=>c.id===id); if(!chat)return; if(!await window.confirm('Delete the entire chat "'+(chat.title||"New Conversation")+'"? This cannot be undone.'))return; state.conversations=state.conversations.filter(c=>c.id!==id); if(state.activeId===id)state.activeId=state.conversations[0]?.id||null; if(!state.activeId)newConversation();else{save();renderAll();} notify("Chat deleted."); }
         function renderHistory() {
           if (!el.history) return; el.history.replaceChildren();
           for (const conversation of state.conversations) {
@@ -5603,7 +5617,7 @@
           const conversation = activeConversation();
           if (!conversation) return;
 
-          if (!confirm("Clear all messages in this conversation?")) return;
+          if (!await window.confirm("Clear all messages in this conversation?")) return;
           conversation.messages = [];
           conversation.title = "New Conversation";
           save();
@@ -5959,7 +5973,7 @@
           notify("Local Rainbow AI data erased.");
         });
         $("#privacyClearHistoryBtn")?.addEventListener("click", () => {
-          if (!confirm("Delete all conversations from this browser? This cannot be undone.")) return;
+          if (!await window.confirm("Delete all conversations from this browser? This cannot be undone.")) return;
           state.conversations = [];
           state.activeId = null;
           save(); newConversation(); closeModal("privacyModal");
@@ -6058,7 +6072,7 @@
         $("#toggleNewPromptFormBtn")?.addEventListener("click", () => { $("#editPromptIdInput").value=""; $("#newPromptTitleInput").value=""; $("#newPromptContentInput").value=""; togglePanel("promptEditorForm", true); });
         $("#cancelPromptFormBtn")?.addEventListener("click", () => togglePanel("promptEditorForm", false));
         const TEMPLATE_KEY="rainbow_ai_custom_templates"; let customTemplates=[]; try{const saved=JSON.parse(localStorage.getItem(TEMPLATE_KEY)||"[]");if(Array.isArray(saved))customTemplates=saved;}catch{}
-        function renderCustomTemplates(){const grid=$("#promptStudioGrid");if(!grid)return;grid.replaceChildren();customTemplates.forEach(t=>{const card=document.createElement("div");card.className="prompt-template-card";const title=document.createElement("strong");title.textContent=t.name;const body=document.createElement("p");body.textContent=t.prompt.slice(0,180);const actions=document.createElement("div");actions.className="prompt-template-actions";const add=(label,fn)=>{const b=document.createElement("button");b.type="button";b.className="btn btn-secondary";b.textContent=label;b.addEventListener("click",fn);actions.appendChild(b);};add("Use",()=>{if(el.input){el.input.value=t.prompt;el.input.dispatchEvent(new Event("input",{bubbles:true}));}closeModal("promptStudioModal");el.input?.focus();});add("Copy",async()=>{try{await navigator.clipboard.writeText(t.prompt);notify("Prompt copied.");}catch{notify("Clipboard access was blocked.");}});add("Edit",()=>{$("#editPromptIdInput").value=t.id;$("#newPromptTitleInput").value=t.name;$("#newPromptContentInput").value=t.prompt;$("#newPromptCategorySelect").value=t.category||"custom";togglePanel("promptEditorForm",true);});add("Delete",()=>{if(!confirm("Delete this prompt template?"))return;customTemplates=customTemplates.filter(x=>x.id!==t.id);localStorage.setItem(TEMPLATE_KEY,JSON.stringify(customTemplates));renderCustomTemplates();notify("Prompt deleted.");});card.append(title,body,actions);grid.appendChild(card);});}
+        function renderCustomTemplates(){const grid=$("#promptStudioGrid");if(!grid)return;grid.replaceChildren();customTemplates.forEach(t=>{const card=document.createElement("div");card.className="prompt-template-card";const title=document.createElement("strong");title.textContent=t.name;const body=document.createElement("p");body.textContent=t.prompt.slice(0,180);const actions=document.createElement("div");actions.className="prompt-template-actions";const add=(label,fn)=>{const b=document.createElement("button");b.type="button";b.className="btn btn-secondary";b.textContent=label;b.addEventListener("click",fn);actions.appendChild(b);};add("Use",()=>{if(el.input){el.input.value=t.prompt;el.input.dispatchEvent(new Event("input",{bubbles:true}));}closeModal("promptStudioModal");el.input?.focus();});add("Copy",async()=>{try{await navigator.clipboard.writeText(t.prompt);notify("Prompt copied.");}catch{notify("Clipboard access was blocked.");}});add("Edit",()=>{$("#editPromptIdInput").value=t.id;$("#newPromptTitleInput").value=t.name;$("#newPromptContentInput").value=t.prompt;$("#newPromptCategorySelect").value=t.category||"custom";togglePanel("promptEditorForm",true);});add("Delete",async()=>{if(!await window.confirm("Delete this prompt template?"))return;customTemplates=customTemplates.filter(x=>x.id!==t.id);localStorage.setItem(TEMPLATE_KEY,JSON.stringify(customTemplates));renderCustomTemplates();notify("Prompt deleted.");});card.append(title,body,actions);grid.appendChild(card);});}
         $("#savePromptTemplateBtn")?.addEventListener("click",()=>{const name=$("#newPromptTitleInput")?.value.trim(),promptText=$("#newPromptContentInput")?.value.trim();if(!name||!promptText)return notify("Enter a template name and prompt first.");const id=$("#editPromptIdInput")?.value;const item={id:id||((crypto.randomUUID&&crypto.randomUUID())||String(Date.now())),name,prompt:promptText,category:$("#newPromptCategorySelect")?.value||"custom"};if(id)customTemplates=customTemplates.map(t=>t.id===id?item:t);else customTemplates.unshift(item);try{localStorage.setItem(TEMPLATE_KEY,JSON.stringify(customTemplates));}catch{}renderCustomTemplates();togglePanel("promptEditorForm",false);notify(id?"Template updated.":"Template saved.");}); renderCustomTemplates();
 
         // Projects: provide a functional local create/list flow.
