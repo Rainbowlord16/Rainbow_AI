@@ -5613,7 +5613,7 @@
         });
 
         // Clear current chat.
-        $("#clearCurrentChatBtn")?.addEventListener("click", () => {
+        $("#clearCurrentChatBtn")?.addEventListener("click", async () => {
           const conversation = activeConversation();
           if (!conversation) return;
 
