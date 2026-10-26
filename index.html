@@ -3935,10 +3935,8 @@
         <div class="modal-body">
           <div
             id="settingsTabGateway"
-            class="settings-tab-pane hidden"
-            aria-hidden="true"
-            style="display: none; flex-direction: column; gap: var(--space-md)"
-          >
+            data-settings-panel="gateway" class="settings-tab-pane"
+           aria-hidden="false" style="display: flex; flex-direction: column; gap: var(--space-md)">
             <div class="form-group">
               <label for="gatewayUrlInput" class="form-label"
                 ><span>Inference Gateway Base URL</span
@@ -4028,9 +4026,8 @@
 
           <div
             id="settingsTabAppearance"
-            class="settings-tab-pane hidden"
-            style="display: flex; flex-direction: column; gap: var(--space-md)"
-          >
+            data-settings-panel="appearance" class="settings-tab-pane hidden"
+           aria-hidden="true" style="display: none; flex-direction: column; gap: var(--space-md)">
             <div class="form-group">
               <label for="themeSelect" class="form-label">Color Theme</label
               ><select id="themeSelect" class="form-select">
@@ -4082,9 +4079,8 @@
 
           <div
             id="settingsTabBehavior"
-            class="settings-tab-pane hidden"
-            style="display: flex; flex-direction: column; gap: var(--space-md)"
-          >
+            data-settings-panel="behavior" class="settings-tab-pane hidden"
+           aria-hidden="true" style="display: none; flex-direction: column; gap: var(--space-md)">
             <div class="form-row-inline">
               <div>
                 <div class="form-label">Send on Enter</div>
@@ -4149,9 +4145,8 @@
 
           <div
             id="settingsTabBackup"
-            class="settings-tab-pane hidden"
-            style="display: flex; flex-direction: column; gap: var(--space-md)"
-          >
+            data-settings-panel="backup" class="settings-tab-pane hidden"
+           aria-hidden="true" style="display: none; flex-direction: column; gap: var(--space-md)">
             <div class="form-group">
               <div class="form-label">Export Full Workspace Backup</div>
               <p class="form-help">Download all data as JSON.</p>
@@ -5522,7 +5517,7 @@
         // Support close buttons with data-close-modal and Escape key.
         document.addEventListener("keydown", (event) => {
           if (event.key === "Escape") {
-            $(".modal, [role='dialog']").forEach((modal) => {
+            $$(".modal, [role='dialog']").forEach((modal) => {
               if (modal.id) closeModal(modal.id);
             });
           }
@@ -5798,23 +5793,26 @@
         }
 
         function showSettingsTab(tabName) {
-          $("[data-settings-tab]").forEach((button) => {
+          $$("[data-settings-tab]").forEach((button) => {
             const active = button.dataset.settingsTab === tabName;
             button.classList.toggle("active", active);
             button.setAttribute("aria-selected", String(active));
           });
-          $("[data-settings-panel]").forEach((panel) => {
-            panel.classList.toggle("hidden", panel.dataset.settingsPanel !== tabName);
+          $$("[data-settings-panel]").forEach((panel) => {
+            const active = panel.dataset.settingsPanel === tabName;
+            panel.classList.toggle("hidden", !active);
+            panel.style.display = active ? "flex" : "none";
+            panel.setAttribute("aria-hidden", String(!active));
           });
         }
 
         function showPromptCategory(category) {
-          $("[data-prompt-cat]").forEach((button) => {
+          $$("[data-prompt-cat]").forEach((button) => {
             const active = button.dataset.promptCat === category;
             button.classList.toggle("active", active);
             button.setAttribute("aria-selected", String(active));
           });
-          $("[data-prompt-category]").forEach((item) => {
+          $$("[data-prompt-category]").forEach((item) => {
             item.classList.toggle("hidden", category !== "all" && item.dataset.promptCategory !== category);
           });
         }
@@ -5867,8 +5865,8 @@
         // Clear active project filter.
         $("#clearActiveProjectBtn")?.addEventListener("click", () => {
           $("#activeProjectBanner")?.classList.add("hidden");
-          $(".history-item").forEach(item => item.hidden = false);
-          $("[data-filter]").forEach(item => {
+          $$(".history-item").forEach(item => item.hidden = false);
+          $$("[data-filter]").forEach(item => {
             item.classList.toggle("active", item.dataset.filter === "all");
             item.setAttribute("aria-selected", String(item.dataset.filter === "all"));
           });
@@ -6036,7 +6034,7 @@
         });
 
         // Settings tabs and save action.
-        $("[data-settings-tab]").forEach((button) => button.addEventListener("click", () => showSettingsTab(button.dataset.settingsTab)));
+        $$("[data-settings-tab]").forEach((button) => button.addEventListener("click", () => showSettingsTab(button.dataset.settingsTab)));
         $("#saveSettingsBtn")?.addEventListener("click", () => {
           const theme = $("#themeSelect")?.value;
           if (theme) setTheme(theme);
@@ -6111,14 +6109,14 @@
         });
 
         // History filters and utility buttons.
-        $("[data-filter]").forEach((button) => button.addEventListener("click", () => {
+        $$("[data-filter]").forEach((button) => button.addEventListener("click", () => {
           const filter = button.dataset.filter;
-          $("[data-filter]").forEach((item) => {
+          $$("[data-filter]").forEach((item) => {
             const active = item === button;
             item.classList.toggle("active", active);
             item.setAttribute("aria-selected", String(active));
           });
-          $(".history-item", el.history || document).forEach((item) => {
+          $$(".history-item", el.history || document).forEach((item) => {
             const conversation = state.conversations.find((c) => c.title === item.textContent);
             item.hidden = filter === "pinned" ? !conversation?.pinned : filter === "archived" ? !conversation?.archived : filter === "project" ? !conversation?.projectId : false;
           });
@@ -6139,7 +6137,7 @@
         function syncProfile() {
           const profile = readProfile(), name = (profile.name || "").trim();
           if ($("#profileDisplayName")) $("#profileDisplayName").textContent = name || "Rainbow User";
-          $(".profile-avatar").forEach(node => node.textContent = (name[0] || "R").toUpperCase());
+          $$(".profile-avatar").forEach(node => node.textContent = (name[0] || "R").toUpperCase());
           if ($("#profileNameInput")) $("#profileNameInput").value = name;
           if ($("#profileGreetingSelect")) $("#profileGreetingSelect").value = profile.greeting || "random";
         }
