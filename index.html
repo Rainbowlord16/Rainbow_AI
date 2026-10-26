@@ -5998,25 +5998,18 @@
           $("#canvasToggleBtn")?.setAttribute("aria-pressed", String(state.canvasOpen));
         });
         $("#canvasModeEditBtn")?.addEventListener("click", () => {
-          togglePanel("canvasEditorPanel", true);
-          togglePanel("canvasPreviewPanel", false);
+          $("#canvasTextarea")?.classList.remove("hidden"); $("#canvasPreviewPane")?.classList.add("hidden");
         });
         $("#canvasModePreviewBtn")?.addEventListener("click", () => {
-          togglePanel("canvasEditorPanel", false);
-          togglePanel("canvasPreviewPanel", true);
-          const preview = $("#canvasPreviewFrame");
-          const editor = $("#canvasEditor");
+          $("#canvasTextarea")?.classList.add("hidden"); $("#canvasPreviewPane")?.classList.remove("hidden");
+          const preview = $("#canvasPreviewPane");
+          const editor = $("#canvasTextarea");
           if (preview && editor) {
-            const doc = preview.contentDocument;
-            if (doc) {
-              doc.open();
-              doc.write(editor.value || "");
-              doc.close();
-            }
+            preview.textContent = editor.value || "";
           }
         });
         $("#canvasCopyBtn")?.addEventListener("click", async () => {
-          const editor = $("#canvasEditor");
+          const editor = $("#canvasTextarea");
           if (!editor) return notify("Canvas editor is unavailable.");
           try {
             await navigator.clipboard.writeText(editor.value);
@@ -6024,12 +6017,12 @@
           } catch { notify("Clipboard access was blocked by the browser."); }
         });
         $("#canvasDownloadBtn")?.addEventListener("click", () => {
-          const editor = $("#canvasEditor");
+          const editor = $("#canvasTextarea");
           if (editor) downloadFile("rainbow-canvas.md", editor.value, "text/markdown;charset=utf-8");
           else notify("Canvas editor is unavailable.");
         });
         $("#canvasSnapshotBtn")?.addEventListener("click", () => {
-          const editor = $("#canvasEditor");
+          const editor = $("#canvasTextarea");
           if (!editor) return notify("Canvas editor is unavailable.");
           try {
             localStorage.setItem("rainbow_ai_canvas_snapshot", editor.value);
@@ -6037,7 +6030,7 @@
           } catch { notify("Could not save the Canvas snapshot."); }
         });
         $("#canvasAskAiRefineBtn")?.addEventListener("click", () => {
-          const editor = $("#canvasEditor");
+          const editor = $("#canvasTextarea");
           const prompt = editor?.value.trim();
           if (!prompt) return notify("Add some content to Canvas first.");
           closeModal("canvasDrawer");
