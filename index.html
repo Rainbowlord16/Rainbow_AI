@@ -6154,7 +6154,7 @@
         const PROFILE_KEY = "rainbow_ai_profile";
         function readProfile() { try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || "{}"); } catch { return {}; } }
         function setProfileAvatar(imageSrc) {
-          $(".profile-avatar").forEach(node => {
+          $$(".profile-avatar").forEach(node => {
             if (imageSrc) { node.textContent = ""; node.style.backgroundImage = "url("+JSON.stringify(imageSrc)+")"; node.style.backgroundSize = "cover"; node.style.backgroundPosition = "center"; }
             else { node.style.backgroundImage = ""; node.textContent = ((readProfile().name || "Rainbow User")[0] || "R").toUpperCase(); }
           });
@@ -6164,7 +6164,7 @@
         function syncProfile() {
           const profile = readProfile(), name = (profile.name || "").trim();
           if ($("#profileDisplayName")) $("#profileDisplayName").textContent = name || "Rainbow User";
-          $(".profile-avatar").forEach(node => { if(!profile.image) { node.style.backgroundImage=""; node.textContent=(name[0]||"R").toUpperCase(); }});
+          $$(".profile-avatar").forEach(node => { if(!profile.image) { node.style.backgroundImage=""; node.textContent=(name[0]||"R").toUpperCase(); }});
           if ($("#profileNameInput")) $("#profileNameInput").value = name;
           if ($("#profileGreetingSelect")) $("#profileGreetingSelect").value = profile.greeting || "random";
           if ($("#profileImageUrlInput")) $("#profileImageUrlInput").value = profile.image && /^https?:/i.test(profile.image) ? profile.image : "";
