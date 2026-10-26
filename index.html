@@ -2777,7 +2777,9 @@
       #appShell.sidebar-collapsed #sidebarCollapseBtn { opacity:0; pointer-events:none; }
       #appShell.sidebar-collapsed .sidebar-header:hover #sidebarCollapseBtn { opacity:1; pointer-events:auto; }
       #appShell.sidebar-collapsed .sidebar-header:hover .brand-logo-btn .brand-mark { opacity:.2; }
-      .profile-avatar { width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#ff9a00,#ef39ba,#4b8dff);color:white;font-weight:700; }
+      .profile-avatar { width:36px;height:36px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,#ff9a00,#ef39ba,#4b8dff);color:white;font-weight:700;object-fit:cover; }
+      .brand-logo-image{width:26px;height:26px;object-fit:contain;transition:opacity .15s ease}.brand-collapse-glyph{display:none;width:22px;height:22px}.brand-icon:hover .brand-logo-image{opacity:1}.brand-logo-btn:hover .brand-icon .brand-logo-image{display:none}.brand-logo-btn:hover .brand-icon .brand-collapse-glyph{display:block}.brand-original-mark{display:none}.welcome-logo-image{width:38px;height:38px;object-fit:contain}.welcome-original-mark{display:none}.profile-image-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0 16px}.profile-image-preview{width:56px;height:56px;object-fit:cover;border-radius:50%;border:1px solid var(--border-default)}
+      .rainbow-alert-backdrop{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.58);backdrop-filter:blur(8px)}.rainbow-alert-card{width:min(420px,100%);border:1px solid var(--border-default);border-radius:20px;padding:24px;background:var(--bg-surface-1,#11131a);color:var(--text-primary,#f8fafc);box-shadow:0 24px 80px rgba(0,0,0,.42)}.rainbow-alert-card h2{font-size:1.1rem;margin:0 0 10px}.rainbow-alert-card p{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 22px;color:var(--text-secondary,#cbd5e1);line-height:1.5}.rainbow-alert-actions{display:flex;justify-content:flex-end}.rainbow-alert-card button{border:0;border-radius:10px;padding:10px 18px;background:var(--accent-primary,#6366f1);color:white;font:inherit;font-weight:600;cursor:pointer}
       .profile-menu { position:absolute;z-index:80;right:14px;bottom:70px;width:230px;padding:8px;border:1px solid var(--border,#303341);border-radius:14px;background:var(--panel,#141620);box-shadow:0 14px 42px #0005; }
       .profile-menu button { display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:0;border-radius:9px;background:transparent;color:inherit;text-align:left;cursor:pointer; }
       .profile-menu button:hover { background:var(--hover,#252836); }
@@ -2827,7 +2829,9 @@
             title="Rainbow AI — New Chat"
           >
             <span class="brand-icon" aria-hidden="true">
-              <svg viewBox="0 0 64 64" fill="none">
+              <img class="brand-logo-image" src="./icon-new.png" alt="" />
+              <svg class="brand-collapse-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
+              <svg class="brand-original-mark" viewBox="0 0 64 64" fill="none">
                 <defs>
                   <linearGradient
                     id="brandRainbowGrad"
@@ -3543,7 +3547,8 @@
               <div id="chatStreamInner" class="chat-stream-inner">
                 <div id="welcomeScreen" class="welcome-screen">
                   <div class="welcome-prism-badge" aria-hidden="true">
-                    <svg viewBox="0 0 64 64" fill="none">
+                    <img src="./icon-new.png" alt="" class="welcome-logo-image" />
+                    <svg class="welcome-original-mark" viewBox="0 0 64 64" fill="none">
                       <path
                         d="M10 46 A22 22 0 0 1 54 46"
                         stroke="url(#brandRainbowGrad)"
@@ -3562,10 +3567,7 @@
                   </div>
 
                   <div>
-                    <h2 class="welcome-heading">
-                      Welcome to
-                      <span class="welcome-heading-rainbow">Rainbow AI</span>
-                    </h2>
+                    <h2 class="welcome-heading">Where shall we begin?</h2>
                     <p class="welcome-subtext">
                       Your helpful AI workspace for writing, learning, coding, and exploring ideas.
                     </p>
@@ -5059,7 +5061,7 @@
     <div id="profileModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle" aria-hidden="true">
       <div class="modal-backdrop" data-close-modal="profileModal"></div><div class="modal-panel">
         <div class="modal-header"><h2 id="profileModalTitle">Your profile</h2><button type="button" class="icon-btn" data-close-modal="profileModal" aria-label="Close profile settings">×</button></div>
-        <div class="modal-body"><label class="form-label" for="profileNameInput">Display name</label><input id="profileNameInput" class="form-input" maxlength="40" placeholder="What should Rainbow AI call you?"/>
+        <div class="modal-body"><label class="form-label" for="profileImageUrlInput">Profile image URL</label><input id="profileImageUrlInput" class="form-input" type="url" placeholder="https://example.com/avatar.png" autocomplete="url"/><div class="profile-image-row"><img id="profileImagePreview" class="profile-image-preview hidden" alt="Profile image preview"/><button type="button" class="btn btn-secondary" id="chooseProfileImageBtn">Upload image</button><button type="button" class="btn btn-secondary" id="clearProfileImageBtn">Remove image</button><input id="profileImageFileInput" type="file" accept="image/*" hidden/></div><p class="form-help">Use a public image URL or upload an image from your device. Saved only in this browser.</p><label class="form-label" for="profileNameInput">Display name</label><input id="profileNameInput" class="form-input" maxlength="40" placeholder="What should Rainbow AI call you?"/>
         <p class="form-help">This profile is saved only in this browser. No account or sign-in is required.</p>
         <label class="form-label" for="profileGreetingSelect">Welcome greeting</label><select id="profileGreetingSelect" class="form-select"><option value="random">Surprise me each refresh</option><option value="friendly">Friendly and relaxed</option><option value="focused">Focused and productive</option></select></div>
         <div class="modal-footer"><button type="button" class="btn btn-secondary" data-close-modal="profileModal">Cancel</button><button id="saveProfileBtn" type="button" class="btn btn-primary">Save profile</button></div>
@@ -5113,6 +5115,16 @@
           scroll: $("#chatScrollContainer"),
           announce: $("#srAnnouncer"),
           toast: $("#toastRegion"),
+        };
+
+        // Replace native alert boxes with an in-app centered dialog.
+        window.alert = function(message) {
+          const existing = document.getElementById("rainbowAlertBackdrop"); existing?.remove();
+          const backdrop=document.createElement("div");backdrop.id="rainbowAlertBackdrop";backdrop.className="rainbow-alert-backdrop";backdrop.setAttribute("role","presentation");
+          const card=document.createElement("section");card.className="rainbow-alert-card";card.setAttribute("role","alertdialog");card.setAttribute("aria-modal","true");card.setAttribute("aria-labelledby","rainbowAlertTitle");
+          const title=document.createElement("h2");title.id="rainbowAlertTitle";title.textContent="Rainbow AI";
+          const body=document.createElement("p");body.textContent=String(message);
+          const actions=document.createElement("div");actions.className="rainbow-alert-actions";const ok=document.createElement("button");ok.type="button";ok.textContent="OK";ok.addEventListener("click",()=>backdrop.remove());actions.appendChild(ok);card.append(title,body,actions);backdrop.appendChild(card);document.body.appendChild(backdrop);ok.focus();backdrop.addEventListener("click",e=>{if(e.target===backdrop)backdrop.remove();});document.addEventListener("keydown",function closeAlert(e){if(e.key==="Escape"&&document.getElementById("rainbowAlertBackdrop")){backdrop.remove();document.removeEventListener("keydown",closeAlert);}}, {once:true});
         };
 
         function notify(message) {
@@ -6134,22 +6146,39 @@
 
         const PROFILE_KEY = "rainbow_ai_profile";
         function readProfile() { try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || "{}"); } catch { return {}; } }
+        function setProfileAvatar(imageSrc) {
+          $(".profile-avatar").forEach(node => {
+            if (imageSrc) { node.textContent = ""; node.style.backgroundImage = "url("+JSON.stringify(imageSrc)+")"; node.style.backgroundSize = "cover"; node.style.backgroundPosition = "center"; }
+            else { node.style.backgroundImage = ""; node.textContent = ((readProfile().name || "Rainbow User")[0] || "R").toUpperCase(); }
+          });
+          const preview=$("#profileImagePreview");
+          if(preview){preview.src=imageSrc||"";preview.classList.toggle("hidden",!imageSrc);}
+        }
         function syncProfile() {
           const profile = readProfile(), name = (profile.name || "").trim();
           if ($("#profileDisplayName")) $("#profileDisplayName").textContent = name || "Rainbow User";
-          $$(".profile-avatar").forEach(node => node.textContent = (name[0] || "R").toUpperCase());
+          $(".profile-avatar").forEach(node => { if(!profile.image) { node.style.backgroundImage=""; node.textContent=(name[0]||"R").toUpperCase(); }});
           if ($("#profileNameInput")) $("#profileNameInput").value = name;
           if ($("#profileGreetingSelect")) $("#profileGreetingSelect").value = profile.greeting || "random";
+          if ($("#profileImageUrlInput")) $("#profileImageUrlInput").value = profile.image && /^https?:/i.test(profile.image) ? profile.image : "";
+          setProfileAvatar(profile.image || "");
         }
         $("#openProfileBtn")?.addEventListener("click", () => { $("#profileMenu")?.classList.toggle("hidden"); syncProfile(); });
         for (const id of ["editProfileBtn","profileSettingsBtn"]) document.getElementById(id)?.addEventListener("click", () => { $("#profileMenu")?.classList.add("hidden"); syncProfile(); openModal("profileModal"); });
+        $("#chooseProfileImageBtn")?.addEventListener("click",()=>$("#profileImageFileInput")?.click());
+        $("#profileImageFileInput")?.addEventListener("change",event=>{const file=event.target.files?.[0];if(!file)return;if(!file.type.startsWith("image/")){notify("Choose an image file.");return;}if(file.size>2*1024*1024){notify("Please choose an image under 2 MB.");return;}const reader=new FileReader();reader.onload=()=>{const profile=readProfile();profile.image=String(reader.result||"");try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));syncProfile();}catch{notify("Image is too large to save in this browser.");}};reader.readAsDataURL(file);});
+        $("#profileImageUrlInput")?.addEventListener("change",()=>{const input=$("#profileImageUrlInput"),url=input.value.trim();if(!url)return;try{const parsed=new URL(url);if(!["http:","https:"].includes(parsed.protocol))throw new Error();const profile=readProfile();profile.image=parsed.href;localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));syncProfile();}catch{notify("Enter a valid public http or https image URL.");}});
+        $("#clearProfileImageBtn")?.addEventListener("click",()=>{const profile=readProfile();delete profile.image;localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));syncProfile();if($("#profileImageUrlInput"))$("#profileImageUrlInput").value="";if($("#profileImageFileInput"))$("#profileImageFileInput").value="";});
         $("#saveProfileBtn")?.addEventListener("click", () => {
-          localStorage.setItem(PROFILE_KEY, JSON.stringify({name:$("#profileNameInput")?.value.trim() || "", greeting:$("#profileGreetingSelect")?.value || "random"}));
+          const profile=readProfile();profile.name=$("#profileNameInput")?.value.trim() || "";profile.greeting=$("#profileGreetingSelect")?.value || "random";
+          const imageUrl=$("#profileImageUrlInput")?.value.trim();if(imageUrl){try{const parsed=new URL(imageUrl);if(!["http:","https:"].includes(parsed.protocol))throw new Error();profile.image=parsed.href;}catch{notify("Enter a valid public http or https image URL.");return;}}
+          try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));}catch{notify("Could not save profile. Try a smaller image.");return;}
           syncProfile(); closeModal("profileModal"); notify("Profile settings saved on this device.");
         });
         document.addEventListener("click", event => { if (!event.target.closest("#profileMenu") && !event.target.closest("#openProfileBtn")) $("#profileMenu")?.classList.add("hidden"); });
-        const welcomeLines = ["Let’s get started.", "Your move.", "What should we work on?", "What’s on your mind?", "Ready when you are.", "Let’s make something great.", "Where shall we begin?", "What can I help you explore?"];
+        const welcomeLines = ["Where shall we begin?", "What should we work on?", "What’s on your mind?", "Ready when you are.", "Let’s make something great.", "What can I help you explore?"];
         const profileGreeting = readProfile().greeting || "random";
+        syncProfile();
         const greetingPool = profileGreeting === "focused" ? ["Let’s make progress.", "What’s the priority today?", "What shall we tackle first?"] : profileGreeting === "friendly" ? ["Hey there! What’s on your mind?", "Ready when you are.", "What would you like to explore?"] : welcomeLines;
         const greetingHeading = $(".welcome-heading");
         if (greetingHeading) {
