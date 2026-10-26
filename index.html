@@ -2793,6 +2793,21 @@
       #profileModal .modal-backdrop { position: absolute; inset: 0; }
       #profileModal .modal-panel { position: relative; z-index: 1; width: min(520px, calc(100vw - 32px)); max-height: 88vh; overflow: auto; margin: auto; }
 
+
+      /* Interaction hotfix: keep one logo visible and make it the sidebar toggle. */
+      .brand-icon { position: relative; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 30px; width: 30px; height: 30px; }
+      .brand-icon .brand-logo-image { display: block !important; opacity: 1 !important; }
+      .brand-icon .brand-collapse-glyph, .brand-icon .brand-original-mark { display: none !important; }
+      #appShell.sidebar-collapsed .brand-logo-btn:hover .brand-icon .brand-logo-image { display: none !important; }
+      #appShell.sidebar-collapsed .brand-logo-btn:hover .brand-icon .brand-collapse-glyph { display: block !important; }
+      #appShell:not(.sidebar-collapsed) .brand-logo-btn:hover .brand-icon .brand-logo-image { display: block !important; }
+      #appShell:not(.sidebar-collapsed) .brand-logo-btn:hover .brand-icon .brand-collapse-glyph { display: none !important; }
+      #profileModal:not(.hidden) { display: block !important; }
+      #profileModal .modal-backdrop { z-index: 0 !important; }
+      #profileModal .modal-panel { position: relative !important; z-index: 2 !important; display: block !important; }
+      #profileModal .modal-panel, #profileModal .modal-panel * { pointer-events: auto; }
+      @media (max-width: 768px) { #sidebarBackdrop { display: none !important; } }
+
     </style>
   </head>
 
@@ -3304,23 +3319,7 @@
       <main class="workspace-main">
         <header class="workspace-header">
           <div class="header-left">
-            <button
-              id="mobileMenuBtn"
-              type="button"
-              class="icon-btn"
-              aria-label="Open navigation menu"
-              title="Toggle navigation"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              >
-                <path d="M3 12h18M3 6h18M3 18h18" />
-              </svg>
-            </button>
+              <!-- Mobile hamburger removed: use the sidebar brand control instead. -->
 
             <div class="header-chat-title-wrap">
               <h1
@@ -5597,22 +5596,8 @@
           $("#appShell")?.classList.remove("mobile-sidebar-open");
           $("#sidebarBackdrop")?.classList.remove("visible");
         }
-        $("#mobileMenuBtn")?.addEventListener("click", () => {
-          const shell = $("#appShell");
-          if (!shell) return;
-          const opening = !shell.classList.contains("mobile-sidebar-open");
-          shell.classList.toggle("mobile-sidebar-open", opening);
-          $("#sidebarBackdrop")?.classList.toggle("visible", opening);
-        });
+        // Mobile hamburger navigation removed; no drawer toggle handler is needed.
         $("#sidebarBackdrop")?.addEventListener("click", closeMobileSidebar);
-        $("#sidebar")?.querySelectorAll("button, a").forEach(item => {
-          item.addEventListener("click", () => {
-            if (window.matchMedia("(max-width: 768px)").matches) closeMobileSidebar();
-          });
-        });
-        document.addEventListener("keydown", event => {
-          if (event.key === "Escape") closeMobileSidebar();
-        });
 
         // Search/filter conversation history.
         $("#sidebarSearchInput")?.addEventListener("input", (event) => {
