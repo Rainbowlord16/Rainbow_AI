@@ -2808,6 +2808,47 @@
       #profileModal .modal-panel, #profileModal .modal-panel * { pointer-events: auto; }
       @media (max-width: 768px) { #sidebarBackdrop { display: none !important; } }
 
+      /* Profile modal: visible, shaped panel above the intentional blur backdrop. */
+      #profileModal:not(.hidden) {
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 10000 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 20px !important;
+        isolation: isolate;
+      }
+      #profileModal:not(.hidden) > .modal-backdrop {
+        position: absolute !important;
+        inset: 0 !important;
+        z-index: 0 !important;
+        background: rgba(5, 8, 18, .62) !important;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+      #profileModal:not(.hidden) > .modal-panel {
+        position: relative !important;
+        z-index: 1 !important;
+        display: block !important;
+        width: min(520px, calc(100vw - 40px)) !important;
+        max-height: min(88vh, 760px) !important;
+        overflow: auto !important;
+        margin: 0 !important;
+        padding: 24px !important;
+        border: 1px solid var(--border-default, rgba(255,255,255,.16)) !important;
+        border-radius: 22px !important;
+        background: var(--bg-surface-1, #151824) !important;
+        color: var(--text-primary, #f8fafc) !important;
+        box-shadow: 0 24px 80px rgba(0,0,0,.48) !important;
+        pointer-events: auto !important;
+      }
+      #profileModal:not(.hidden) > .modal-panel button,
+      #profileModal:not(.hidden) > .modal-panel input,
+      #profileModal:not(.hidden) > .modal-panel select {
+        pointer-events: auto !important;
+      }
+
     </style>
   </head>
 
@@ -6174,13 +6215,28 @@
           if ($("#profileImageUrlInput")) $("#profileImageUrlInput").value = profile.image && /^https?:/i.test(profile.image) ? profile.image : "";
           setProfileAvatar(profile.image || "");
         }
-        $("#openProfileBtn")?.addEventListener("click", () => { $("#profileMenu")?.classList.toggle("hidden"); syncProfile(); });
-        for (const id of ["editProfileBtn","profileSettingsBtn"]) document.getElementById(id)?.addEventListener("click", event => {
+        $("#openProfileBtn")?.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          $("#profileMenu")?.classList.toggle("hidden");
+          syncProfile();
+        });
+
+        // Edit Account edits the user's name, greeting, and avatar.
+        $("#editProfileBtn")?.addEventListener("click", event => {
           event.preventDefault();
           event.stopPropagation();
           $("#profileMenu")?.classList.add("hidden");
           syncProfile();
           openModal("profileModal");
+        });
+
+        // Account Settings opens the main application settings, not the profile editor.
+        $("#profileSettingsBtn")?.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          $("#profileMenu")?.classList.add("hidden");
+          openModal("settingsModal");
         });
         $("#chooseProfileImageBtn")?.addEventListener("click",()=>$("#profileImageFileInput")?.click());
         $("#profileImageFileInput")?.addEventListener("change",event=>{const file=event.target.files?.[0];if(!file)return;if(!file.type.startsWith("image/")){notify("Choose an image file.");return;}if(file.size>2*1024*1024){notify("Please choose an image under 2 MB.");return;}const reader=new FileReader();reader.onload=()=>{const profile=readProfile();profile.image=String(reader.result||"");try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));syncProfile();}catch{notify("Image is too large to save in this browser.");}};reader.readAsDataURL(file);});
