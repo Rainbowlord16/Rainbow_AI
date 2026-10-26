@@ -5972,7 +5972,7 @@
           if (el.gateway) el.gateway.value = state.gateway;
           notify("Local Rainbow AI data erased.");
         });
-        $("#privacyClearHistoryBtn")?.addEventListener("click", () => {
+        $("#privacyClearHistoryBtn")?.addEventListener("click", async () => {
           if (!await window.confirm("Delete all conversations from this browser? This cannot be undone.")) return;
           state.conversations = [];
           state.activeId = null;
