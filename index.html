@@ -45,7 +45,7 @@
       referrerpolicy="no-referrer"
     ></script>
     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.9/purify.min.js"
+      src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.3.1/purify.min.js"
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
@@ -2671,7 +2671,9 @@
         }
       }
 
+      .mobile-menu-trigger { display: none; }
       @media (max-width: 768px) {
+        .mobile-menu-trigger { display: inline-flex; }
         .sidebar {
           position: fixed;
           top: 2px;
@@ -2806,7 +2808,7 @@
       #profileModal .modal-backdrop { z-index: 0 !important; }
       #profileModal .modal-panel { position: relative !important; z-index: 2 !important; display: block !important; }
       #profileModal .modal-panel, #profileModal .modal-panel * { pointer-events: auto; }
-      @media (max-width: 768px) { #sidebarBackdrop { display: none !important; } }
+      @media (max-width: 768px) { #sidebarBackdrop { display: block; } }
 
       /* Profile modal: visible, shaped panel above the intentional blur backdrop. */
       #profileModal:not(.hidden) {
@@ -3379,8 +3381,9 @@
       <main class="workspace-main">
         <header class="workspace-header">
           <div class="header-left">
-              <!-- Mobile hamburger removed: use the sidebar brand control instead. -->
-
+            <button id="mobileMenuBtn" type="button" class="icon-btn mobile-menu-trigger" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false" title="Open navigation">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
             <div class="header-chat-title-wrap">
               <h1
                 id="activeChatTitle"
@@ -5192,10 +5195,12 @@
         const DEFAULT_GATEWAY =
           "https://agrees-offers-flashing-rocky.trycloudflare.com";
         const STORAGE_KEY = "rainbow_ai_part3_state";
-        const REQUEST_TIMEOUT = 45000;
+        const DEFAULT_REQUEST_TIMEOUT = 45000;
 
         const state = {
           gateway: DEFAULT_GATEWAY,
+          gatewayMode: "auto",
+          requestTimeout: DEFAULT_REQUEST_TIMEOUT,
           conversations: [],
           activeId: null,
           busy: false,
@@ -5281,6 +5286,8 @@
                 conversations: state.conversations,
                 activeId: state.activeId,
                 gateway: state.gateway,
+                gatewayMode: state.gatewayMode,
+                requestTimeout: state.requestTimeout,
                 theme: state.theme,
                 studyMode: state.studyMode,
               }),
@@ -5314,8 +5321,13 @@
 
             if (typeof saved.activeId === "string")
               state.activeId = saved.activeId;
-            if (typeof saved.gateway === "string")
-              state.gateway = saved.gateway;
+            if (typeof saved.gateway === "string") {
+              try { state.gateway = safeGateway(saved.gateway); } catch { state.gateway = DEFAULT_GATEWAY; }
+            }
+            if (["auto", "gradio", "gradio_legacy", "openai"].includes(saved.gatewayMode))
+              state.gatewayMode = saved.gatewayMode;
+            if (Number.isFinite(saved.requestTimeout))
+              state.requestTimeout = Math.min(120000, Math.max(10000, saved.requestTimeout));
             if (["dark", "midnight", "light"].includes(saved.theme)) {
               state.theme = saved.theme;
             }
@@ -5424,6 +5436,76 @@
           return url.origin;
         }
 
+        function extractAssistantText(payload, mode) {
+          const candidates = [
+            payload?.data?.[0],
+            payload?.output,
+            payload?.response,
+            payload?.choices?.[0]?.message?.content,
+            payload?.choices?.[0]?.text,
+            payload?.message?.content,
+            payload?.content,
+          ];
+          const value = candidates.find(v => typeof v === "string" || typeof v === "number");
+          if (value === undefined) {
+            const detail = payload?.detail || payload?.error || payload?.message;
+            throw new Error(typeof detail === "string" ? detail : "The gateway returned an unrecognized response format.");
+          }
+          return String(value);
+        }
+
+        async function requestGateway(prompt, signal) {
+          const base = safeGateway(el.gateway?.value.trim() || state.gateway || DEFAULT_GATEWAY);
+          state.gateway = base;
+          const mode = $("#gatewayModeSelect")?.value || state.gatewayMode || "auto";
+          const timeoutValue = Number($("#requestTimeoutInput")?.value);
+          const timeout = Number.isFinite(timeoutValue) ? Math.min(120, Math.max(10, timeoutValue)) * 1000 : state.requestTimeout;
+          state.gatewayMode = mode;
+          state.requestTimeout = timeout;
+          save();
+
+          const headers = { "Content-Type": "application/json", "Accept": "application/json" };
+          const model = el.model?.value || MODEL;
+          const attempts = mode === "auto"
+            ? [
+                { path: "/call/predict", body: { data: [prompt, model] }, kind: "gradio" },
+                { path: "/run/predict", body: { data: [prompt, model] }, kind: "legacy" },
+                { path: "/api/predict", body: { data: [prompt, model] }, kind: "legacy" },
+              ]
+            : mode === "gradio"
+              ? [{ path: "/call/predict", body: { data: [prompt, model] }, kind: "gradio" }]
+              : mode === "gradio_legacy"
+                ? [{ path: "/run/predict", body: { data: [prompt, model] }, kind: "legacy" }, { path: "/api/predict", body: { data: [prompt, model] }, kind: "legacy" }]
+                : [{ path: "/v1/chat/completions", body: { model, messages: [{ role: "user", content: prompt }] }, kind: "openai", headers: { ...headers, "Accept": "application/json" } }];
+
+          let lastError;
+          for (let i = 0; i < attempts.length; i++) {
+            const attempt = attempts[i];
+            try {
+              const response = await fetch(base + attempt.path, {
+                method: "POST",
+                headers: attempt.headers || headers,
+                signal,
+                body: JSON.stringify(attempt.body),
+              });
+              if (!response.ok) {
+                const detail = await response.text().catch(() => "");
+                const error = new Error(`Gateway ${attempt.path} returned HTTP ${response.status}${detail ? `: ${detail.slice(0, 240)}` : ""}`);
+                error.status = response.status;
+                throw error;
+              }
+              const payload = await response.json();
+              return extractAssistantText(payload, attempt.kind);
+            } catch (error) {
+              lastError = error;
+              // Only probe another endpoint for route/method misses. Do not duplicate
+              // a generation after a server-side failure or a network interruption.
+              if (signal.aborted || error.name === "AbortError" || ![404, 405].includes(error.status) || i === attempts.length - 1) throw error;
+            }
+          }
+          throw lastError || new Error("No compatible gateway endpoint was found.");
+        }
+
         async function sendMessage(textOverride = null) {
           if (state.busy) {
             notify(
@@ -5461,66 +5543,43 @@
           $("#stopGenerationBtn")?.classList.remove("hidden");
           state.controller = new AbortController();
 
-          const timeout = setTimeout(
-            () => state.controller?.abort(),
-            REQUEST_TIMEOUT,
-          );
+          const controller = state.controller;
+          let timedOut = false;
+          const timeoutMs = Number($("#requestTimeoutInput")?.value || 45) * 1000;
+          const timeout = setTimeout(() => {
+            timedOut = true;
+            controller.abort();
+          }, Math.min(120000, Math.max(10000, timeoutMs)));
 
           setStatus("Connecting…", null);
 
           try {
-            state.gateway = safeGateway(
-              el.gateway?.value.trim() || state.gateway || DEFAULT_GATEWAY,
-            );
-
-            const selectedModel = MODEL;
-            const response = await fetch(`${state.gateway}/call/predict`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              signal: state.controller.signal,
-              body: JSON.stringify({ data: [text, selectedModel] }),
-            });
-
-            if (!response.ok) {
-              throw new Error(`Gateway returned HTTP ${response.status}.`);
-            }
-
-            const payload = await response.json();
-            const output = payload?.data?.[0];
-
-            if (typeof output !== "string" && typeof output !== "number") {
-              throw new Error(
-                "The gateway response did not contain data[0]. Check your backend's expected request and response format.",
-              );
-            }
-
+            const output = await requestGateway(text, controller.signal);
             const current = state.conversations.find((c) => c.id === targetId);
-            if (current) {
-              current.messages.push({
-                role: "assistant",
-                content: String(output),
-              });
+            if (current && !controller.signal.aborted) {
+              current.messages.push({ role: "assistant", content: output });
               save();
             }
 
             setStatus("Gateway responded", true);
           } catch (error) {
-            const message =
-              error.name === "AbortError"
-                ? "The request timed out or was cancelled. Check the gateway and try again."
+            const wasCancelled = error.name === "AbortError" && !timedOut;
+            const message = timedOut
+              ? "The request timed out. Check the gateway or increase the timeout in Settings."
+              : wasCancelled
+                ? "Response stopped."
                 : `Unable to get a response: ${error.message}`;
 
             const current = state.conversations.find((c) => c.id === targetId);
-            if (current) {
+            if (current && !wasCancelled) {
               current.messages.push({ role: "assistant", content: message });
               save();
             }
-
-            setStatus("Connection issue", false);
+            setStatus(wasCancelled ? "Response stopped" : "Connection issue", wasCancelled ? null : false);
           } finally {
             clearTimeout(timeout);
             state.busy = false;
-            state.controller = null;
+            if (state.controller === controller) state.controller = null;
             if (el.send) el.send.disabled = !String(el.input?.value || "").trim();
             $("#stopGenerationBtn")?.classList.add("hidden");
             renderAll();
@@ -5692,9 +5751,20 @@
         function closeMobileSidebar() {
           $("#appShell")?.classList.remove("mobile-sidebar-open");
           $("#sidebarBackdrop")?.classList.remove("visible");
+          $("#mobileMenuBtn")?.setAttribute("aria-expanded", "false");
         }
-        // Mobile hamburger navigation removed; no drawer toggle handler is needed.
+        $("#mobileMenuBtn")?.addEventListener("click", () => {
+          const shell = $("#appShell");
+          if (!shell) return;
+          const opening = !shell.classList.contains("mobile-sidebar-open");
+          shell.classList.toggle("mobile-sidebar-open", opening);
+          $("#sidebarBackdrop")?.classList.toggle("visible", opening);
+          $("#mobileMenuBtn")?.setAttribute("aria-expanded", String(opening));
+        });
         $("#sidebarBackdrop")?.addEventListener("click", closeMobileSidebar);
+        $("#chatHistoryList")?.addEventListener("click", event => {
+          if (event.target.closest("button")) closeMobileSidebar();
+        });
 
         // Search/filter conversation history.
         $("#sidebarSearchInput")?.addEventListener("input", (event) => {
@@ -5808,6 +5878,20 @@
         $("#themeSelect")?.addEventListener("change", (event) => {
           setTheme(event.target.value);
         });
+        $("#gatewayModeSelect")?.addEventListener("change", event => {
+          if (["auto", "gradio", "gradio_legacy", "openai"].includes(event.target.value)) {
+            state.gatewayMode = event.target.value;
+            save();
+            notify("Gateway protocol preference saved.");
+          }
+        });
+        $("#requestTimeoutInput")?.addEventListener("input", event => {
+          const seconds = Math.min(120, Math.max(10, Number(event.target.value) || 45));
+          state.requestTimeout = seconds * 1000;
+          const label = $("#requestTimeoutLabel");
+          if (label) label.textContent = `${seconds}s`;
+          save();
+        });
 
         // Composer utility controls.
         $("#clearComposerBtn")?.addEventListener("click", () => {
@@ -5882,12 +5966,13 @@
 
         // Keep the model selector limited to the configured model.
         if (el.model) {
-          el.model.replaceChildren();
-          const option = document.createElement("option");
-          option.value = MODEL;
-          option.textContent = MODEL;
-          option.selected = true;
-          el.model.appendChild(option);
+          if (![...el.model.options].some(option => option.value === MODEL)) {
+            const option = document.createElement("option");
+            option.value = MODEL;
+            option.textContent = MODEL;
+            el.model.appendChild(option);
+          }
+          el.model.value = MODEL;
         }
 
 
@@ -6349,6 +6434,15 @@
         load();
 
         if (el.gateway) el.gateway.value = state.gateway;
+        if ($("#gatewayModeSelect")) $("#gatewayModeSelect").value = state.gatewayMode;
+        if ($("#requestTimeoutInput")) {
+          $("#requestTimeoutInput").value = String(Math.round(state.requestTimeout / 1000));
+          if ($("#requestTimeoutLabel")) $("#requestTimeoutLabel").textContent = `${Math.round(state.requestTimeout / 1000)}s`;
+        }
+        if ($("#studyModeToggleBtn")) {
+          $("#studyModeToggleBtn").setAttribute("aria-pressed", String(state.studyMode));
+          document.documentElement.classList.toggle("study-mode", state.studyMode);
+        }
         setTheme(state.theme);
         applyBubblePreferences();
 
