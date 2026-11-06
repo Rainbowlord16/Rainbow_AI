@@ -2781,7 +2781,7 @@
       #appShell.sidebar-collapsed .sidebar-header:hover .brand-logo-btn .brand-mark { opacity:.2; }
       .profile-avatar { width:36px;height:36px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,#ff9a00,#ef39ba,#4b8dff);color:white;font-weight:700;object-fit:cover; }
       .brand-logo-image{width:26px;height:26px;object-fit:contain;transition:opacity .15s ease}.brand-collapse-glyph{display:none;width:22px;height:22px}.brand-icon:hover .brand-logo-image{opacity:1}#appShell.sidebar-collapsed .brand-logo-btn:hover .brand-icon .brand-logo-image{display:none}#appShell.sidebar-collapsed .brand-logo-btn:hover .brand-icon .brand-collapse-glyph{display:block}#appShell:not(.sidebar-collapsed) .brand-logo-image{display:block!important}#appShell:not(.sidebar-collapsed) .brand-collapse-glyph{display:none!important}.brand-original-mark{display:none}.welcome-logo-image{width:38px;height:38px;object-fit:contain}.welcome-original-mark{display:none}.profile-image-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0 16px}.profile-image-preview{width:56px;height:56px;object-fit:cover;border-radius:50%;border:1px solid var(--border-default)}
-      .rainbow-alert-backdrop{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.58);backdrop-filter:blur(8px)}.rainbow-alert-card{width:min(420px,100%);border:1px solid var(--border-default);border-radius:20px;padding:24px;background:var(--bg-surface-1,#11131a);color:var(--text-primary,#f8fafc);box-shadow:0 24px 80px rgba(0,0,0,.42)}.rainbow-alert-card h2{font-size:1.1rem;margin:0 0 10px}.rainbow-alert-card p{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 22px;color:var(--text-secondary,#cbd5e1);line-height:1.5}.rainbow-alert-actions{display:flex;justify-content:flex-end}.rainbow-alert-card button{border:0;border-radius:10px;padding:10px 18px;background:var(--accent-primary,#6366f1);color:white;font:inherit;font-weight:600;cursor:pointer}
+      .rainbow-alert-backdrop{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.58);backdrop-filter:blur(8px)}.rainbow-alert-card{display:flex;flex-direction:column;gap:14px;width:min(420px,100%);max-height:calc(100dvh - 40px);overflow-y:auto;border:1px solid var(--border-default);border-radius:20px;padding:24px;background:var(--bg-surface-1,#11131a);color:var(--text-primary,#f8fafc);box-shadow:0 24px 80px rgba(0,0,0,.42)}.rainbow-alert-card h2{font-size:1.1rem;line-height:1.3;margin:0}.rainbow-alert-card p{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;color:var(--text-secondary,#cbd5e1);line-height:1.55}.rainbow-alert-input{width:100%;margin:0!important}.rainbow-alert-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:4px}.rainbow-alert-card button{border:0;border-radius:10px;padding:10px 18px;background:var(--accent-primary,#6366f1);color:white;font:inherit;font-weight:600;cursor:pointer}.rainbow-alert-card button:focus-visible{outline:2px solid var(--accent-primary);outline-offset:3px}
       .profile-menu { position:absolute;z-index:80;right:14px;bottom:70px;width:230px;padding:8px;border:1px solid var(--border,#303341);border-radius:14px;background:var(--panel,#141620);box-shadow:0 14px 42px #0005; }
       .profile-menu button { display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:0;border-radius:9px;background:transparent;color:inherit;text-align:left;cursor:pointer; }
       .profile-menu button:hover { background:var(--hover,#252836); }
@@ -2801,7 +2801,9 @@
       .brand-icon .brand-logo-image { display: block !important; opacity: 1 !important; }
       .brand-icon .brand-collapse-glyph, .brand-icon .brand-original-mark { display: none !important; }
       #appShell.sidebar-collapsed .brand-logo-btn:hover .brand-icon .brand-logo-image { display: none !important; }
-      #appShell.sidebar-collapsed .brand-logo-btn:hover .brand-icon .brand-collapse-glyph { display: block !important; }
+      /* Keep the brand mark as the only logo; the header collapse button is the sole toggle icon. */
+      #appShell .brand-icon .brand-collapse-glyph,
+      #appShell .brand-icon .brand-original-mark { display: none !important; }
       #appShell:not(.sidebar-collapsed) .brand-logo-btn:hover .brand-icon .brand-logo-image { display: block !important; }
       #appShell:not(.sidebar-collapsed) .brand-logo-btn:hover .brand-icon .brand-collapse-glyph { display: none !important; }
       #profileModal:not(.hidden) { display: block !important; }
@@ -5235,7 +5237,7 @@
             const title=document.createElement("h2"); title.textContent="Rainbow AI";
             const body=document.createElement("p"); body.textContent=String(message ?? ""); card.append(title,body);
             let field=null;
-            if(mode==="prompt"){field=document.createElement("input");field.type="text";field.className="form-input";field.value=defaultValue||"";field.style.width="100%";field.style.marginBottom="16px";card.appendChild(field);}
+            if(mode==="prompt"){field=document.createElement("input");field.type="text";field.className="form-input rainbow-alert-input";field.value=defaultValue||"";card.appendChild(field);}
             const actions=document.createElement("div"); actions.className="rainbow-alert-actions"; let settled=false;
             const finish=value=>{if(settled)return;settled=true;backdrop.remove();document.removeEventListener("keydown",onKey);resolve(value);};
             const onKey=e=>{if(e.key==="Escape")finish(mode==="alert"?undefined:mode==="confirm"?false:null);else if(e.key==="Enter"&&mode==="prompt")finish(field.value);};
