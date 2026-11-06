@@ -2872,6 +2872,12 @@
       #accountSettingsModal .account-settings-footnote { margin: 0; color: var(--text-secondary, #aab0c0); font-size: .78rem; }
       @media (max-width: 520px) { #accountSettingsModal .account-settings-identity { flex-wrap: wrap; } #accountSettingsModal .account-settings-identity-copy { min-width: calc(100% - 72px); } }
 
+
+      /* Final sidebar icon guard: never render a second SVG over the brand image. */
+      #appShell .brand-icon .brand-collapse-glyph,
+      #appShell .brand-icon .brand-original-mark {
+        display: none !important;
+      }
     </style>
   </head>
 
