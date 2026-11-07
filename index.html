@@ -6778,6 +6778,7 @@ document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=
           if (agentsOverlay?.classList.contains("open")) return; // Rainbow-Agents owns its close handler.
           const visibleModals=[...document.querySelectorAll(".modal-backdrop:not(.hidden), .modal:not(.hidden)")]
             .filter(node=>node.id && node.getClientRects().length && getComputedStyle(node).visibility!=="hidden")
+            .reverse()
             .sort((a,b)=>(Number(getComputedStyle(b).zIndex)||0) - (Number(getComputedStyle(a).zIndex)||0));
           if (visibleModals.length) {
             const top=visibleModals[0];
