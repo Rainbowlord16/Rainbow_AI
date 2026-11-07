@@ -5706,6 +5706,20 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           throw lastError || new Error("No compatible gateway endpoint was found.");
         }
 
+        async function generateConversationTitle(id,firstUserMessage,assistantReply) {
+          const chat=state.conversations.find(c=>c.id===id);
+          if(!chat||chat.titleAttempted||(chat.title!=="New Conversation"&&chat.title!=="New Chat"))return;
+          chat.titleAttempted=true;save();const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),22000);
+          try{
+            const titlePrompt="[CHAT TITLE TASK] Create a concise, descriptive chat title based on this first exchange. Return ONLY the title, without quotes, explanation or Markdown. Maximum 6 words and 52 characters. Avoid generic titles.\n\nUser message:\n"+String(firstUserMessage).slice(0,1800)+"\n\nAssistant response:\n"+String(assistantReply).slice(0,2400);
+            const raw=await requestGatewayWithFallback(titlePrompt,controller.signal);
+            const title=String(raw||"").replace(/[\\r\\n]+/g," ").replace(/^[\\"']+|[\\"']+$/g,"").replace(/^(title|chat title)\\s*:\\s*/i,"").replace(/\\s+/g," ").trim().slice(0,52);
+            if(!title)throw new Error("The model returned an empty title.");
+            const latest=state.conversations.find(c=>c.id===id);if(!latest)return;latest.title=title;latest.titleGenerated=true;save();renderHistory();if(state.activeId===id&&el.title)el.title.textContent=title;
+          }catch(error){const latest=state.conversations.find(c=>c.id===id);if(!latest)return;latest.title=String(firstUserMessage||"New Conversation").replace(/\\s+/g," ").trim().slice(0,48)||"New Conversation";save();renderHistory();}
+          finally{clearTimeout(timeout);}
+        }
+
         async function sendMessage(textOverride = null) {
           if (state.busy) {
             notify(
@@ -5729,13 +5743,7 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
 
           conversation.messages.push({ role: "user", content: visibleUserText });
 
-          if (
-            conversation.title === "New Conversation" ||
-            conversation.title === "New Chat"
-          ) {
-            conversation.title =
-              visibleUserText.slice(0, 48) + (visibleUserText.length > 48 ? "…" : "");
-          }
+          const shouldGenerateTitle=!conversation.titleAttempted&&(conversation.title==="New Conversation"||conversation.title==="New Chat");
 
           if (el.input && textOverride === null) {
             el.input.value = "";
@@ -5772,6 +5780,7 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
               current.messages.push({ role: "assistant", content: output });
               if($("#rainbowOutputMode")?.value==="json"){try{JSON.parse(output);}catch{current.messages.push({role:"assistant",content:"⚠️ JSON validation warning: the response was not valid JSON. Try regenerating or ask for corrected JSON."});}}
               save();
+              if(shouldGenerateTitle)void generateConversationTitle(targetId,visibleUserText,output);
               if($("#rainbowAutoSpeak")?.checked)speakText(output,"Rainbow AI");
             }
 
