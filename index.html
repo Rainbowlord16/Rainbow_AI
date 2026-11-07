@@ -5944,6 +5944,18 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
 
           if (
             (event.ctrlKey || event.metaKey) &&
+            event.key.toLowerCase() === "f"
+          ) {
+            event.preventDefault();
+            event.stopPropagation();
+            const searchButton=$("#openSearchModalBtn");
+            if(searchButton)searchButton.click();
+            else { const search=$("#sidebarSearchInput"); search?.focus(); search?.select(); }
+            return;
+          }
+
+          if (
+            (event.ctrlKey || event.metaKey) &&
             event.key.toLowerCase() === "b"
           ) {
             event.preventDefault();
