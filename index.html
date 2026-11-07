@@ -5977,6 +5977,7 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           const target = event.target;
           const typing = target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
           if (event.key === "Escape") return; // The global topmost-overlay handler owns Escape.
+          if (typing) return;
           if (mod && !event.altKey) {
             const actions = {
               f: () => { const b=$("#openSearchModalBtn"); if(b)b.click(); else {const x=$("#sidebarSearchInput");x?.focus();x?.select();} },
