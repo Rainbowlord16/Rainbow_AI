@@ -5647,6 +5647,7 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
 
           let text = String(textOverride ?? el.input?.value ?? "").trim();
           if (!text) return;
+          const visibleUserText=text;
           const outputMode=$("#rainbowOutputMode")?.value||"normal",custom=$("#customSystemPromptInput")?.value?.trim()||"",projectInstructions=$("#projectInstructionsInput")?.value?.trim()||"";
           const recent=(activeConversation()?.messages||[]).slice(-8).map(m=>(m.role==="user"?"User: ":"Assistant: ")+m.content).join("\n\n");
           const study=state.studyMode?"\nSTUDY MODE: Teach Socratically, give hints before answers and ask one guiding question at a time.":"";
@@ -5657,14 +5658,14 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           let conversation = ensureConversation();
           const targetId = conversation.id;
 
-          conversation.messages.push({ role: "user", content: text });
+          conversation.messages.push({ role: "user", content: visibleUserText });
 
           if (
             conversation.title === "New Conversation" ||
             conversation.title === "New Chat"
           ) {
             conversation.title =
-              text.slice(0, 48) + (text.length > 48 ? "…" : "");
+              visibleUserText.slice(0, 48) + (visibleUserText.length > 48 ? "…" : "");
           }
 
           if (el.input && textOverride === null) {
