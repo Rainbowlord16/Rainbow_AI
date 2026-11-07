@@ -5208,40 +5208,20 @@
         </div>
 
         <div class="modal-body" style="gap: var(--space-xs)">
-          <div class="form-row-inline">
-            <span>Start New Chat</span
-            ><kbd class="kbd-badge">Ctrl / Cmd + K</kbd>
-          </div>
-          <div class="form-row-inline">
-            <span>Global Conversation Search</span
-            ><kbd class="kbd-badge">Ctrl / Cmd + F</kbd>
-          </div>
-          <div class="form-row-inline">
-            <span>Focus Message Composer</span><kbd class="kbd-badge">/</kbd>
-          </div>
-          <div class="form-row-inline">
-            <span>Toggle Sidebar</span
-            ><kbd class="kbd-badge">Ctrl / Cmd + B</kbd>
-          </div>
-          <div class="form-row-inline">
-            <span>Toggle Rainbow Canvas</span
-            ><kbd class="kbd-badge">Ctrl / Cmd + .</kbd>
-          </div>
-          <div class="form-row-inline">
-            <span>Open Prompt Studio</span
-            ><kbd class="kbd-badge">Ctrl / Cmd + P</kbd>
-          </div>
-          <div class="form-row-inline">
-            <span>Stop Active Generation / Close Modal</span
-            ><kbd class="kbd-badge">Esc</kbd>
-          </div>
-          <div class="form-row-inline">
-            <span>Send Message</span><kbd class="kbd-badge">Enter</kbd>
-          </div>
-          <div class="form-row-inline">
-            <span>Insert Newline</span
-            ><kbd class="kbd-badge">Shift + Enter</kbd>
-          </div>
+          <div class="form-row-inline"><span>Start a new chat</span><kbd class="kbd-badge">Ctrl / Cmd + K</kbd></div>
+          <div class="form-row-inline"><span>Global conversation search</span><kbd class="kbd-badge">Ctrl / Cmd + F</kbd></div>
+          <div class="form-row-inline"><span>Focus message composer</span><kbd class="kbd-badge">/</kbd></div>
+          <div class="form-row-inline"><span>Toggle sidebar width</span><kbd class="kbd-badge">Ctrl / Cmd + B</kbd></div>
+          <div class="form-row-inline"><span>Open Settings</span><kbd class="kbd-badge">Ctrl / Cmd + ,</kbd></div>
+          <div class="form-row-inline"><span>Open Prompt Studio</span><kbd class="kbd-badge">Ctrl / Cmd + P</kbd></div>
+          <div class="form-row-inline"><span>Open Nova learning companion</span><kbd class="kbd-badge">Ctrl / Cmd + Shift + N</kbd></div>
+          <div class="form-row-inline"><span>Open Rainbow-Agents Studio</span><kbd class="kbd-badge">Ctrl / Cmd + Shift + A</kbd></div>
+          <div class="form-row-inline"><span>Toggle Rainbow Canvas</span><kbd class="kbd-badge">Ctrl / Cmd + .</kbd></div>
+          <div class="form-row-inline"><span>Open keyboard shortcuts</span><kbd class="kbd-badge">?</kbd></div>
+          <div class="form-row-inline"><span>Stop generation / close top popup</span><kbd class="kbd-badge">Esc</kbd></div>
+          <div class="form-row-inline"><span>Send message</span><kbd class="kbd-badge">Enter</kbd></div>
+          <div class="form-row-inline"><span>Insert a new line</span><kbd class="kbd-badge">Shift + Enter</kbd></div>
+          <p class="form-help" style="margin-top:10px">Shortcuts work when you're not typing in a text field. Ctrl is replaced by ⌘ on Mac.</p>
         </div>
 
         <div class="modal-footer">
@@ -5990,41 +5970,29 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
             ?.addEventListener("click", () => openModal(modalId));
         }
 
-        // Support close buttons with data-close-modal and Escape key.
+        // Keyboard shortcuts: Ctrl on Windows/Linux, Command on macOS.
         document.addEventListener("keydown", (event) => {
-          if (event.key === "Escape") {
-            $$(".modal, [role='dialog']").forEach((modal) => {
-              if (modal.id) closeModal(modal.id);
-            });
+          const mod = event.ctrlKey || event.metaKey;
+          const key = event.key.toLowerCase();
+          const target = event.target;
+          const typing = target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
+          if (event.key === "Escape") return; // The global topmost-overlay handler owns Escape.
+          if (mod && !event.altKey) {
+            const actions = {
+              f: () => { const b=$("#openSearchModalBtn"); if(b)b.click(); else {const x=$("#sidebarSearchInput");x?.focus();x?.select();} },
+              b: () => $("#sidebarCollapseBtn")?.click(),
+              k: () => newConversation(),
+              ",": () => $("#openSettingsBtn")?.click(),
+              p: () => $("#openPromptStudioBtn")?.click()
+            };
+            if (actions[key]) { event.preventDefault(); event.stopPropagation(); actions[key](); return; }
+            if (event.shiftKey && key === "n") { event.preventDefault(); $("#openNovaSidebarBtn")?.click(); return; }
+            if (event.shiftKey && key === "a") { event.preventDefault(); $("#rainbowAgentsSidebarBtn")?.click(); return; }
+            if (key === ".") { event.preventDefault(); $("#canvasToggleBtn")?.click(); return; }
           }
-
-          if (
-            (event.ctrlKey || event.metaKey) &&
-            event.key.toLowerCase() === "f"
-          ) {
-            event.preventDefault();
-            event.stopPropagation();
-            const searchButton=$("#openSearchModalBtn");
-            if(searchButton)searchButton.click();
-            else { const search=$("#sidebarSearchInput"); search?.focus(); search?.select(); }
-            return;
-          }
-
-          if (
-            (event.ctrlKey || event.metaKey) &&
-            event.key.toLowerCase() === "b"
-          ) {
-            event.preventDefault();
-            $("#appShell")?.classList.toggle("sidebar-collapsed");
-          }
-
-          if (
-            (event.ctrlKey || event.metaKey) &&
-            event.key.toLowerCase() === "k"
-          ) {
-            event.preventDefault();
-            newConversation();
-          }
+          if (typing || event.altKey || mod) return;
+          if (event.key === "/" && !event.shiftKey) { event.preventDefault(); $("#composerInput")?.focus(); return; }
+          if (event.key === "?" || (event.key === "/" && event.shiftKey)) { event.preventDefault(); openModal("shortcutsModal"); }
         });
 
         // Canvas drawer controls.
