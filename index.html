@@ -2869,6 +2869,14 @@
       #accountSettingsModal .account-settings-row > div { display: grid; gap: 4px; min-width: 0; }
       #accountSettingsModal .secondary-btn { flex: 0 0 auto; border: 1px solid var(--border-default, rgba(255,255,255,.18)); border-radius: 10px; padding: 8px 12px; background: var(--bg-surface-2, rgba(255,255,255,.06)); color: inherit; cursor: pointer; }
       #accountSettingsModal .secondary-btn:hover { background: var(--bg-surface-3, rgba(255,255,255,.1)); }
+      #accountSettingsModal .personalization-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+      #accountSettingsModal .personalization-field { display:grid; gap:6px; min-width:0; }
+      #accountSettingsModal .personalization-field.full { grid-column:1/-1; }
+      #accountSettingsModal .personalization-field label { color:var(--text-secondary,#aab0c0); font-size:.82rem; font-weight:600; }
+      #accountSettingsModal .personalization-field .form-input, #accountSettingsModal .personalization-field .form-select { width:100%; min-width:0; }
+      #accountSettingsModal .personalization-actions { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+      #accountSettingsModal .personalization-note { color:var(--text-muted,#8992a7); font-size:.78rem; line-height:1.5; }
+      @media(max-width:560px){#accountSettingsModal .personalization-grid{grid-template-columns:1fr;}#accountSettingsModal .personalization-field.full{grid-column:auto;}}
       #accountSettingsModal .account-settings-footnote { margin: 0; color: var(--text-secondary, #aab0c0); font-size: .78rem; }
       @media (max-width: 520px) { #accountSettingsModal .account-settings-identity { flex-wrap: wrap; } #accountSettingsModal .account-settings-identity-copy { min-width: calc(100% - 72px); } }
 
@@ -4096,6 +4104,20 @@
             <p>Manage the name and avatar shown in your Rainbow AI workspace, and choose how your welcome message feels.</p>
             <div class="account-settings-row"><div><strong>Display name</strong><span id="accountSettingsDisplayName">Rainbow User</span></div><button type="button" class="secondary-btn" id="accountSettingsEditNameBtn">Edit</button></div>
             <div class="account-settings-row"><div><strong>Welcome greeting</strong><span id="accountSettingsGreeting">Random friendly greeting</span></div><button type="button" class="secondary-btn" id="accountSettingsGreetingBtn">Change</button></div>
+          </div>
+          <div class="account-settings-section" id="professionalPersonalizationSection">
+            <h3>Professional personalization</h3>
+            <p>Tell Rainbow AI about your work, experience and goals so its answers can be more relevant. These preferences are included with your chat prompts.</p>
+            <div class="personalization-grid">
+              <div class="personalization-field"><label for="proProfessionInput">Occupation or job title</label><input id="proProfessionInput" class="form-input" maxlength="100" placeholder="e.g. Software developer"></div>
+              <div class="personalization-field"><label for="proIndustryInput">Industry or field</label><input id="proIndustryInput" class="form-input" maxlength="100" placeholder="e.g. Education, technology"></div>
+              <div class="personalization-field"><label for="proExpertiseInput">Experience level</label><select id="proExpertiseInput" class="form-select"><option value="">Not specified</option><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option><option value="expert">Expert</option></select></div>
+              <div class="personalization-field"><label for="proResponseStyleInput">Response style</label><select id="proResponseStyleInput" class="form-select"><option value="balanced">Balanced</option><option value="professional">Professional</option><option value="concise">Concise</option><option value="detailed">Detailed</option><option value="technical">Technical</option><option value="beginner-friendly">Beginner-friendly</option></select></div>
+              <div class="personalization-field full"><label for="proExpertiseAreasInput">Skills and areas of expertise</label><input id="proExpertiseAreasInput" class="form-input" maxlength="500" placeholder="e.g. HTML, Python, project management"></div>
+              <div class="personalization-field full"><label for="proGoalsInput">Goals and interests</label><textarea id="proGoalsInput" class="form-input" rows="3" maxlength="1200" placeholder="What are you working toward? What topics matter to you?"></textarea></div>
+              <div class="personalization-field full"><label for="proCustomInstructionsInput">Custom instructions</label><textarea id="proCustomInstructionsInput" class="form-input" rows="4" maxlength="2000" placeholder="How should Rainbow AI tailor its answers, explanations and recommendations?"></textarea></div>
+            </div>
+            <div class="personalization-actions"><span class="personalization-note">Saved locally on this device. You can change or clear these preferences at any time.</span><button type="button" class="secondary-btn" id="saveProfessionalPersonalizationBtn">Save personalization</button></div>
           </div>
           <div class="account-settings-section">
             <h3>Privacy & storage</h3>
@@ -5728,6 +5750,36 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           }finally{clearTimeout(timeout);}
         }
 
+        const PROFESSIONAL_PERSONALIZATION_KEY = "rainbow_ai_professional_personalization_v1";
+        const professionalPersonalizationDefaults = { profession:"", industry:"", expertise:"", responseStyle:"balanced", expertiseAreas:"", goals:"", customInstructions:"" };
+        function readProfessionalPersonalization() {
+          try {
+            const saved = JSON.parse(localStorage.getItem(PROFESSIONAL_PERSONALIZATION_KEY) || "{}");
+            return { ...professionalPersonalizationDefaults, ...(saved && typeof saved === "object" ? saved : {}) };
+          } catch { return { ...professionalPersonalizationDefaults }; }
+        }
+        function saveProfessionalPersonalization(showNotice = false) {
+          const value = {
+            profession:$("#proProfessionInput")?.value.trim().slice(0,100)||"",
+            industry:$("#proIndustryInput")?.value.trim().slice(0,100)||"",
+            expertise:$("#proExpertiseInput")?.value||"",
+            responseStyle:$("#proResponseStyleInput")?.value||"balanced",
+            expertiseAreas:$("#proExpertiseAreasInput")?.value.trim().slice(0,500)||"",
+            goals:$("#proGoalsInput")?.value.trim().slice(0,1200)||"",
+            customInstructions:$("#proCustomInstructionsInput")?.value.trim().slice(0,2000)||""
+          };
+          try { localStorage.setItem(PROFESSIONAL_PERSONALIZATION_KEY, JSON.stringify(value)); if(showNotice)notify("Professional personalization saved."); return value; }
+          catch(error) { notify("Could not save personalization. Browser storage may be unavailable."); return null; }
+        }
+        function initializeProfessionalPersonalization() {
+          const p=readProfessionalPersonalization();
+          const fields={proProfessionInput:p.profession,proIndustryInput:p.industry,proExpertiseInput:p.expertise,proResponseStyleInput:p.responseStyle,proExpertiseAreasInput:p.expertiseAreas,proGoalsInput:p.goals,proCustomInstructionsInput:p.customInstructions};
+          Object.entries(fields).forEach(([id,value])=>{const field=document.getElementById(id);if(field)field.value=value;});
+          ["proProfessionInput","proIndustryInput","proExpertiseInput","proResponseStyleInput","proExpertiseAreasInput","proGoalsInput","proCustomInstructionsInput"].forEach(id=>document.getElementById(id)?.addEventListener("change",()=>saveProfessionalPersonalization(false)));
+          $("#saveProfessionalPersonalizationBtn")?.addEventListener("click",()=>saveProfessionalPersonalization(true));
+        }
+        initializeProfessionalPersonalization();
+
         async function sendMessage(textOverride = null) {
           if (state.busy) {
             notify(
@@ -5739,12 +5791,16 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           let text = String(textOverride ?? el.input?.value ?? "").trim();
           if (!text) return;
           const visibleUserText=text;
+          const professionalProfile=readProfessionalPersonalization();
+          const professionalContext=[professionalProfile.profession&&"Occupation: "+professionalProfile.profession,professionalProfile.industry&&"Industry: "+professionalProfile.industry,professionalProfile.expertise&&"Experience level: "+professionalProfile.expertise,professionalProfile.expertiseAreas&&"Skills and expertise: "+professionalProfile.expertiseAreas,professionalProfile.goals&&"Goals and interests: "+professionalProfile.goals].filter(Boolean).join("\n");
+          const styleGuidance=({professional:"Use a polished, workplace-appropriate professional tone.",concise:"Prefer concise answers and avoid unnecessary elaboration.",detailed:"Give thorough explanations, context and practical examples.",technical:"Use precise technical language and include implementation details where useful.","beginner-friendly":"Explain unfamiliar concepts in accessible steps and define jargon."})[professionalProfile.responseStyle]||"";
+          const personalizationPrompt=(professionalContext||styleGuidance||professionalProfile.customInstructions)?"USER PERSONALIZATION (use as helpful context, not as facts beyond what is stated):\n"+(professionalContext||"No occupation or expertise details supplied.")+"\n"+(styleGuidance?"Response preference: "+styleGuidance+"\n":"")+(professionalProfile.customInstructions?"Additional user instructions: "+professionalProfile.customInstructions+"\n":"")+"Do not force this profile into unrelated answers. If a detail is irrelevant, ignore it.\n\n":"";
           const outputMode=$("#rainbowOutputMode")?.value||"normal",custom=$("#customSystemPromptInput")?.value?.trim()||"",projectInstructions=$("#projectInstructionsInput")?.value?.trim()||"";
           const recent=(activeConversation()?.messages||[]).slice(-8).map(m=>(m.role==="user"?"User: ":"Assistant: ")+m.content).join("\n\n");
           const study=state.studyMode?"\nSTUDY MODE: Teach Socratically, give hints before answers and ask one guiding question at a time.":"";
           const format=outputMode==="json"?"\nReturn valid JSON only, without Markdown fences.":outputMode==="markdown"?"\nUse clear Markdown headings and lists.":outputMode==="diagram"?"\nReturn a valid Mermaid flowchart in a mermaid code fence, followed by a brief explanation.":"";
           const relay=$("#rainbowRelayToggle")?.checked?"\nAGENT RELAY: Present concise labeled Researcher, Architect and Concise stages. Give useful conclusions only; do not reveal private chain-of-thought.":"";
-          const fileContext=retrieveRainbowContext(text);text=(custom?"GLOBAL INSTRUCTIONS: "+custom+"\n\n":"")+(projectInstructions?"ACTIVE PROJECT INSTRUCTIONS: "+projectInstructions+"\n\n":"")+(recent?"RECENT CHAT CONTEXT (bounded):\n"+recent+"\n\n":"")+(fileContext?"RELEVANT UPLOADED FILE EXCERPTS:\n"+fileContext+"\n\n":"")+text+study+format;if(text.length>14000)text=text.slice(-14000);
+          const fileContext=retrieveRainbowContext(text);text=personalizationPrompt+(custom?"GLOBAL INSTRUCTIONS: "+custom+"\n\n":"")+(projectInstructions?"ACTIVE PROJECT INSTRUCTIONS: "+projectInstructions+"\n\n":"")+(recent?"RECENT CHAT CONTEXT (bounded):\n"+recent+"\n\n":"")+(fileContext?"RELEVANT UPLOADED FILE EXCERPTS:\n"+fileContext+"\n\n":"")+text+study+format;if(text.length>14000)text=text.slice(-14000);
 
           let conversation = ensureConversation();
           const targetId = conversation.id;
@@ -6713,6 +6769,28 @@ root.addEventListener("click",e=>{if(e.target===root)close();});document.addEven
 document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=>{open();if(innerWidth<=768)document.getElementById("appShell")?.classList.remove("mobile-sidebar-open");});render();save();
 })();
 /* END RAINBOW_AGENTS_STUDIO_V1 */
+
+        // Global Escape handling: dismiss the topmost Rainbow overlay before anything underneath it.
+        document.addEventListener("keydown", (event) => {
+          if (event.key !== "Escape" || event.defaultPrevented) return;
+          if (document.getElementById("rainbowAlertBackdrop")) return; // Its own dialog handler resolves the promise.
+          const agentsOverlay=document.getElementById("rainbowAgentsModal");
+          if (agentsOverlay?.classList.contains("open")) return; // Rainbow-Agents owns its close handler.
+          const visibleModals=[...document.querySelectorAll(".modal-backdrop:not(.hidden), .modal:not(.hidden)")]
+            .filter(node=>node.id && node.getClientRects().length && getComputedStyle(node).visibility!=="hidden")
+            .sort((a,b)=>Number(getComputedStyle(b).zIndex)||0 - (Number(getComputedStyle(a).zIndex)||0));
+          if (visibleModals.length) {
+            const top=visibleModals[0];
+            closeModal(top.id);
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
+          const profileMenu=$("#profileMenu");
+          if(profileMenu&&!profileMenu.classList.contains("hidden")){profileMenu.classList.add("hidden");event.preventDefault();event.stopPropagation();return;}
+          if($("#novaDrawer")?.classList.contains("open")){closeNova();event.preventDefault();event.stopPropagation();return;}
+          if($("#appShell")?.classList.contains("mobile-sidebar-open")){closeMobileSidebar();event.preventDefault();event.stopPropagation();return;}
+        }, true);
 
         // Restore saved data and start the interface.
         load();
