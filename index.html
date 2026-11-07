@@ -2873,6 +2873,80 @@
       @media (max-width: 520px) { #accountSettingsModal .account-settings-identity { flex-wrap: wrap; } #accountSettingsModal .account-settings-identity-copy { min-width: calc(100% - 72px); } }
 
 
+      /* Mobile-first workspace refinements: safe viewport, scrollable welcome area and a compact composer. */
+      @media (max-width: 768px) {
+        html, body { min-height: 100%; height: 100%; height: 100dvh; }
+        .app-shell { height: 100%; height: 100dvh; min-height: 0; }
+        .workspace, .workspace-main, .workspace-body, .chat-column { min-height: 0; min-width: 0; }
+        .workspace-header { min-width: 0; gap: 6px; padding-inline: 8px; }
+        .header-left, .header-center, .header-right { min-width: 0; }
+        .header-chat-title { max-width: min(42vw, 190px); }
+        .chat-scroll-container {
+          min-height: 0;
+          overscroll-behavior: contain;
+          -webkit-overflow-scrolling: touch;
+          padding: 14px 10px 20px;
+          scroll-padding-bottom: 20px;
+        }
+        .chat-stream-inner { min-height: 100%; gap: 18px; }
+        .welcome-screen {
+          width: 100%;
+          max-width: 560px;
+          margin: 0 auto;
+          padding: 20px 6px 16px;
+          gap: 16px;
+        }
+        .welcome-heading { font-size: clamp(1.45rem, 6vw, 1.9rem); }
+        .welcome-subtext { font-size: .9rem; padding-inline: 8px; }
+        .welcome-capabilities { gap: 7px; }
+        .capability-chip { padding: 7px 11px; }
+        .starter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        .starter-card { min-width: 0; padding: 11px; }
+        .composer-region {
+          flex: 0 0 auto;
+          padding: 6px 8px calc(8px + env(safe-area-inset-bottom));
+          background: var(--bg-app);
+        }
+        .composer-container { width: 100%; gap: 5px; }
+        .composer-box { min-width: 0; padding: 7px 8px; border-radius: 16px; }
+        .composer-textarea {
+          display: block;
+          min-width: 0;
+          min-height: 42px;
+          max-height: 144px;
+          font-size: 16px;
+          line-height: 1.45;
+          overflow-wrap: anywhere;
+        }
+        .composer-toolbar { align-items: center; flex-wrap: wrap; row-gap: 5px; }
+        .composer-tools-left { flex: 1 1 auto; min-width: 0; flex-wrap: wrap; }
+        .composer-tools-right { flex: 0 0 auto; margin-left: auto; }
+        .composer-tool-btn { min-height: 34px; padding: 6px 8px; font-size: .75rem; }
+        .send-btn, .stop-btn { min-height: 36px; padding-inline: 11px; }
+        .composer-footnote { padding: 2px 4px 0; font-size: .66rem; }
+        .ai-accuracy-notice { margin-top: 5px; padding: 7px 9px; font-size: .7rem; }
+        .message-actions { opacity: 1; flex-wrap: wrap; }
+        .message-action-btn { min-height: 30px; padding: 5px 9px; }
+      }
+      @media (max-width: 420px) {
+        .workspace-header { height: 54px; }
+        .header-chat-title { max-width: 34vw; font-size: .82rem; }
+        .header-right { gap: 3px; }
+        .header-right .icon-btn { width: 34px; min-width: 34px; }
+        .starter-grid { grid-template-columns: 1fr; }
+        .composer-toolbar { gap: 4px; }
+        .composer-tools-left { gap: 2px; }
+        .composer-tool-btn { gap: 4px; padding-inline: 6px; }
+        .char-counter { display: none; }
+        .composer-footnote { flex-direction: row; align-items: center; justify-content: space-between; gap: 6px; }
+      }
+      @media (max-height: 700px) and (max-width: 768px) {
+        .welcome-screen { padding-top: 10px; gap: 11px; }
+        .welcome-prism-badge { width: 52px; height: 52px; }
+        .welcome-prism-badge img { max-width: 34px; max-height: 34px; }
+        .welcome-capabilities { gap: 5px; }
+      }
+
       /* Final sidebar icon guard: never render a second SVG over the brand image. */
       #appShell .brand-icon .brand-collapse-glyph,
       #appShell .brand-icon .brand-original-mark {
@@ -3750,7 +3824,7 @@
                     id="composerInput"
                     class="composer-textarea"
                     rows="1"
-                    placeholder="Ask Rainbow-AI-Unified-12B anything... (Enter to send, Shift+Enter for newline)"
+                    placeholder="Message Rainbow AI… (Enter to send)"
                     aria-label="Message prompt"
                   ></textarea>
 
@@ -5406,6 +5480,21 @@
             if(message.role==="assistant"&&typeof window.marked?.parse==="function"&&typeof window.DOMPurify?.sanitize==="function")content.innerHTML=window.DOMPurify.sanitize(window.marked.parse(String(message.content||"")));else content.textContent=String(message.content||"");bubble.appendChild(content);
             const actions=document.createElement("div");actions.className="message-actions";const copy=document.createElement("button");copy.type="button";copy.className="message-action-btn";copy.textContent="Copy";copy.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(String(message.content||""));notify("Message copied.");}catch{notify("Clipboard access was blocked.");}});actions.appendChild(copy);
             if(message.role==="user"){const edit=document.createElement("button");edit.type="button";edit.className="message-action-btn";edit.textContent="Edit";edit.addEventListener("click",()=>{if(!el.input)return;el.input.value=String(message.content||"");el.input.dispatchEvent(new Event("input",{bubbles:true}));el.input.focus();notify("Edit the text in the composer, then send it again.");});actions.appendChild(edit);}
+            if(message.role==="assistant" && conversation?.messages?.[conversation.messages.length-1]===message){
+              const regenerate=document.createElement("button");regenerate.type="button";regenerate.className="message-action-btn";regenerate.textContent="Regenerate";
+              regenerate.addEventListener("click",()=>{
+                if(state.busy)return notify("Wait for the current response to finish.");
+                const latest=activeConversation();if(!latest)return;
+                const aiIndex=latest.messages.lastIndexOf(message);if(aiIndex<0)return;
+                let userIndex=aiIndex-1;while(userIndex>=0&&latest.messages[userIndex].role!=="user")userIndex--;
+                if(userIndex<0)return notify("There is no prompt to regenerate.");
+                const prompt=String(latest.messages[userIndex].content||"");
+                latest.messages.splice(userIndex);save();renderAll();sendMessage(prompt);
+              });actions.appendChild(regenerate);
+              const continueBtn=document.createElement("button");continueBtn.type="button";continueBtn.className="message-action-btn";continueBtn.textContent="Continue";
+              continueBtn.addEventListener("click",()=>{if(state.busy)return notify("Wait for the current response to finish.");sendMessage("Continue your previous response from where it ended. Do not repeat what you have already written.");});
+              actions.appendChild(continueBtn);
+            }
             row.append(header,bubble,actions);el.messages.appendChild(row);
           }
           if (el.scroll) el.scrollTop = el.scroll.scrollHeight;
