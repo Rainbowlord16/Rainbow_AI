@@ -5329,7 +5329,7 @@ function retrieveRainbowContext(query){const terms=String(query).toLowerCase().m
 const powerBar=document.createElement("div");powerBar.className="rainbow-power-tools";powerBar.innerHTML='<label class="form-help">Output <select id="rainbowOutputMode" class="form-select"><option value="normal">Normal</option><option value="markdown">Markdown</option><option value="json">Strict JSON</option><option value="diagram">Mermaid diagram</option></select></label><label class="form-help"><input id="rainbowRelayToggle" type="checkbox"> Agent relay</label><label class="form-help"><input id="rainbowAutoSpeak" type="checkbox"> Speak replies</label><button id="rainbowPolishBtn" class="composer-tool-btn" type="button">✨ Polish prompt</button><button id="rainbowBranchBtn" class="composer-tool-btn" type="button">Fork latest turn</button>';const composerBox=$("#composerBox");if(composerBox)composerBox.insertBefore(powerBar,composerBox.querySelector(".composer-toolbar"));
 function novaMood(mood,label){const a=$("#novaAvatar");if(a)a.dataset.mood=mood;const l=$("#novaMoodLabel");if(l)l.textContent=label||({idle:"Nova is ready to learn with you!",listening:"I'm listening…",thinking:"Nova is thinking…",speaking:"Nova is speaking!"}[mood]||"Nova is here!");const m=$("#novaMouth");if(m)m.setAttribute("d",mood==="speaking"?"M76 116q14 23 28 0":"M76 119q14 14 28 0");}
 function speakText(text,who){if(!("speechSynthesis"in window))return notify("Speech output is not supported in this browser.");window.speechSynthesis.cancel();const clean=String(text).replace(/[#*_>]/g," ").slice(0,5000);const u=new SpeechSynthesisUtterance(clean);u.lang=navigator.language||"en-US";u.rate=.96;u.onstart=()=>novaMood("speaking",who+" is speaking.");u.onend=()=>novaMood("idle");u.onerror=()=>novaMood("idle");window.speechSynthesis.speak(u);}
-function openNova(){$("#novaDrawer")?.classList.add("open");$("#novaOverlay")?.classList.add("open");$("#novaDrawer")?.setAttribute("aria-hidden","false");$("#novaInput")?.focus();}
+function openNova(){const log=$("#novaChatLog");if(log&&novaHistory.length&&log.children.length===1&&log.firstElementChild.textContent.startsWith("Hi!")){log.replaceChildren();novaHistory.forEach(m=>{const line=document.createElement("div");line.className="nova-line "+(m.role==="user"?"user":"");line.textContent=m.text||"";log.appendChild(line);});}$("#novaDrawer")?.classList.add("open");$("#novaOverlay")?.classList.add("open");$("#novaDrawer")?.setAttribute("aria-hidden","false");$("#novaInput")?.focus();}
 function closeNova(){$("#novaDrawer")?.classList.remove("open");$("#novaOverlay")?.classList.remove("open");$("#novaDrawer")?.setAttribute("aria-hidden","true");if(novaRecognition){novaRecognition.stop();novaRecognition=null;}novaMood("idle");}
 let novaRecognition=null;$("#openNovaBtn")?.addEventListener("click",openNova);$("#closeNovaBtn")?.addEventListener("click",closeNova);$("#novaOverlay")?.addEventListener("click",closeNova);
 let novaHistory=[];try{novaHistory=JSON.parse(localStorage.getItem("rainbow_nova_history_v1")||"[]");if(!Array.isArray(novaHistory))novaHistory=[];}catch{novaHistory=[];}function novaLog(role,text){const log=$("#novaChatLog");if(!log)return;const line=document.createElement("div");line.className="nova-line "+(role==="user"?"user":"");line.textContent=text;log.appendChild(line);log.scrollTop=log.scrollHeight;novaHistory.push({role,text});try{localStorage.setItem("rainbow_nova_history_v1",JSON.stringify(novaHistory.slice(-80)));}catch{}}
@@ -5647,12 +5647,12 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
 
           let text = String(textOverride ?? el.input?.value ?? "").trim();
           if (!text) return;
-          const outputMode=$("#rainbowOutputMode")?.value||"normal",custom=$("#customSystemPromptInput")?.value?.trim()||"";
+          const outputMode=$("#rainbowOutputMode")?.value||"normal",custom=$("#customSystemPromptInput")?.value?.trim()||"",projectInstructions=$("#projectInstructionsInput")?.value?.trim()||"";
           const recent=(activeConversation()?.messages||[]).slice(-8).map(m=>(m.role==="user"?"User: ":"Assistant: ")+m.content).join("\n\n");
           const study=state.studyMode?"\nSTUDY MODE: Teach Socratically, give hints before answers and ask one guiding question at a time.":"";
           const format=outputMode==="json"?"\nReturn valid JSON only, without Markdown fences.":outputMode==="markdown"?"\nUse clear Markdown headings and lists.":outputMode==="diagram"?"\nReturn a valid Mermaid flowchart in a mermaid code fence, followed by a brief explanation.":"";
           const relay=$("#rainbowRelayToggle")?.checked?"\nAGENT RELAY: Present concise labeled Researcher, Architect and Concise stages. Give useful conclusions only; do not reveal private chain-of-thought.":"";
-          const fileContext=retrieveRainbowContext(text);text=(custom?"GLOBAL INSTRUCTIONS: "+custom+"\n\n":"")+(recent?"RECENT CHAT CONTEXT (bounded):\n"+recent+"\n\n":"")+(fileContext?"RELEVANT UPLOADED FILE EXCERPTS:\n"+fileContext+"\n\n":"")+text+study+format+relay;if(text.length>14000)text=text.slice(-14000);
+          const fileContext=retrieveRainbowContext(text);text=(custom?"GLOBAL INSTRUCTIONS: "+custom+"\n\n":"")+(projectInstructions?"ACTIVE PROJECT INSTRUCTIONS: "+projectInstructions+"\n\n":"")+(recent?"RECENT CHAT CONTEXT (bounded):\n"+recent+"\n\n":"")+(fileContext?"RELEVANT UPLOADED FILE EXCERPTS:\n"+fileContext+"\n\n":"")+text+study+format;if(text.length>14000)text=text.slice(-14000);
 
           let conversation = ensureConversation();
           const targetId = conversation.id;
@@ -5691,7 +5691,12 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           setStatus("Connecting…", null);
 
           try {
-            const output = await requestGateway(text, controller.signal);
+            let output;
+            if($("#rainbowRelayToggle")?.checked){
+              const research=await requestGateway("Researcher stage: extract relevant facts, constraints and unknowns for this task. Return a concise brief, not hidden reasoning.\n\n"+text,controller.signal);
+              const architecture=await requestGateway("Architect stage: turn this research brief into a sound plan or solution. Identify risks and concrete steps.\n\nOriginal task:\n"+text+"\n\nResearch brief:\n"+research,controller.signal);
+              output=await requestGateway("Concise stage: write the final user-facing answer using this design. Do not reveal private reasoning; present only the useful result.\n\nOriginal task:\n"+text+"\n\nDesign brief:\n"+architecture,controller.signal);
+            }else{output=await requestGateway(text,controller.signal);}
             const current = state.conversations.find((c) => c.id === targetId);
             if (current && !controller.signal.aborted) {
               current.messages.push({ role: "assistant", content: output });
