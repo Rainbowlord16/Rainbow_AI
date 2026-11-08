@@ -3419,7 +3419,7 @@
                   text-overflow: ellipsis;
                   white-space: nowrap;
                 "
-                >Gateway Ready</span
+                >Gateway configured</span
               >
             </div>
             <button
@@ -5785,10 +5785,8 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         initializeProfessionalPersonalization();
 
         async function sendMessage(textOverride = null) {
-          if (state.busy) {
-            notify(
-              "Rainbow AI is still responding. Please wait or cancel the request.",
-            );
+          if (state.busy || novaBusy) {
+            notify("Rainbow AI or Nova is still responding. Please wait or cancel the active request.");
             return;
           }
 
