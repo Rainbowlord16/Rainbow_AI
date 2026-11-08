@@ -1,5 +1,7 @@
+import logging
 import os
 import re
+
 import requests
 import uvicorn
 from fastapi import FastAPI, HTTPException
@@ -9,168 +11,159 @@ from pydantic import BaseModel
 # -------------------------------------------------------------------
 # Configuration
 # -------------------------------------------------------------------
-LLAMA_SERVER_URL = "http://127.0.0.1:8081/completion"
-LLAMA_HEALTH_URL = "http://127.0.0.1:8081/health"
+LLAMA_SERVER_URL = os.getenv("LLAMA_SERVER_URL", "http://127.0.0.1:8081/completion").strip()
+LLAMA_HEALTH_URL = os.getenv("LLAMA_HEALTH_URL", "http://127.0.0.1:8081/health").strip()
+LLAMA_REQUEST_TIMEOUT = max(10.0, float(os.getenv("LLAMA_REQUEST_TIMEOUT", "120")))
+
+DEFAULT_ALLOWED_ORIGINS = (
+    "https://rainbowlord16.github.io,"
+    "http://localhost:5500,"
+    "http://127.0.0.1:5500"
+)
+ALLOWED_ORIGINS = [
+    origin.strip().rstrip("/")
+    for origin in os.getenv("RAINBOW_ALLOWED_ORIGINS", DEFAULT_ALLOWED_ORIGINS).split(",")
+    if origin.strip()
+]
 
 app = FastAPI(title="Rainbow AI Custom Chat Adapter")
 
-# Allow CORS so your GitHub Pages frontend can communicate without browser blocks
+# CORS applies to browser origins, not the gateway host. Override the
+# allow-list with RAINBOW_ALLOWED_ORIGINS if the frontend domain changes.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Accept"],
 )
 
-# -------------------------------------------------------------------
-# Request Schema matching Rainbow AI Frontend
-# -------------------------------------------------------------------
+
 class InferencePayload(BaseModel):
     data: list
 
-# -------------------------------------------------------------------
-# Prompt Formatter & Sanitizer
-# -------------------------------------------------------------------
+
 def format_prompt_for_model(user_message: str, history: list = None) -> str:
-    """
-    Constructs the verified prompt structure:
-    <|turn>user\n...<|turn>model\n<|channel>final\n
-    """
+    """Build the model's expected turn/channel prompt format."""
     prompt = ""
-    
-    # If conversational history is provided, build turns sequentially
     if history:
         for turn in history:
+            if not isinstance(turn, dict):
+                continue
             role = turn.get("role", "user")
-            content = turn.get("content", "").strip()
+            content = str(turn.get("content", "")).strip()
             if role == "user":
                 prompt += f"<|turn>user\n{content}\n"
-            elif role == "assistant" or role == "model":
+            elif role in ("assistant", "model"):
                 prompt += f"<|turn>model\n<|channel>final\n{content}<|channel|>\n"
-
-    # Append the current active user turn
     prompt += f"<|turn>user\n{user_message.strip()}<|turn>model\n<|channel>final\n"
     return prompt
 
+
 def sanitize_model_output(raw_text: str) -> str:
-    """
-    Strips internal model formatting, control tokens, and channel artifacts.
-    """
+    """Remove leaked model control markers from the visible answer."""
     if not raw_text:
         return ""
-
-    text = raw_text
-
-    # 1. Remove leading channel markers if leaked
-    text = re.sub(r"^<\|channel\|>", "", text)
-    text = re.sub(r"^final\n*", "", text, flags=re.IGNORECASE)
-    
-    # 2. Strip any turn markers or trailing channel tags
-    control_patterns = [
-        r"<\|turn>.*",
-        r"<\|channel\|>.*",
-        r"<\|turn>",
-        r"<\|channel>",
-        r"final<\|channel\|>",
-    ]
-    for pattern in control_patterns:
-        text = re.sub(pattern, "", text, flags=re.DOTALL)
-
-    # 3. Clean up leading/trailing whitespace
+    text = str(raw_text).strip()
+    text = re.split(r"<\|turn>(?:user|model)?", text, maxsplit=1)[0]
+    text = re.sub(r"<\|channel\|>", "", text)
+    text = re.sub(r"<\|channel>", "", text)
+    text = re.sub(r"^final\s*", "", text, flags=re.IGNORECASE)
     return text.strip()
 
-# -------------------------------------------------------------------
-# Endpoints
-# -------------------------------------------------------------------
+
 @app.get("/")
 def health_check():
-    """
-    Verifies that the adapter is online and checks if llama.cpp is responding.
-    """
-    llama_status = "offline"
+    """Report adapter health separately from llama.cpp health."""
+    llama_status = "unreachable"
     try:
-        r = requests.get(LLAMA_HEALTH_URL, timeout=2)
-        if r.status_code == 200:
-            llama_status = "connected"
-    except Exception:
+        response = requests.get(LLAMA_HEALTH_URL, timeout=3)
+        llama_status = "connected" if response.ok else "offline"
+    except requests.exceptions.Timeout:
+        llama_status = "timeout"
+    except requests.exceptions.RequestException:
         llama_status = "unreachable"
 
     return {
         "adapter_status": "online",
         "llama_cpp_backend": llama_status,
-        "target_endpoint": LLAMA_SERVER_URL
+        "target_endpoint": LLAMA_SERVER_URL,
     }
+
 
 @app.post("/call/predict")
 def predict(payload: InferencePayload):
     """
-    Primary endpoint called by the Rainbow AI website.
-    Translates input, queries llama.cpp /completion, cleans output, and returns.
+    FastAPI contract used by Rainbow AI:
+      request:  {"data": ["prompt", "model/persona"]}
+      response: {"data": ["assistant response"]}
     """
     try:
-        # Extract prompt from frontend array: data: [query, model]
-        if not payload.data or len(payload.data) == 0:
-            raise HTTPException(status_code=400, detail="Empty prompt array received.")
+        if not isinstance(payload.data, list) or not payload.data:
+            raise HTTPException(status_code=400, detail="A non-empty data array is required.")
+        if not isinstance(payload.data[0], str):
+            raise HTTPException(status_code=400, detail="The prompt must be a string.")
 
-        user_input = str(payload.data[0]).strip()
-        selected_model = payload.data[1] if len(payload.data) > 1 else "default"
-
+        user_input = payload.data[0].strip()
         if not user_input:
-            raise HTTPException(status_code=400, detail="User message cannot be empty.")
+            raise HTTPException(status_code=400, detail="The prompt cannot be empty.")
+        if len(user_input) > 30000:
+            raise HTTPException(status_code=413, detail="The prompt is too long (maximum 30000 characters).")
 
-        # 1. Format the raw prompt with the model's native turn/channel tags
-        formatted_prompt = format_prompt_for_model(user_input)
+        # Keep the second array value accepted for frontend compatibility.
+        # This adapter currently uses the one model loaded by llama.cpp.
+        if len(payload.data) > 1 and not isinstance(payload.data[1], (str, int, float)):
+            raise HTTPException(status_code=400, detail="The model/persona value must be a string or number.")
 
-        # 2. Construct the payload for llama-server's /completion endpoint
         llama_payload = {
-            "prompt": formatted_prompt,
+            "prompt": format_prompt_for_model(user_input),
             "n_predict": 2048,
             "temperature": 0.7,
             "top_p": 0.9,
             "repeat_penalty": 1.1,
-            # Strict stop tokens to prevent the model from rambling or echoing turns
-            "stop": [
-                "<|turn>",
-                "<|turn>user",
-                "<|turn>model",
-                "<|channel|>",
-                "User:",
-                "Assistant:"
-            ]
+            "stop": ["<|turn>", "<|turn>user", "<|turn>model", "User:", "Assistant:"],
         }
 
-        # 3. Send request to llama-server
-        response = requests.post(
-            LLAMA_SERVER_URL,
-            json=llama_payload,
-            timeout=120  # Ample time for 12B token generation on T4
-        )
-
-        if response.status_code != 200:
-            raise HTTPException(
-                status_code=502,
-                detail=f"llama.cpp error {response.status_code}: {response.text}"
+        try:
+            response = requests.post(
+                LLAMA_SERVER_URL,
+                json=llama_payload,
+                timeout=LLAMA_REQUEST_TIMEOUT,
             )
+            response.raise_for_status()
+        except requests.exceptions.Timeout:
+            raise HTTPException(status_code=504, detail="Inference timed out on the llama.cpp server.")
+        except requests.exceptions.ConnectionError:
+            raise HTTPException(status_code=503, detail="The inference backend is unavailable.")
+        except requests.exceptions.RequestException:
+            logging.exception("llama.cpp request failed")
+            raise HTTPException(status_code=502, detail="The inference backend returned an unsuccessful response.")
 
-        result_data = response.json()
-        raw_completion = result_data.get("content", "")
+        try:
+            result_data = response.json()
+        except ValueError:
+            raise HTTPException(status_code=502, detail="The inference backend returned invalid JSON.")
 
-        # 4. Sanitize control tokens from the response
+        if not isinstance(result_data, dict):
+            raise HTTPException(status_code=502, detail="The inference backend returned an unexpected response.")
+
+        raw_completion = result_data.get("content")
+        if not isinstance(raw_completion, str):
+            raise HTTPException(status_code=502, detail="The inference backend response did not contain text.")
+
         clean_text = sanitize_model_output(raw_completion)
-
         if not clean_text:
             clean_text = "I processed your request, but no text content was returned."
 
-        # 5. Return in the exact shape Rainbow AI expects
         return {"data": [clean_text]}
 
-    except requests.exceptions.Timeout:
-        raise HTTPException(status_code=504, detail="Inference timed out on the llama.cpp server.")
-    except requests.exceptions.ConnectionError:
-        raise HTTPException(status_code=503, detail="Could not connect to llama-server on port 8081.")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except HTTPException:
+        # Preserve intentional 4xx/5xx responses instead of turning them into 500s.
+        raise
+    except Exception:
+        logging.exception("Unexpected Rainbow AI adapter error")
+        raise HTTPException(status_code=500, detail="An unexpected inference adapter error occurred.")
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
