@@ -4212,9 +4212,7 @@
                 autocomplete="off"
               />
               <p class="form-help">
-                Compatible with Gradio endpoints (<code>/call/predict</code>,
-                <code>/run/predict</code>) reaching
-                <strong>Rainbow-AI-Unified-12B</strong>.
+                Uses the Rainbow AI FastAPI adapter at <code>/call/predict</code>, which forwards requests to the configured llama.cpp inference server.
               </p>
             </div>
             <div class="form-group">
@@ -4222,16 +4220,7 @@
                 >Gateway Request Protocol</label
               >
               <select id="gatewayModeSelect" class="form-select">
-                <option value="auto">
-                  Auto-Detect (Gradio /call/predict → /api/predict)
-                </option>
-                <option value="gradio">Gradio 4+ Queue (/call/predict)</option>
-                <option value="gradio_legacy">
-                  Gradio Legacy (/run/predict or /api/predict)
-                </option>
-                <option value="openai">
-                  OpenAI-Compatible (/v1/chat/completions)
-                </option>
+                <option value="fastapi">FastAPI adapter (/call/predict)</option>
               </select>
             </div>
             <div class="form-group">
@@ -5328,7 +5317,7 @@
 
         const state = {
           gateway: DEFAULT_GATEWAY,
-          gatewayMode: "auto",
+          gatewayMode: "fastapi",
           requestTimeout: DEFAULT_REQUEST_TIMEOUT,
           conversations: [],
           activeId: null,
@@ -5361,15 +5350,47 @@ let rainbowFileChunks=[];
 function indexRainbowText(name,text){const clean=String(text||"").slice(0,120000),size=1100,overlap=180;for(let i=0;i<clean.length;i+=size-overlap){const chunk=clean.slice(i,i+size);if(chunk.trim())rainbowFileChunks.push({name,text:chunk});}if(rainbowFileChunks.length>180)rainbowFileChunks=rainbowFileChunks.slice(-180);}
 function retrieveRainbowContext(query){const terms=String(query).toLowerCase().match(/[a-z0-9]{3,}/g)||[];if(!terms.length||!rainbowFileChunks.length)return "";const ranked=rainbowFileChunks.map(c=>{const hay=c.text.toLowerCase();let score=0;for(const term of terms){const count=hay.split(term).length-1;if(count)score+=Math.min(count,4)*(term.length>6?2:1);}return {...c,score};}).filter(c=>c.score>0).sort((a,b)=>b.score-a.score).slice(0,4);return ranked.map(c=>"SOURCE "+c.name+":\n"+c.text).join("\n\n---\n\n");}
 const secondaryWrap=document.createElement("div");secondaryWrap.className="form-group";secondaryWrap.innerHTML='<label class="form-label" for="secondaryGatewayInput">Optional backup gateway</label><input id="secondaryGatewayInput" class="form-input" type="url" placeholder="https://your-backup-gateway.example"><p class="form-help">Used only after a primary network, 502 or 504 failure. Leave blank to disable fallback.</p>';const gatewayPanel=$("#settingsTabGateway");if(gatewayPanel){const primary=$("#gatewayUrlInput")?.closest(".form-group");if(primary)primary.after(secondaryWrap);else gatewayPanel.appendChild(secondaryWrap);}const secondaryInput=$("#secondaryGatewayInput");if(secondaryInput){try{secondaryInput.value=localStorage.getItem("rainbow_ai_secondary_gateway")||"";}catch{}secondaryInput.addEventListener("change",()=>{const value=secondaryInput.value.trim();if(!value){localStorage.removeItem("rainbow_ai_secondary_gateway");notify("Backup gateway disabled.");return;}try{const safe=safeGateway(value);localStorage.setItem("rainbow_ai_secondary_gateway",safe);secondaryInput.value=safe;notify("Backup gateway saved on this device.");}catch(e){notify(e.message);}});}
-async function requestGatewayWithFallback(prompt,signal,personaOverride=null){try{return await requestGateway(prompt,signal,personaOverride);}catch(error){if(signal?.aborted||error.name==="AbortError")throw error;const eligible=error.status===502||error.status===504||error.name==="TypeError"||/failed to fetch|network/i.test(error.message||"");let backup="";try{backup=localStorage.getItem("rainbow_ai_secondary_gateway")||"";}catch{}if(!eligible||!backup)throw error;setStatus("Trying backup gateway…",null);return requestGateway(prompt,signal,personaOverride,safeGateway(backup));}}
+async function requestGatewayWithFallback(prompt,signal,personaOverride=null){try{return await requestGateway(prompt,signal,personaOverride);}catch(error){if(signal?.aborted||error.name==="AbortError")throw error;const eligible=[502,503,504].includes(error.status)||error.name==="TypeError"||/failed to fetch|network/i.test(error.message||"");let backup="";try{backup=localStorage.getItem("rainbow_ai_secondary_gateway")||"";}catch{}if(!eligible||!backup)throw error;setStatus("Trying backup gateway…",null);return requestGateway(prompt,signal,personaOverride,safeGateway(backup));}}
 const powerBar=document.createElement("div");powerBar.className="rainbow-power-tools";powerBar.innerHTML='<label class="form-help">Output <select id="rainbowOutputMode" class="form-select"><option value="normal">Normal</option><option value="markdown">Markdown</option><option value="json">Strict JSON</option><option value="diagram">Mermaid diagram</option></select></label><label class="form-help"><input id="rainbowRelayToggle" type="checkbox"> Agent relay</label><label class="form-help"><input id="rainbowAutoSpeak" type="checkbox"> Speak replies</label><button id="rainbowPolishBtn" class="composer-tool-btn" type="button">Polish prompt</button><button id="rainbowBranchBtn" class="composer-tool-btn" type="button">Fork latest turn</button>';const composerBox=$("#composerBox");if(composerBox)composerBox.insertBefore(powerBar,composerBox.querySelector(".composer-toolbar"));
 function novaMood(mood,label){const a=$("#novaAvatar");if(a)a.dataset.mood=mood;const l=$("#novaMoodLabel");if(l)l.textContent=label||({idle:"Nova is ready to learn with you!",listening:"I'm listening…",thinking:"Nova is thinking…",speaking:"Nova is speaking!"}[mood]||"Nova is here!");const m=$("#novaMouth");if(m)m.setAttribute("d",mood==="speaking"?"M76 116q14 23 28 0":"M76 119q14 14 28 0");}
 function speakText(text,who){if(!("speechSynthesis"in window))return notify("Speech output is not supported in this browser.");window.speechSynthesis.cancel();const clean=String(text).replace(/[#*_>]/g," ").slice(0,5000);const u=new SpeechSynthesisUtterance(clean);u.lang=navigator.language||"en-US";u.rate=.96;u.onstart=()=>novaMood("speaking",who+" is speaking.");u.onend=()=>novaMood("idle");u.onerror=()=>novaMood("idle");window.speechSynthesis.speak(u);}
 function openNova(){const log=$("#novaChatLog");if(log&&novaHistory.length&&log.children.length===1&&log.firstElementChild.textContent.startsWith("Hi!")){log.replaceChildren();novaHistory.forEach(m=>{const line=document.createElement("div");line.className="nova-line "+(m.role==="user"?"user":"");line.textContent=m.text||"";log.appendChild(line);});}$("#novaDrawer")?.classList.add("open");$("#novaOverlay")?.classList.add("open");$("#novaDrawer")?.setAttribute("aria-hidden","false");$("#novaInput")?.focus();}
-function closeNova(){$("#novaDrawer")?.classList.remove("open");$("#novaOverlay")?.classList.remove("open");$("#novaDrawer")?.setAttribute("aria-hidden","true");if(novaRecognition){novaRecognition.stop();novaRecognition=null;}novaMood("idle");}
-let novaRecognition=null;$("#openNovaBtn")?.addEventListener("click",openNova);$("#openNovaSidebarBtn")?.addEventListener("click",()=>{openNova();if(window.innerWidth<=768)$("#sidebar")?.classList.remove("open");});$("#closeNovaBtn")?.addEventListener("click",closeNova);$("#novaOverlay")?.addEventListener("click",closeNova);
+function closeNova(){novaController?.abort();$("#novaDrawer")?.classList.remove("open");$("#novaOverlay")?.classList.remove("open");$("#novaDrawer")?.setAttribute("aria-hidden","true");if(novaRecognition){try{novaRecognition.stop();}catch{}novaRecognition=null;}novaMood("idle");}
+let novaRecognition=null,novaController=null,novaBusy=false;$("#openNovaBtn")?.addEventListener("click",openNova);$("#openNovaSidebarBtn")?.addEventListener("click",()=>{openNova();if(window.innerWidth<=768)$("#sidebar")?.classList.remove("open");});$("#closeNovaBtn")?.addEventListener("click",closeNova);$("#novaOverlay")?.addEventListener("click",closeNova);
 let novaHistory=[];try{novaHistory=JSON.parse(localStorage.getItem("rainbow_nova_history_v1")||"[]");if(!Array.isArray(novaHistory))novaHistory=[];}catch{novaHistory=[];}function novaLog(role,text){const log=$("#novaChatLog");if(!log)return;const line=document.createElement("div");line.className="nova-line "+(role==="user"?"user":"");line.textContent=text;log.appendChild(line);log.scrollTop=log.scrollHeight;novaHistory.push({role,text});try{localStorage.setItem("rainbow_nova_history_v1",JSON.stringify(novaHistory.slice(-80)));}catch{}}
-async function askNova(text){if(!text.trim())return;if(state.busy)return notify("Wait for Rainbow AI to finish first.");novaLog("user",text);$("#novaInput").value="";novaMood("thinking");const level=$("#novaLevel")?.value||"Curious explorer (8–10)",topic=$("#novaTopic")?.value||"Surprise me";const prompt="[NOVA LEARNING MODE] You are Nova, a warm age-appropriate learning companion. Learner level: "+level+". Topic: "+topic+". Explain in short encouraging steps, use safe examples, ask one small check-for-understanding question, never request personal details, and do not give dangerous instructions. User: "+text;try{const answer=await requestGatewayWithFallback(prompt,new AbortController().signal,"nova");novaLog("assistant",answer);novaMood("idle");if($("#novaSpeakToggle")?.checked)speakText(answer,"Nova");if($("#novaHandsFree")?.checked)setTimeout(startNovaMic,450);}catch(error){novaMood("idle");novaLog("assistant","I couldn't reach the learning engine: "+error.message);}}
+async function askNova(text){
+  text=String(text||"").trim();
+  if(!text)return;
+  if(state.busy||novaBusy)return notify("Wait for the current Rainbow AI or Nova request to finish.");
+  novaBusy=true;
+  const controller=new AbortController();
+  novaController=controller;
+  const timeoutMs=Math.min(120000,Math.max(10000,Number($("#requestTimeoutInput")?.value||45)*1000));
+  let timedOut=false;
+  const timeout=setTimeout(()=>{timedOut=true;controller.abort();},timeoutMs);
+  novaLog("user",text);
+  $("#novaInput").value="";
+  novaMood("thinking");
+  const level=$("#novaLevel")?.value||"Curious explorer (8–10)";
+  const topic=$("#novaTopic")?.value||"Surprise me";
+  const prompt="[NOVA LEARNING MODE] You are Nova, a warm age-appropriate learning companion. Learner level: "+level+". Topic: "+topic+". Explain in short encouraging steps, use safe examples, ask one small check-for-understanding question, never request personal details, and do not give dangerous instructions. User: "+text;
+  try{
+    const answer=await requestGatewayWithFallback(prompt,controller.signal,"nova");
+    if(controller.signal.aborted)return;
+    novaLog("assistant",answer);
+    novaMood("idle");
+    if($("#novaSpeakToggle")?.checked)speakText(answer,"Nova");
+    if($("#novaHandsFree")?.checked)setTimeout(()=>{if($("#novaDrawer")?.classList.contains("open"))startNovaMic();},450);
+  }catch(error){
+    if(timedOut)novaLog("assistant","Nova's request timed out. Check the gateway or increase the timeout in Settings.");
+    else if(!controller.signal.aborted)novaLog("assistant","I couldn't reach the learning engine: "+error.message);
+    novaMood("idle");
+  }finally{
+    clearTimeout(timeout);
+    if(novaController===controller)novaController=null;
+    novaBusy=false;
+  }
+}
 $("#novaSendBtn")?.addEventListener("click",()=>askNova($("#novaInput")?.value||""));$("#novaInput")?.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();askNova(e.currentTarget.value);}});
 function startNovaMic(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return notify("Voice input is unavailable in this browser.");if(novaRecognition){novaRecognition.stop();novaRecognition=null;return;}try{novaRecognition=new SR();novaRecognition.lang=navigator.language||"en-US";novaRecognition.interimResults=false;novaRecognition.continuous=false;novaMood("listening");novaRecognition.onresult=e=>{const t=e.results?.[0]?.[0]?.transcript||"";if(t)askNova(t);};novaRecognition.onerror=e=>{novaMood("idle");notify(e.error==="not-allowed"?"Allow microphone access to use Nova voice.":"Nova voice input failed.");};novaRecognition.onend=()=>{novaRecognition=null;if(!$("#novaHandsFree")?.checked)novaMood("idle");};novaRecognition.start();}catch{novaRecognition=null;novaMood("idle");notify("Could not start Nova voice input. Check microphone permission.");}}
 $("#novaMicBtn")?.addEventListener("click",startNovaMic);$("#novaStopSpeak")?.addEventListener("click",()=>{window.speechSynthesis?.cancel();novaMood("idle");});
@@ -5493,8 +5514,8 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
             if (typeof saved.gateway === "string") {
               try { state.gateway = safeGateway(saved.gateway); } catch { state.gateway = DEFAULT_GATEWAY; }
             }
-            if (["auto", "gradio", "gradio_legacy", "openai"].includes(saved.gatewayMode))
-              state.gatewayMode = saved.gatewayMode;
+            // Migrate previous Gradio/OpenAI preferences to the actual FastAPI adapter.
+            state.gatewayMode = "fastapi";
             if (Number.isFinite(saved.requestTimeout))
               state.requestTimeout = Math.min(120000, Math.max(10000, saved.requestTimeout));
             if (["dark", "midnight", "light"].includes(saved.theme)) {
@@ -5654,53 +5675,62 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         async function requestGateway(prompt, signal, personaOverride = null, gatewayOverride = null) {
           const base = safeGateway(gatewayOverride || el.gateway?.value.trim() || state.gateway || DEFAULT_GATEWAY);
           state.gateway = base;
-          const mode = $("#gatewayModeSelect")?.value || state.gatewayMode || "auto";
           const timeoutValue = Number($("#requestTimeoutInput")?.value);
-          const timeout = Number.isFinite(timeoutValue) ? Math.min(120, Math.max(10, timeoutValue)) * 1000 : state.requestTimeout;
-          state.gatewayMode = mode;
+          const timeout = Number.isFinite(timeoutValue)
+            ? Math.min(120, Math.max(10, timeoutValue)) * 1000
+            : state.requestTimeout;
+          state.gatewayMode = "fastapi";
           state.requestTimeout = timeout;
           save();
 
-          const headers = { "Content-Type": "application/json", "Accept": "application/json" };
           const model = personaOverride || el.model?.value || MODEL;
-          const attempts = mode === "auto"
-            ? [
-                { path: "/call/predict", body: { data: [prompt, model] }, kind: "gradio" },
-                { path: "/run/predict", body: { data: [prompt, model] }, kind: "legacy" },
-                { path: "/api/predict", body: { data: [prompt, model] }, kind: "legacy" },
-              ]
-            : mode === "gradio"
-              ? [{ path: "/call/predict", body: { data: [prompt, model] }, kind: "gradio" }]
-              : mode === "gradio_legacy"
-                ? [{ path: "/run/predict", body: { data: [prompt, model] }, kind: "legacy" }, { path: "/api/predict", body: { data: [prompt, model] }, kind: "legacy" }]
-                : [{ path: "/v1/chat/completions", body: { model, messages: [{ role: "user", content: prompt }] }, kind: "openai", headers: { ...headers, "Accept": "application/json" } }];
+          const controller = new AbortController();
+          const abortFromParent = () => controller.abort();
+          if (signal?.aborted) controller.abort();
+          else signal?.addEventListener("abort", abortFromParent, { once: true });
+          let timeoutId;
+          try {
+            timeoutId = setTimeout(() => controller.abort(), timeout);
+            const response = await fetch(base + "/call/predict", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+              },
+              signal: controller.signal,
+              body: JSON.stringify({ data: [prompt, model] }),
+            });
 
-          let lastError;
-          for (let i = 0; i < attempts.length; i++) {
-            const attempt = attempts[i];
+            const contentType = response.headers.get("content-type") || "";
+            const rawBody = await response.text();
+            let payload = null;
             try {
-              const response = await fetch(base + attempt.path, {
-                method: "POST",
-                headers: attempt.headers || headers,
-                signal,
-                body: JSON.stringify(attempt.body),
-              });
-              if (!response.ok) {
-                const detail = await response.text().catch(() => "");
-                const error = new Error(`Gateway ${attempt.path} returned HTTP ${response.status}${detail ? `: ${detail.slice(0, 240)}` : ""}`);
-                error.status = response.status;
-                throw error;
-              }
-              const payload = await response.json();
-              return extractAssistantText(payload, attempt.kind);
-            } catch (error) {
-              lastError = error;
-              // Only probe another endpoint for route/method misses. Do not duplicate
-              // a generation after a server-side failure or a network interruption.
-              if (signal.aborted || error.name === "AbortError" || ![404, 405].includes(error.status) || i === attempts.length - 1) throw error;
+              payload = rawBody ? JSON.parse(rawBody) : null;
+            } catch {
+              payload = null;
             }
+
+            if (!response.ok) {
+              const detail = typeof payload?.detail === "string" ? payload.detail.slice(0, 180) : "";
+              const error = new Error(`FastAPI adapter returned HTTP ${response.status}${detail ? `: ${detail}` : ""}`);
+              error.status = response.status;
+              throw error;
+            }
+            if (!contentType.toLowerCase().includes("application/json") || !payload || typeof payload !== "object" || Array.isArray(payload)) {
+              throw new Error("FastAPI adapter returned an invalid response. Expected JSON.");
+            }
+            return extractAssistantText(payload, "fastapi");
+          } catch (error) {
+            if (controller.signal.aborted && !signal?.aborted) {
+              const timeoutError = new Error(`FastAPI request timed out after ${Math.round(timeout / 1000)} seconds.`);
+              timeoutError.name = "TimeoutError";
+              throw timeoutError;
+            }
+            throw error;
+          } finally {
+            clearTimeout(timeoutId);
+            signal?.removeEventListener("abort", abortFromParent);
           }
-          throw lastError || new Error("No compatible gateway endpoint was found.");
         }
 
         async function generateConversationTitle(id,firstUserMessage,assistantReply) {
@@ -6116,22 +6146,33 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         });
 
         $("#testGatewayBtn")?.addEventListener("click", async () => {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 8000);
           try {
             const base = safeGateway(el.gateway?.value || state.gateway);
             const response = await fetch(`${base}/`, {
               method: "GET",
-              signal: AbortSignal.timeout
-                ? AbortSignal.timeout(8000)
-                : undefined,
+              headers: { "Accept": "application/json" },
+              signal: controller.signal,
             });
-
-            notify(
-              response.ok
-                ? "Gateway host responded. This does not guarantee inference is working."
-                : `Gateway host returned HTTP ${response.status}.`,
-            );
+            const contentType = response.headers.get("content-type") || "";
+            const payload = contentType.toLowerCase().includes("application/json")
+              ? await response.json()
+              : null;
+            if (!response.ok) throw new Error(`Gateway health check returned HTTP ${response.status}.`);
+            if (payload?.adapter_status !== "online") {
+              throw new Error("The URL responded, but it did not identify itself as the Rainbow AI FastAPI adapter.");
+            }
+            const backend = payload.llama_cpp_backend || "unknown";
+            notify(backend === "connected"
+              ? "FastAPI adapter is online and llama.cpp is connected."
+              : `FastAPI adapter is online, but llama.cpp is ${backend}. Inference may not work yet.`);
           } catch (error) {
-            notify(`Gateway test failed: ${error.message}`);
+            notify(error.name === "AbortError"
+              ? "Gateway health check timed out after 8 seconds."
+              : `Gateway test failed: ${error.message}`);
+          } finally {
+            clearTimeout(timeout);
           }
         });
 
@@ -6140,10 +6181,10 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           setTheme(event.target.value);
         });
         $("#gatewayModeSelect")?.addEventListener("change", event => {
-          if (["auto", "gradio", "gradio_legacy", "openai"].includes(event.target.value)) {
-            state.gatewayMode = event.target.value;
+          if (event.target.value === "fastapi") {
+            state.gatewayMode = "fastapi";
             save();
-            notify("Gateway protocol preference saved.");
+            notify("FastAPI gateway protocol selected.");
           }
         });
         $("#requestTimeoutInput")?.addEventListener("input", event => {
