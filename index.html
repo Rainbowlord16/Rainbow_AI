@@ -3026,7 +3026,7 @@
 .rw2-bar{height:8px;background:#64748b33;border-radius:99px;overflow:hidden;margin-top:6px}.rw2-bar span{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#3b82f6);border-radius:99px}
 .rw2-status{padding:12px;border-radius:10px;background:var(--panel3,#222736);line-height:1.5}
 .rw2-svg-motion{transform-box:fill-box;transform-origin:center}
-svg[data-rw-motion="search"]:hover circle,button:focus-visible svg[data-rw-motion="search"] circle{animation:rw-search-scan .85s ease both}
+svg[data-rw-motion-ready="1"] path,svg[data-rw-motion-ready="1"] line,svg[data-rw-motion-ready="1"] circle,svg[data-rw-motion-ready="1"] rect,svg[data-rw-motion-ready="1"] polygon{animation:rw-svg-appear .8s cubic-bezier(.2,.7,.2,1) both}\nsvg[data-rw-motion="attach"]:hover path,button:focus-visible svg[data-rw-motion="attach"] path{animation:rw-attach-draw .7s ease both}\nsvg[data-rw-motion="polish"]:hover path,button:focus-visible svg[data-rw-motion="polish"] path{animation:rw-polish-spark .9s ease both}\nsvg[data-rw-motion="fork"]:hover path,button:focus-visible svg[data-rw-motion="fork"] path{animation:rw-fork-draw .65s ease both}\nsvg[data-rw-motion="text"]:hover path,button:focus-visible svg[data-rw-motion="text"] path{animation:rw-text-write .7s ease both}\nsvg[data-rw-motion="search"]:hover circle,button:focus-visible svg[data-rw-motion="search"] circle{animation:rw-search-scan .85s ease both}
 svg[data-rw-motion="search"]:hover path,button:focus-visible svg[data-rw-motion="search"] path{animation:rw-search-glint .85s ease both}
 svg[data-rw-motion="send"]:hover path,button:focus-visible svg[data-rw-motion="send"] path{animation:rw-send-flight .65s cubic-bezier(.2,.8,.2,1) both}
 svg[data-rw-motion="voice"]:hover path,button:focus-visible svg[data-rw-motion="voice"] path{animation:rw-voice-wave .8s ease-in-out both}
@@ -3036,7 +3036,7 @@ svg[data-rw-motion="alert"]:hover path,button:focus-visible svg[data-rw-motion="
 svg[data-rw-motion="brand"] path{animation:rw-brand-flow 7s ease-in-out infinite}
 svg[data-rw-motion="brand"] circle{animation:rw-brand-spark 3.2s ease-in-out infinite}
 svg[data-rw-motion="generic"]:hover path,svg[data-rw-motion="generic"]:hover circle,svg[data-rw-motion="generic"]:hover rect,svg[data-rw-motion="generic"]:hover polygon,button:focus-visible svg[data-rw-motion="generic"] path{animation:rw-ink-reveal .55s ease both}
-@keyframes rw-search-scan{0%{opacity:.65}45%{opacity:1;filter:drop-shadow(0 0 3px currentColor)}100%{opacity:1}}
+@keyframes rw-svg-appear{0%{opacity:.25;stroke-dasharray:1 80;stroke-dashoffset:16;transform:translateY(1px)}100%{opacity:1;stroke-dasharray:80 0;stroke-dashoffset:0;transform:translateY(0)}}@keyframes rw-attach-draw{0%{stroke-dasharray:2 60;stroke-dashoffset:20}100%{stroke-dasharray:60 0;stroke-dashoffset:0}}@keyframes rw-polish-spark{0%{opacity:.6;filter:none}45%{opacity:1;filter:drop-shadow(0 0 4px currentColor)}100%{opacity:1;filter:none}}@keyframes rw-fork-draw{0%{stroke-dasharray:2 48;stroke-dashoffset:18}100%{stroke-dasharray:48 0;stroke-dashoffset:0}}@keyframes rw-text-write{0%{stroke-dasharray:1 32;stroke-dashoffset:14}100%{stroke-dasharray:32 0;stroke-dashoffset:0}}@keyframes rw-search-scan{0%{opacity:.65}45%{opacity:1;filter:drop-shadow(0 0 3px currentColor)}100%{opacity:1}}
 @keyframes rw-search-glint{0%{stroke-dasharray:2 30;stroke-dashoffset:20}100%{stroke-dasharray:30 0;stroke-dashoffset:0}}
 @keyframes rw-send-flight{0%{transform:translate(-1px,1px);opacity:.65}65%{transform:translate(2px,-2px)}100%{transform:translate(0,0);opacity:1}}
 @keyframes rw-voice-wave{0%,100%{opacity:.8}50%{opacity:1;filter:drop-shadow(0 0 3px currentColor)}}
@@ -3956,7 +3956,7 @@ svg[data-rw-motion="generic"]:hover path,svg[data-rw-motion="generic"]:hover cir
                         class="composer-tool-btn"
                         title="Attach files"
                       >
-                        Attach
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-rw-icon="attach"><path d="m8 12.5 7.1-7.1a3 3 0 0 1 4.2 4.2l-8.5 8.5a5 5 0 0 1-7.1-7.1l8.1-8.1"/></svg><span>Attach</span>
                       </button>
                       <button
                         id="composerPromptStudioBtn"
@@ -3964,7 +3964,7 @@ svg[data-rw-motion="generic"]:hover path,svg[data-rw-motion="generic"]:hover cir
                         class="composer-tool-btn"
                         title="Templates"
                       >
-                        Templates
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-rw-icon="text"><path d="M4 5h16M12 5v14M8 19h8"/></svg><span>Templates</span>
                       </button>
                       <button
                         id="voiceInputBtn"
@@ -3972,7 +3972,7 @@ svg[data-rw-motion="generic"]:hover path,svg[data-rw-motion="generic"]:hover cir
                         class="composer-tool-btn"
                         title="Voice dictation"
                       >
-                        Voice
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-rw-icon="voice"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg><span>Voice</span>
                       </button>
                       <button
                         id="clearComposerBtn"
@@ -5426,6 +5426,8 @@ function retrieveRainbowContext(query){const terms=String(query).toLowerCase().m
 const secondaryWrap=document.createElement("div");secondaryWrap.className="form-group";secondaryWrap.innerHTML='<label class="form-label" for="secondaryGatewayInput">Optional backup gateway</label><input id="secondaryGatewayInput" class="form-input" type="url" placeholder="https://your-backup-gateway.example"><p class="form-help">Used only after a primary network, 502 or 504 failure. Leave blank to disable fallback.</p>';const gatewayPanel=$("#settingsTabGateway");if(gatewayPanel){const primary=$("#gatewayUrlInput")?.closest(".form-group");if(primary)primary.after(secondaryWrap);else gatewayPanel.appendChild(secondaryWrap);}const secondaryInput=$("#secondaryGatewayInput");if(secondaryInput){try{secondaryInput.value=localStorage.getItem("rainbow_ai_secondary_gateway")||"";}catch{}secondaryInput.addEventListener("change",()=>{const value=secondaryInput.value.trim();if(!value){localStorage.removeItem("rainbow_ai_secondary_gateway");notify("Backup gateway disabled.");return;}try{const safe=safeGateway(value);localStorage.setItem("rainbow_ai_secondary_gateway",safe);secondaryInput.value=safe;notify("Backup gateway saved on this device.");}catch(e){notify(e.message);}});}
 async function requestGatewayWithFallback(prompt,signal,personaOverride=null){try{return await requestGateway(prompt,signal,personaOverride);}catch(error){if(signal?.aborted||error.name==="AbortError")throw error;const eligible=[502,503,504].includes(error.status)||error.name==="TypeError"||/failed to fetch|network/i.test(error.message||"");let backup="";try{backup=localStorage.getItem("rainbow_ai_secondary_gateway")||"";}catch{}if(!eligible||!backup)throw error;setStatus("Trying backup gateway…",null);return requestGateway(prompt,signal,personaOverride,safeGateway(backup));}}
 const powerBar=document.createElement("div");powerBar.className="rainbow-power-tools";powerBar.innerHTML='<label class="form-help">Output <select id="rainbowOutputMode" class="form-select"><option value="normal">Normal</option><option value="markdown">Markdown</option><option value="json">Strict JSON</option><option value="diagram">Mermaid diagram</option></select></label><label class="form-help"><input id="rainbowRelayToggle" type="checkbox"> Agent relay</label><label class="form-help"><input id="rainbowAutoSpeak" type="checkbox"> Speak replies</label><button id="rainbowPolishBtn" class="composer-tool-btn" type="button">Polish prompt</button><button id="rainbowBranchBtn" class="composer-tool-btn" type="button">Fork latest turn</button>';const composerBox=$("#composerBox");if(composerBox)composerBox.insertBefore(powerBar,composerBox.querySelector(".composer-toolbar"));
+const svgActionIcons={polish:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-rw-icon="polish"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></svg>',fork:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-rw-icon="fork"><path d="M6 3v12a4 4 0 0 0 4 4h2"/><path d="m14 15 4 4-4 4"/><circle cx="6" cy="5" r="2"/><circle cx="18" cy="5" r="2"/><path d="M6 7c0 5 12 0 12-2"/></svg>'};
+const polishBtn=powerBar.querySelector("#rainbowPolishBtn"),forkBtn=powerBar.querySelector("#rainbowBranchBtn");if(polishBtn)polishBtn.innerHTML=svgActionIcons.polish+'<span>Polish prompt</span>';if(forkBtn)forkBtn.innerHTML=svgActionIcons.fork+'<span>Fork latest turn</span>';
 function novaMood(mood,label){const a=$("#novaAvatar");if(a)a.dataset.mood=mood;const l=$("#novaMoodLabel");if(l)l.textContent=label||({idle:"Nova is ready to learn with you!",listening:"I'm listening…",thinking:"Nova is thinking…",speaking:"Nova is speaking!"}[mood]||"Nova is here!");const m=$("#novaMouth");if(m)m.setAttribute("d",mood==="speaking"?"M76 116q14 23 28 0":"M76 119q14 14 28 0");}
 function speakText(text,who){if(!("speechSynthesis"in window))return notify("Speech output is not supported in this browser.");window.speechSynthesis.cancel();const clean=String(text).replace(/[#*_>]/g," ").slice(0,5000);const u=new SpeechSynthesisUtterance(clean);u.lang=navigator.language||"en-US";u.rate=.96;u.onstart=()=>novaMood("speaking",who+" is speaking.");u.onend=()=>novaMood("idle");u.onerror=()=>novaMood("idle");window.speechSynthesis.speak(u);}
 function openNova(){const log=$("#novaChatLog");if(log&&novaHistory.length&&log.children.length===1&&log.firstElementChild.textContent.startsWith("Hi!")){log.replaceChildren();novaHistory.forEach(m=>{const line=document.createElement("div");line.className="nova-line "+(m.role==="user"?"user":"");line.textContent=m.text||"";log.appendChild(line);});}$("#novaDrawer")?.classList.add("open");$("#novaOverlay")?.classList.add("open");$("#novaDrawer")?.setAttribute("aria-hidden","false");$("#novaInput")?.focus();}
@@ -7043,9 +7045,9 @@ document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=
   const classify=svg=>{
     if(svg.id==="novaAvatar")return "nova";
     const host=svg.closest("button,[role='button'],a")||svg.parentElement;
-    const words=[svg.id,svg.getAttribute("aria-label"),svg.getAttribute("class"),svg.getAttribute("data-icon"),host?.getAttribute("aria-label"),host?.getAttribute("title"),host?.textContent].filter(Boolean).join(" ").toLowerCase();
+    const words=[svg.id,svg.getAttribute("aria-label"),svg.getAttribute("class"),svg.getAttribute("data-icon"),svg.getAttribute("data-rw-icon"),host?.getAttribute("aria-label"),host?.getAttribute("title"),host?.textContent].filter(Boolean).join(" ").toLowerCase();
     if(svg.classList.contains("brand-original-mark")||svg.classList.contains("welcome-original-mark"))return "brand";
-    if(/search|find|lookup|filter/.test(words))return "search";
+    if(/attach|paperclip|file/.test(words))return "attach";if(/polish|sparkle|magic/.test(words))return "polish";if(/fork|branch|split/.test(words))return "fork";if(/text|template|type/.test(words))return "text";if(/search|find|lookup|filter/.test(words))return "search";
     if(/send|submit|paper.?plane|message/.test(words))return "send";
     if(/microphone|voice|listen|speech|audio/.test(words))return "voice";
     if(/plus|add|create|new chat|insert/.test(words))return "add";
