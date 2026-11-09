@@ -7220,5 +7220,139 @@ document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=
  </div>
 </div>
 
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const overlay=$("rainbowHubOverlay");
+if(!overlay)return;
+const store=window.RainbowWorkspace?.storage;
+const read=(key,fallback)=>store?.get("hub:"+key,fallback)??fallback;
+const write=(key,value)=>store?.set("hub:"+key,value);
+const names={overview:"Rainbow Hub",files:"File Hub",flow:"FlowForge",code:"Code Arena",sim:"Rainbow Simulator",story:"StoryWorld",api:"API Playground",focus:"Focus Mode",dashboard:"Personal Dashboard"};
+function open(tab="overview"){
+ overlay.classList.add("open");document.body.style.overflow="hidden";select(tab);
+}
+function close(){overlay.classList.remove("open");document.body.style.overflow="";}
+function select(tab){
+ if(!names[tab])tab="overview";
+ overlay.querySelectorAll("[data-rh-tab]").forEach(b=>b.classList.toggle("active",b.dataset.rhTab===tab));
+ overlay.querySelectorAll("[data-rh-panel]").forEach(p=>p.classList.toggle("active",p.dataset.rhPanel===tab));
+ $("rhTitle").textContent=names[tab];$("rhSubtitle").textContent=tab==="overview"?"One workspace. Your tools, connected.":"Local-first tools connected to the Rainbow workspace.";
+ if(tab==="dashboard")renderDashboard();if(tab==="files")listFiles();if(tab==="story")renderStories();if(tab==="flow")renderFlow();
+}
+$("rainbowHubSidebarBtn")?.addEventListener("click",()=>open());
+$("rhClose")?.addEventListener("click",close);
+overlay.addEventListener("click",e=>{if(e.target===overlay)close();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay.classList.contains("open"))close();});
+overlay.querySelectorAll("[data-rh-tab]").forEach(b=>b.addEventListener("click",()=>select(b.dataset.rhTab)));
+overlay.querySelectorAll("[data-rh-open]").forEach(b=>b.addEventListener("click",()=>select(b.dataset.rhOpen)));
+const moduleInfo=[
+ ["flowforge","FlowForge",["workflow-builder","local-storage","json-export"]],
+ ["code-arena","Code Arena",["sandboxed-html-css-js-preview"]],
+ ["simulator","Rainbow Simulator",["local-queue-model"]],
+ ["storyworld","StoryWorld",["story-notebook","chat-handoff"]],
+ ["dashboard","Personal Dashboard",["workspace-overview"]],
+ ["api-playground","API Playground",["same-origin-api-testing"]],
+ ["focus-mode","Focus Mode",["focus-timer","session-totals"]],
+ ["file-hub","File Hub",["indexed-document-search","excerpt-reuse"]]
+];
+moduleInfo.forEach(([id,name,capabilities])=>window.RainbowWorkspace?.register(id,{name,capabilities}));
+function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function listFiles(){
+ const names=window.RainbowWorkspace?.documents?.list?.()||[];
+ $("rhFileStatus").textContent=names.length?names.length+" indexed file(s); "+(window.RainbowWorkspace.documents.count?.()||0)+" extracted chunks.":"No readable files have been indexed yet.";
+ $("rhFileResults").replaceChildren();
+ names.forEach(name=>{
+  const row=document.createElement("div");row.className="rh-item";
+  const title=document.createElement("strong");title.textContent=name;
+  const btn=document.createElement("button");btn.className="rh-btn";btn.type="button";btn.textContent="Show excerpts";
+  btn.addEventListener("click",()=>showFile(name));
+  row.append(title,document.createTextNode(" "),btn);$("rhFileResults").append(row);
+ });
+}
+function showFile(name){
+ const excerpts=window.RainbowWorkspace?.documents?.retrieve?.(name)||"";
+ const row=document.createElement("div");row.className="rh-item";
+ const title=document.createElement("strong");title.textContent=name;
+ const pre=document.createElement("pre");pre.textContent=excerpts||"No matching excerpt could be retrieved. Try searching for a phrase from the document.";
+ row.append(title,pre);$("rhFileResults").prepend(row);
+}
+$("rhFileList")?.addEventListener("click",listFiles);
+$("rhFileSearch")?.addEventListener("click",()=>{
+ const q=$("rhFileQuery").value.trim();if(!q){listFiles();return;}
+ const result=window.RainbowWorkspace?.documents?.retrieve?.(q)||"";
+ $("rhFileStatus").textContent=result?"Relevant extracted passages found.":"No matching indexed passages found.";
+ $("rhFileResults").replaceChildren();
+ const row=document.createElement("div");row.className="rh-item";const pre=document.createElement("pre");pre.textContent=result||"Try another term or attach a text-readable file.";row.append(pre);$("rhFileResults").append(row);
+});
+const defaultSteps=["Define the objective and success criteria","Gather relevant files and context","Ask Rainbow Agents to plan the work","Review the result and verify assumptions"];
+let flow=read("flow",{name:"My Rainbow workflow",steps:defaultSteps});
+function renderFlow(){
+ $("rhFlowName").value=flow.name||"My Rainbow workflow";const list=$("rhFlowSteps");list.replaceChildren();
+ (flow.steps||[]).forEach((step,index)=>{
+  const row=document.createElement("div");row.className="rh-step";
+  const num=document.createElement("span");num.textContent=String(index+1).padStart(2,"0");
+  const input=document.createElement("input");input.value=step;input.maxLength=240;input.setAttribute("aria-label","Workflow step "+(index+1));input.addEventListener("input",()=>{flow.steps[index]=input.value;});
+  const controls=document.createElement("span");
+  const up=document.createElement("button");up.type="button";up.textContent="↑";up.title="Move step up";up.disabled=index===0;up.addEventListener("click",()=>{[flow.steps[index-1],flow.steps[index]]=[flow.steps[index],flow.steps[index-1]];renderFlow();});
+  const down=document.createElement("button");down.type="button";down.textContent="↓";down.title="Move step down";down.disabled=index===flow.steps.length-1;down.addEventListener("click",()=>{[flow.steps[index+1],flow.steps[index]]=[flow.steps[index],flow.steps[index+1]];renderFlow();});
+  const del=document.createElement("button");del.type="button";del.textContent="×";del.title="Delete step";del.addEventListener("click",()=>{flow.steps.splice(index,1);renderFlow();});
+  controls.append(up,down,del);row.append(num,input,controls);list.append(row);
+ });
+}
+$("rhAddStep")?.addEventListener("click",()=>{flow.steps.push("New workflow step");renderFlow();});
+$("rhSaveFlow")?.addEventListener("click",()=>{flow.name=$("rhFlowName").value.trim()||"Untitled workflow";flow.steps=flow.steps.map(x=>String(x).trim()).filter(Boolean);write("flow",flow);$("rhFlowStatus").textContent="Workflow saved locally.";renderFlow();});
+$("rhExportFlow")?.addEventListener("click",()=>{flow.name=$("rhFlowName").value.trim()||"Untitled workflow";const blob=new Blob([JSON.stringify({schema:"rainbow.flowforge.v1",...flow},null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="rainbow-workflow.json";a.click();URL.revokeObjectURL(url);});
+function populateChat(text){
+ const input=$("composerInput");if(!input){$("rhFlowStatus").textContent="Chat composer was not found.";return;}
+ input.value=text;input.dispatchEvent(new Event("input",{bubbles:true}));input.focus();close();
+}
+const flowSend=document.createElement("button");flowSend.className="rh-btn primary";flowSend.type="button";flowSend.textContent="Send workflow plan to Rainbow Chat";flowSend.addEventListener("click",()=>{flow.name=$("rhFlowName").value.trim()||"Workflow";populateChat("Help me execute and review this workflow step by step: "+flow.name+"\\n"+flow.steps.map((x,i)=>(i+1)+". "+x).join("\\n"));});
+$("rhFlowStatus")?.parentElement?.querySelector(".rh-row")?.append(flowSend);
+const starter={html:"<main><h1>Hello, Rainbow!</h1><p>Edit this starter and run it.</p><button id='demo'>Click me</button></main>",css:"body{font:16px system-ui;padding:2rem;color:#172033}button{padding:.7rem 1rem;border:0;border-radius:10px;background:#6366f1;color:white}",js:"document.querySelector('#demo')?.addEventListener('click',()=>alert('It works!'));"};
+$("rhRunCode")?.addEventListener("click",()=>{
+ const html=$("rhCodeHtml").value,css=$("rhCodeCss").value,js=$("rhCodeJs").value.replace(/<\/script/gi,"<\\/script");
+ const src="<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><style>"+css+"</style></head><body>"+html+"<script>"+js+"<\/script></body></html>";
+ $("rhCodePreview").srcdoc=src;
+});
+$("rhClearCode")?.addEventListener("click",()=>{$("rhCodeHtml").value=starter.html;$("rhCodeCss").value=starter.css;$("rhCodeJs").value=starter.js;$("rhCodePreview").srcdoc="about:blank";});
+$("rhRunSim")?.addEventListener("click",()=>{
+ const demand=Number($("rhDemand").value),capacity=Number($("rhCapacity").value),minutes=Number($("rhMinutes").value);
+ const incoming=demand*minutes,processed=Math.min(demand,capacity)*minutes,backlog=Math.max(0,demand-capacity)*minutes,utilization=Math.min(100,Math.round(demand/Math.max(1,capacity)*100));
+ $("rhSimOutput").textContent="Simulation duration: "+minutes+" minutes\\nIncoming requests: "+incoming+"\\nProcessing capacity: "+capacity*minutes+"\\nRequests processed: "+processed+"\\nEstimated ending queue: "+backlog+"\\nCapacity utilization: "+utilization+"%\\n"+(backlog?"Demand exceeds capacity; queue grows in this simplified model.":"Capacity meets or exceeds demand in this simplified model.");
+});
+["rhDemand","rhCapacity","rhMinutes"].forEach(id=>$(id)?.addEventListener("input",()=>{$(id+"Out").textContent=$(id).value;}));
+let stories=read("stories",[]);
+function renderStories(){
+ const list=$("rhStoryList");list.replaceChildren();
+ stories.forEach((story,index)=>{const row=document.createElement("div");row.className="rh-item";const title=document.createElement("strong");title.textContent=story.title;const p=document.createElement("p");p.className="rh-muted";p.textContent=(story.world||"").slice(0,180);const load=document.createElement("button");load.className="rh-btn";load.textContent="Load";load.addEventListener("click",()=>{$("rhStoryTitle").value=story.title;$("rhStoryWorld").value=story.world;$("rhStoryScene").value=story.scene;});const remove=document.createElement("button");remove.className="rh-btn";remove.textContent="Delete";remove.addEventListener("click",()=>{stories.splice(index,1);write("stories",stories);renderStories();});row.append(title,p,load,remove);list.append(row);});
+}
+$("rhSaveStory")?.addEventListener("click",()=>{const title=$("rhStoryTitle").value.trim();if(!title){$("rhStoryTitle").focus();return;}stories.unshift({title,world:$("rhStoryWorld").value,scene:$("rhStoryScene").value,updatedAt:Date.now()});stories=stories.slice(0,100);write("stories",stories);renderStories();});
+$("rhSendStory")?.addEventListener("click",()=>{const title=$("rhStoryTitle").value.trim()||"Untitled world";populateChat("Help me develop this story scene.\\nWorld: "+title+"\\nWorld and characters: "+$("rhStoryWorld").value+"\\nScene: "+$("rhStoryScene").value);});
+$("rhApiRun")?.addEventListener("click",async()=>{
+ const path=$("rhApiPath").value.trim(),method=$("rhApiMethod").value;
+ if(!/^\/api\/[a-z0-9/_-]+$/i.test(path)||path.startsWith("//")){$("rhApiOutput").textContent="Invalid path. Use a relative /api/... endpoint only.";return;}
+ let body;try{body=method==="POST"?JSON.parse($("rhApiBody").value||"{}"):undefined;}catch{$("rhApiOutput").textContent="Request body is not valid JSON.";return;}
+ $("rhApiRun").disabled=true;$("rhApiOutput").textContent="Sending request…";
+ try{const result=await window.RainbowWorkspace.api.request(path,{method,body,timeout:30000});$("rhApiOutput").textContent=JSON.stringify(result,null,2);}
+ catch(error){$("rhApiOutput").textContent="Request failed: "+(error.message||String(error));}
+ finally{$("rhApiRun").disabled=false;}
+});
+let focusRemaining=25*60,focusTimer=null,focusCompleted=read("focusCompleted",0);
+function renderTimer(){const m=Math.floor(focusRemaining/60),sec=focusRemaining%60;$("rhTimer").textContent=String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0");$("rhFocusStats").textContent="Completed focus minutes: "+focusCompleted;}
+function pauseTimer(){if(focusTimer){clearInterval(focusTimer);focusTimer=null;}}
+$("rhFocusStart")?.addEventListener("click",()=>{if(focusTimer)return;focusTimer=setInterval(()=>{focusRemaining=Math.max(0,focusRemaining-1);renderTimer();if(!focusRemaining){pauseTimer();focusCompleted+=25;write("focusCompleted",focusCompleted);renderTimer();}},1000);});
+$("rhFocusPause")?.addEventListener("click",pauseTimer);
+$("rhFocusReset")?.addEventListener("click",()=>{pauseTimer();focusRemaining=25*60;renderTimer();});
+function renderDashboard(){
+ const modules=window.RainbowWorkspace?.catalog?.()||[];$("rhModuleCount").textContent=modules.length;$("rhChunkCount").textContent=window.RainbowWorkspace?.documents?.count?.()||0;$("rhWorkflowCount").textContent=1;$("rhFocusCount").textContent=focusCompleted;
+ const list=$("rhModuleList");list.replaceChildren();modules.forEach(m=>{const row=document.createElement("div");row.className="rh-item";const strong=document.createElement("strong");strong.textContent=m.name;const status=document.createElement("span");status.className="rh-muted";status.textContent=" — "+m.status;row.append(strong,status);list.append(row);});
+}
+renderFlow();renderStories();renderTimer();
+})();
+</script>
+
   </body>
 </html>
