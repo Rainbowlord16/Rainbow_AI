@@ -5480,6 +5480,18 @@ svg[data-rw-motion="generic"]:hover [data-rw-part="stroke"],button:hover svg[dat
           toast: $("#toastRegion"),
         };
 
+        // Receive a contextual handoff from another Rainbow ecosystem page.
+        try {
+          const handoff = JSON.parse(localStorage.getItem("rainbow:handoff:v1") || "null");
+          if (handoff && typeof handoff.prompt === "string" && el.input) {
+            el.input.value = handoff.prompt.slice(0, 8000);
+            el.input.placeholder = "Your page context is ready — review it and send when you’re ready.";
+            el.input.dispatchEvent(new Event("input", { bubbles: true }));
+            localStorage.removeItem("rainbow:handoff:v1");
+          }
+        } catch (handoffError) {
+          console.warn("Rainbow page handoff could not be restored:", handoffError);
+        }
 
 let rainbowFileChunks=[];
 function indexRainbowText(name,text){const clean=String(text||"").slice(0,120000),size=1100,overlap=180;for(let i=0;i<clean.length;i+=size-overlap){const chunk=clean.slice(i,i+size);if(chunk.trim())rainbowFileChunks.push({name,text:chunk});}if(rainbowFileChunks.length>180)rainbowFileChunks=rainbowFileChunks.slice(-180);}
