@@ -3109,6 +3109,29 @@ svg[data-rw-motion="generic"]:hover [data-rw-part="stroke"],button:hover svg[dat
 @media(prefers-reduced-motion:reduce){#rainbowHubOverlay *{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 
 
+      /* Keep recent conversations directly beneath Explore; tools scroll independently. */
+      .sidebar-chat-section {
+        display: flex;
+        flex: 1 1 0;
+        flex-direction: column;
+        min-height: 130px;
+        overflow: hidden;
+      }
+      .sidebar-chat-section .sidebar-history {
+        min-height: 0;
+      }
+      .sidebar-modules {
+        flex: 0 1 auto;
+        min-height: 72px;
+        max-height: min(34vh, 320px);
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+      }
+      .app-shell.sidebar-collapsed .sidebar-chat-section {
+        display: none;
+      }
+
       /* Persistent Explore control: visible even in the collapsed rail. */
       .sidebar-explore-btn{width:100%;min-height:38px;display:flex;align-items:center;justify-content:flex-start;gap:9px;padding:8px 12px;border:1px solid rgba(129,140,248,.28);border-radius:var(--radius-md);color:var(--text-primary);background:linear-gradient(110deg,rgba(59,130,246,.13),rgba(168,85,247,.12));font:650 .82rem var(--font-sans);cursor:pointer;transition:background .18s ease,border-color .18s ease,transform .18s ease}
       .sidebar-explore-btn:hover{border-color:rgba(167,139,250,.65);background:linear-gradient(110deg,rgba(59,130,246,.22),rgba(168,85,247,.2));transform:translateY(-1px)}
@@ -3300,6 +3323,89 @@ svg[data-rw-motion="generic"]:hover [data-rw-part="stroke"],button:hover svg[dat
           </div>
         </div>
 
+<section class="sidebar-chat-section" aria-label="Chats">
+        <!-- Conversation Filter Pills -->
+        <div
+          class="sidebar-filter-bar hide-on-collapse"
+          role="tablist"
+          aria-label="Conversation filter"
+        >
+          <button
+            type="button"
+            class="filter-pill active"
+            data-filter="all"
+            role="tab"
+            aria-selected="true"
+          >
+            All
+          </button>
+          <button
+            type="button"
+            class="filter-pill"
+            data-filter="pinned"
+            role="tab"
+            aria-selected="false"
+          >
+            Pinned
+          </button>
+          <button
+            type="button"
+            class="filter-pill"
+            data-filter="project"
+            role="tab"
+            aria-selected="false"
+          >
+            Project
+          </button>
+          <button
+            type="button"
+            class="filter-pill"
+            data-filter="archived"
+            role="tab"
+            aria-selected="false"
+          >
+            Archived
+          </button>
+        </div>
+
+        <!-- Active Project Filter Banner -->
+        <div
+          id="activeProjectBanner"
+          class="active-project-banner hide-on-collapse hidden"
+        >
+          <span id="activeProjectBannerName" class="active-project-banner-name"
+            >Project: Default</span
+          >
+          <button
+            id="clearActiveProjectBtn"
+            type="button"
+            class="chat-action-btn"
+            title="Clear project filter"
+            aria-label="Clear project filter"
+          >
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+            >
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Conversation History List -->
+        <div class="sidebar-section-label hide-on-collapse">Your chats</div>
+        <div
+          id="chatHistoryList"
+          class="sidebar-history hide-on-collapse"
+          role="region"
+          aria-label="Conversation history"
+        ></div>
+        </section>
+
         <!-- Feature Modules Navigation -->
         <nav class="sidebar-modules" aria-label="Rainbow AI modules">
           <button
@@ -3472,87 +3578,6 @@ svg[data-rw-motion="generic"]:hover [data-rw-part="stroke"],button:hover svg[dat
             </span>
           </button>
         </nav>
-
-        <!-- Conversation Filter Pills -->
-        <div
-          class="sidebar-filter-bar hide-on-collapse"
-          role="tablist"
-          aria-label="Conversation filter"
-        >
-          <button
-            type="button"
-            class="filter-pill active"
-            data-filter="all"
-            role="tab"
-            aria-selected="true"
-          >
-            All
-          </button>
-          <button
-            type="button"
-            class="filter-pill"
-            data-filter="pinned"
-            role="tab"
-            aria-selected="false"
-          >
-            Pinned
-          </button>
-          <button
-            type="button"
-            class="filter-pill"
-            data-filter="project"
-            role="tab"
-            aria-selected="false"
-          >
-            Project
-          </button>
-          <button
-            type="button"
-            class="filter-pill"
-            data-filter="archived"
-            role="tab"
-            aria-selected="false"
-          >
-            Archived
-          </button>
-        </div>
-
-        <!-- Active Project Filter Banner -->
-        <div
-          id="activeProjectBanner"
-          class="active-project-banner hide-on-collapse hidden"
-        >
-          <span id="activeProjectBannerName" class="active-project-banner-name"
-            >Project: Default</span
-          >
-          <button
-            id="clearActiveProjectBtn"
-            type="button"
-            class="chat-action-btn"
-            title="Clear project filter"
-            aria-label="Clear project filter"
-          >
-            <svg
-              width="13"
-              height="13"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.2"
-            >
-              <path d="M18 6 6 18M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <!-- Conversation History List -->
-        <div class="sidebar-section-label hide-on-collapse">Your chats</div>
-        <div
-          id="chatHistoryList"
-          class="sidebar-history hide-on-collapse"
-          role="region"
-          aria-label="Conversation history"
-        ></div>
 
         <!-- Sidebar Footer: Gateway Status & Settings -->
         <div class="sidebar-footer">
