@@ -3025,27 +3025,49 @@
 .rw2-result{font-size:1.05rem;font-weight:700}
 .rw2-bar{height:8px;background:#64748b33;border-radius:99px;overflow:hidden;margin-top:6px}.rw2-bar span{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#3b82f6);border-radius:99px}
 .rw2-status{padding:12px;border-radius:10px;background:var(--panel3,#222736);line-height:1.5}
-.rw2-svg-motion{transform-box:fill-box;transform-origin:center}
-svg[data-rw-motion-ready="1"] path,svg[data-rw-motion-ready="1"] line,svg[data-rw-motion-ready="1"] circle,svg[data-rw-motion-ready="1"] rect,svg[data-rw-motion-ready="1"] polygon{animation:rw-svg-appear .8s cubic-bezier(.2,.7,.2,1) both}\nsvg[data-rw-motion="attach"]:hover path,button:focus-visible svg[data-rw-motion="attach"] path{animation:rw-attach-draw .7s ease both}\nsvg[data-rw-motion="polish"]:hover path,button:focus-visible svg[data-rw-motion="polish"] path{animation:rw-polish-spark .9s ease both}\nsvg[data-rw-motion="fork"]:hover path,button:focus-visible svg[data-rw-motion="fork"] path{animation:rw-fork-draw .65s ease both}\nsvg[data-rw-motion="text"]:hover path,button:focus-visible svg[data-rw-motion="text"] path{animation:rw-text-write .7s ease both}\nsvg[data-rw-motion="search"]:hover circle,button:focus-visible svg[data-rw-motion="search"] circle{animation:rw-search-scan .85s ease both}
-svg[data-rw-motion="search"]:hover path,button:focus-visible svg[data-rw-motion="search"] path{animation:rw-search-glint .85s ease both}
-svg[data-rw-motion="send"]:hover path,button:focus-visible svg[data-rw-motion="send"] path{animation:rw-send-flight .65s cubic-bezier(.2,.8,.2,1) both}
-svg[data-rw-motion="voice"]:hover path,button:focus-visible svg[data-rw-motion="voice"] path{animation:rw-voice-wave .8s ease-in-out both}
-svg[data-rw-motion="add"]:hover path,svg[data-rw-motion="add"]:hover line,button:focus-visible svg[data-rw-motion="add"] path{animation:rw-add-draw .5s ease both}
-svg[data-rw-motion="check"]:hover path,button:focus-visible svg[data-rw-motion="check"] path{stroke-dasharray:32;stroke-dashoffset:32;animation:rw-check-draw .55s ease forwards}
-svg[data-rw-motion="alert"]:hover path,button:focus-visible svg[data-rw-motion="alert"] path{animation:rw-alert-ring .8s ease both}
-svg[data-rw-motion="brand"] path{animation:rw-brand-flow 7s ease-in-out infinite}
-svg[data-rw-motion="brand"] circle{animation:rw-brand-spark 3.2s ease-in-out infinite}
-svg[data-rw-motion="generic"]:hover path,svg[data-rw-motion="generic"]:hover circle,svg[data-rw-motion="generic"]:hover rect,svg[data-rw-motion="generic"]:hover polygon,button:focus-visible svg[data-rw-motion="generic"] path{animation:rw-ink-reveal .55s ease both}
-@keyframes rw-svg-appear{0%{opacity:.25;stroke-dasharray:1 80;stroke-dashoffset:16;transform:translateY(1px)}100%{opacity:1;stroke-dasharray:80 0;stroke-dashoffset:0;transform:translateY(0)}}@keyframes rw-attach-draw{0%{stroke-dasharray:2 60;stroke-dashoffset:20}100%{stroke-dasharray:60 0;stroke-dashoffset:0}}@keyframes rw-polish-spark{0%{opacity:.6;filter:none}45%{opacity:1;filter:drop-shadow(0 0 4px currentColor)}100%{opacity:1;filter:none}}@keyframes rw-fork-draw{0%{stroke-dasharray:2 48;stroke-dashoffset:18}100%{stroke-dasharray:48 0;stroke-dashoffset:0}}@keyframes rw-text-write{0%{stroke-dasharray:1 32;stroke-dashoffset:14}100%{stroke-dasharray:32 0;stroke-dashoffset:0}}@keyframes rw-search-scan{0%{opacity:.65}45%{opacity:1;filter:drop-shadow(0 0 3px currentColor)}100%{opacity:1}}
-@keyframes rw-search-glint{0%{stroke-dasharray:2 30;stroke-dashoffset:20}100%{stroke-dasharray:30 0;stroke-dashoffset:0}}
-@keyframes rw-send-flight{0%{transform:translate(-1px,1px);opacity:.65}65%{transform:translate(2px,-2px)}100%{transform:translate(0,0);opacity:1}}
-@keyframes rw-voice-wave{0%,100%{opacity:.8}50%{opacity:1;filter:drop-shadow(0 0 3px currentColor)}}
-@keyframes rw-add-draw{from{stroke-dasharray:1 40;stroke-dashoffset:20}to{stroke-dasharray:40 0;stroke-dashoffset:0}}
-@keyframes rw-check-draw{to{stroke-dashoffset:0}}
-@keyframes rw-alert-ring{0%,100%{transform:translateX(0)}25%{transform:translateX(-1px)}50%{transform:translateX(1px)}75%{transform:translateX(-.5px)}}
-@keyframes rw-brand-flow{0%,100%{filter:drop-shadow(0 0 0 transparent)}50%{filter:drop-shadow(0 0 3px #8b5cf688)}}
-@keyframes rw-brand-spark{0%,100%{opacity:.7}50%{opacity:1;filter:drop-shadow(0 0 4px white)}}
-@keyframes rw-ink-reveal{0%{opacity:.65;filter:drop-shadow(0 0 0 transparent)}60%{opacity:1;filter:drop-shadow(0 0 2px currentColor)}100%{opacity:1;filter:none}}
+
+/* SVG motion language: each icon and its inner geometry receives a semantic animation. */
+svg[data-rw-motion-ready="1"]{overflow:visible}
+svg[data-rw-motion-ready="1"] [data-rw-part]{transform-box:fill-box;transform-origin:center;vector-effect:non-scaling-stroke}
+svg[data-rw-motion="bell"]:hover,button:hover svg[data-rw-motion="bell"],a:hover svg[data-rw-motion="bell"],[role="button"]:hover svg[data-rw-motion="bell"],svg[data-rw-motion="bell"][data-rw-active="1"]{transform-origin:50% 12%;animation:rw-bell-ring .9s ease-in-out both}
+svg[data-rw-motion="bell"] [data-rw-part="clapper"]{transform-origin:50% 0}
+svg[data-rw-motion="bell"]:hover [data-rw-part="clapper"],button:hover svg[data-rw-motion="bell"] [data-rw-part="clapper"],svg[data-rw-motion="bell"][data-rw-active="1"] [data-rw-part="clapper"]{animation:rw-bell-clapper .9s ease-in-out both}
+svg[data-rw-motion="gears"]:hover,button:hover svg[data-rw-motion="gears"],a:hover svg[data-rw-motion="gears"],svg[data-rw-motion="gears"][data-rw-active="1"]{animation:rw-system-boot 1.15s cubic-bezier(.2,.8,.2,1) both}
+svg[data-rw-motion="gears"] [data-rw-part="gear"]{transform-origin:center}
+svg[data-rw-motion="gears"]:hover [data-rw-part="gear"],button:hover svg[data-rw-motion="gears"] [data-rw-part="gear"],svg[data-rw-motion="gears"][data-rw-active="1"] [data-rw-part="gear"]{animation:rw-gear-turn 1.15s cubic-bezier(.2,.8,.2,1) both}
+svg[data-rw-motion="shortcut"]:hover [data-rw-part="key"],button:hover svg[data-rw-motion="shortcut"] [data-rw-part="key"],svg[data-rw-motion="shortcut"][data-rw-active="1"] [data-rw-part="key"]{animation:rw-key-tap .48s ease both;animation-delay:calc(var(--rw-key-index,0)*75ms)}
+svg[data-rw-motion="shortcut"]:hover [data-rw-part="stroke"],button:hover svg[data-rw-motion="shortcut"] [data-rw-part="stroke"],svg[data-rw-motion="shortcut"][data-rw-active="1"] [data-rw-part="stroke"]{animation:rw-type-write .9s steps(5,end) both}
+svg[data-rw-motion="attach"]:hover [data-rw-part="stroke"],button:hover svg[data-rw-motion="attach"] [data-rw-part="stroke"],svg[data-rw-motion="attach"][data-rw-active="1"] [data-rw-part="stroke"]{animation:rw-attach-snap .72s ease both}
+svg[data-rw-motion="polish"]:hover [data-rw-part="stroke"],button:hover svg[data-rw-motion="polish"] [data-rw-part="stroke"],svg[data-rw-motion="polish"][data-rw-active="1"] [data-rw-part="stroke"]{animation:rw-polish-glimmer .95s ease both}
+svg[data-rw-motion="fork"]:hover [data-rw-part="stroke"],button:hover svg[data-rw-motion="fork"] [data-rw-part="stroke"],svg[data-rw-motion="fork"][data-rw-active="1"] [data-rw-part="stroke"]{animation:rw-branch-grow .72s ease both}
+svg[data-rw-motion="text"]:hover [data-rw-part="stroke"],button:hover svg[data-rw-motion="text"] [data-rw-part="stroke"],svg[data-rw-motion="text"][data-rw-active="1"] [data-rw-part="stroke"]{animation:rw-type-write .8s steps(6,end) both}
+svg[data-rw-motion="search"]:hover [data-rw-part="lens"],button:hover svg[data-rw-motion="search"] [data-rw-part="lens"],svg[data-rw-motion="search"][data-rw-active="1"] [data-rw-part="lens"]{animation:rw-lens-scan .8s ease both}
+svg[data-rw-motion="search"]:hover [data-rw-part="stroke"],button:hover svg[data-rw-motion="search"] [data-rw-part="stroke"],svg[data-rw-motion="search"][data-rw-active="1"] [data-rw-part="stroke"]{animation:rw-search-sweep .8s ease both}
+svg[data-rw-motion="send"]:hover [data-rw-part="stroke"],button:hover svg[data-rw-motion="send"] [data-rw-part="stroke"],svg[data-rw-motion="send"][data-rw-active="1"] [data-rw-part="stroke"]{animation:rw-send-launch .62s cubic-bezier(.2,.8,.2,1) both}
+svg[data-rw-motion="voice"]:hover [data-rw-part="wave"],button:hover svg[data-rw-motion="voice"] [data-rw-part="wave"],svg[data-rw-motion="voice"][data-rw-active="1"] [data-rw-part="wave"]{animation:rw-voice-pulse .72s ease-in-out both}
+svg[data-rw-motion="add"]:hover [data-rw-part="stroke"],button:hover svg[data-rw-motion="add"] [data-rw-part="stroke"],svg[data-rw-motion="add"][data-rw-active="1"] [data-rw-part="stroke"]{animation:rw-add-assemble .56s ease both}
+svg[data-rw-motion="check"]:hover [data-rw-part="stroke"],button:hover svg[data-rw-motion="check"] [data-rw-part="stroke"],svg[data-rw-motion="check"][data-rw-active="1"] [data-rw-part="stroke"]{animation:rw-check-confirm .58s ease both}
+svg[data-rw-motion="alert"]:hover,button:hover svg[data-rw-motion="alert"],svg[data-rw-motion="alert"][data-rw-active="1"]{transform-origin:50% 12%;animation:rw-bell-ring .9s ease-in-out both}
+svg[data-rw-motion="brand"] [data-rw-part="stroke"]{animation:rw-brand-current 8s ease-in-out infinite}
+svg[data-rw-motion="generic"]:hover [data-rw-part="stroke"],button:hover svg[data-rw-motion="generic"] [data-rw-part="stroke"],svg[data-rw-motion="generic"][data-rw-active="1"] [data-rw-part="stroke"]{animation:rw-generic-ink .62s ease both}
+@keyframes rw-bell-ring{0%,100%{transform:rotate(0)}12%{transform:rotate(13deg)}25%{transform:rotate(-11deg)}38%{transform:rotate(8deg)}51%{transform:rotate(-6deg)}64%{transform:rotate(3deg)}78%{transform:rotate(-1deg)}}
+@keyframes rw-bell-clapper{0%,100%{transform:rotate(0)}20%{transform:rotate(-22deg)}42%{transform:rotate(18deg)}62%{transform:rotate(-10deg)}80%{transform:rotate(5deg)}}
+@keyframes rw-system-boot{0%{filter:brightness(1)}18%{filter:brightness(1.5) drop-shadow(0 0 3px currentColor)}100%{filter:brightness(1)}}
+@keyframes rw-gear-turn{0%{transform:rotate(0)}72%{transform:rotate(390deg)}100%{transform:rotate(360deg)}}
+@keyframes rw-key-tap{0%,100%{transform:translateY(0);filter:none}35%{transform:translateY(2px);filter:brightness(1.5)}65%{transform:translateY(-1px)}}
+@keyframes rw-type-write{0%{stroke-dasharray:1 40;stroke-dashoffset:30;opacity:.45}100%{stroke-dasharray:40 0;stroke-dashoffset:0;opacity:1}}
+@keyframes rw-attach-snap{0%{stroke-dasharray:1 55;stroke-dashoffset:22;transform:translateY(-1px)}65%{stroke-dasharray:55 0;stroke-dashoffset:0;transform:translateY(1px)}100%{transform:translateY(0)}}
+@keyframes rw-polish-glimmer{0%,100%{filter:none}35%{filter:drop-shadow(0 0 4px #c4b5fd)}65%{filter:drop-shadow(0 0 2px currentColor)}}
+@keyframes rw-branch-grow{0%{stroke-dasharray:1 48;stroke-dashoffset:26}100%{stroke-dasharray:48 0;stroke-dashoffset:0}}
+@keyframes rw-lens-scan{0%{transform:translate(-1px,1px)}45%{transform:translate(1px,-1px)}100%{transform:translate(0,0)}}
+@keyframes rw-search-sweep{0%{stroke-dasharray:1 36;stroke-dashoffset:18}100%{stroke-dasharray:36 0;stroke-dashoffset:0}}
+@keyframes rw-send-launch{0%{transform:translate(-2px,2px);opacity:.65}65%{transform:translate(3px,-3px);opacity:1}100%{transform:translate(0,0)}}
+@keyframes rw-voice-pulse{0%,100%{opacity:.7;filter:none}50%{opacity:1;filter:drop-shadow(0 0 4px currentColor)}}
+@keyframes rw-add-assemble{0%{stroke-dasharray:1 35;stroke-dashoffset:18;transform:scale(.85)}100%{stroke-dasharray:35 0;stroke-dashoffset:0;transform:scale(1)}}
+@keyframes rw-check-confirm{0%{stroke-dasharray:1 32;stroke-dashoffset:25}100%{stroke-dasharray:32 0;stroke-dashoffset:0}}
+@keyframes rw-brand-current{0%,100%{filter:drop-shadow(0 0 0 transparent)}50%{filter:drop-shadow(0 0 3px #8b5cf688)}}
+@keyframes rw-generic-ink{0%{opacity:.55;stroke-dasharray:1 45;stroke-dashoffset:15}100%{opacity:1;stroke-dasharray:45 0;stroke-dashoffset:0}}
+
 @media(max-width:680px){.rw2-backdrop{padding:8px}.rw2-panel{padding:16px;width:100%;max-height:94vh}.rw2-grid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){svg[data-rw-motion],svg[data-rw-motion] *,.rw2-panel *{animation:none!important;transition:none!important}}
 
@@ -7078,42 +7100,53 @@ document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=
 })();
 /* END RAINBOW_SECOND_WAVE_DECISION_LAB_V1 */
 
-/* RAINBOW_SEMANTIC_SVG_MOTION_V1 — every inline SVG receives a role-specific, restrained motion language. */
+/* RAINBOW_SEMANTIC_SVG_MOTION_V2 — every SVG, including nested SVGs and inner geometry, gets semantic motion. */
 (function(){
-  "use strict";
-  const classify=svg=>{
-    if(svg.id==="novaAvatar")return "nova";
-    const host=svg.closest("button,[role='button'],a")||svg.parentElement;
-    const words=[svg.id,svg.getAttribute("aria-label"),svg.getAttribute("class"),svg.getAttribute("data-icon"),svg.getAttribute("data-rw-icon"),host?.getAttribute("aria-label"),host?.getAttribute("title"),host?.textContent].filter(Boolean).join(" ").toLowerCase();
-    if(svg.classList.contains("brand-original-mark")||svg.classList.contains("welcome-original-mark"))return "brand";
-    if(/attach|paperclip|file/.test(words))return "attach";if(/polish|sparkle|magic/.test(words))return "polish";if(/fork|branch|split/.test(words))return "fork";if(/text|template|type/.test(words))return "text";if(/search|find|lookup|filter/.test(words))return "search";
-    if(/send|submit|paper.?plane|message/.test(words))return "send";
-    if(/microphone|voice|listen|speech|audio/.test(words))return "voice";
-    if(/plus|add|create|new chat|insert/.test(words))return "add";
-    if(/check|verify|success|confirm|done|approve/.test(words))return "check";
-    if(/alert|bell|notification|warning/.test(words))return "alert";
-    return "generic";
-  };
-  const decorate=root=>{
-    const list=[];
-    if(root?.matches?.("svg"))list.push(root);
-    root?.querySelectorAll?.("svg").forEach(svg=>list.push(svg));
-    list.forEach(svg=>{
-      if(svg.dataset.rwMotionReady==="1")return;
-      svg.dataset.rwMotionReady="1";
-      svg.dataset.rwMotion=classify(svg);
-      if(svg.dataset.rwMotion!=="nova")svg.style.setProperty("--rw-motion-ready","1");
-    });
-  };
-  decorate(document);
-  if("MutationObserver" in window){
-    const observer=new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{if(node.nodeType===1)decorate(node);})));
-    observer.observe(document.documentElement,{childList:true,subtree:true});
-  }
-  document.addEventListener("rainbow:svg-refresh",()=>decorate(document));
+"use strict";
+const classify=svg=>{
+ const host=svg.closest("button,[role='button'],a,label")||svg.parentElement;
+ const words=[svg.id,svg.getAttribute("aria-label"),svg.getAttribute("class"),svg.getAttribute("data-icon"),svg.getAttribute("data-rw-icon"),svg.getAttribute("title"),host?.getAttribute("aria-label"),host?.getAttribute("title"),host?.getAttribute("data-tooltip"),host?.textContent].filter(Boolean).join(" ").toLowerCase();
+ if(svg.classList.contains("brand-original-mark")||svg.classList.contains("welcome-original-mark")||/rainbow logo|brand mark/.test(words))return "brand";
+ if(/bell|notification|alert|reminder/.test(words))return "bell";
+ if(/gear|settings|system|configure|configuration|preferences|tune/.test(words))return "gears";
+ if(/keyboard|shortcut|hotkey|key.?combination/.test(words))return "shortcut";
+ if(/attach|paperclip|file|upload|clip/.test(words))return "attach";
+ if(/polish|sparkle|magic|enhance|improve/.test(words))return "polish";
+ if(/fork|branch|split|duplicate/.test(words))return "fork";
+ if(/text|template|type|write|edit|compose/.test(words))return "text";
+ if(/search|find|lookup|filter|magnif/.test(words))return "search";
+ if(/send|submit|paper.?plane|launch|arrow.?up/.test(words))return "send";
+ if(/microphone|voice|listen|speech|audio|waveform/.test(words))return "voice";
+ if(/plus|add|create|new chat|insert|expand/.test(words))return "add";
+ if(/check|verify|success|confirm|done|approve|valid/.test(words))return "check";
+ if(/warning|danger|error|caution/.test(words))return "alert";
+ return "generic";
+};
+const decorateOne=svg=>{
+ if(svg.dataset.rwMotionReady==="1")return;
+ const role=classify(svg);svg.dataset.rwMotion=role;svg.dataset.rwMotionReady="1";
+ const children=[...svg.querySelectorAll("path,line,polyline,polygon,rect,circle,ellipse,g")];
+ children.forEach((node,index)=>{
+  const tag=node.tagName.toLowerCase();
+  let part="stroke";
+  if(role==="bell"&&(tag==="circle"||/clapper/i.test(node.getAttribute("class")||"")))part="clapper";
+  else if(role==="gears"&&(tag==="g"||tag==="circle"||tag==="path"))part="gear";
+  else if(role==="shortcut"&&(tag==="rect"||tag==="polygon"))part="key";
+  else if(role==="search"&&tag==="circle")part="lens";
+  else if(role==="voice"&&(tag==="path"||tag==="polyline"))part="wave";
+  node.dataset.rwPart=part;node.style.setProperty("--rw-key-index",String(index%6));
+ });
+ svg.addEventListener("pointerenter",()=>{svg.dataset.rwActive="1";clearTimeout(svg._rwMotionTimer);svg._rwMotionTimer=setTimeout(()=>delete svg.dataset.rwActive,1300);},{passive:true});
+ svg.addEventListener("focus",()=>{svg.dataset.rwActive="1";clearTimeout(svg._rwMotionTimer);svg._rwMotionTimer=setTimeout(()=>delete svg.dataset.rwActive,1300);},{passive:true});
+};
+const decorate=root=>{
+ const list=[];if(root?.matches?.("svg"))list.push(root);root?.querySelectorAll?.("svg").forEach(svg=>list.push(svg));list.forEach(decorateOne);
+};
+decorate(document);
+if("MutationObserver" in window){const observer=new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{if(node.nodeType===1)decorate(node);})));observer.observe(document.documentElement,{childList:true,subtree:true});}
+document.addEventListener("rainbow:svg-refresh",()=>decorate(document));
+window.RainbowSvgMotion={refresh:()=>decorate(document),count:()=>document.querySelectorAll("svg[data-rw-motion-ready='1']").length};
 })();
-
-
 
         // Global Escape handling: dismiss the topmost Rainbow overlay before anything underneath it.
         document.addEventListener("keydown", (event) => {
