@@ -6751,6 +6751,25 @@ addCanvasTool("canvasDiffBtn","Suggest patch",()=>{const e=$("#canvasTextarea");
         }
         syncProfile();
         
+/* RAINBOW_WORKSPACE_CORE_V1 — shared module registry, events, storage and API */
+(function(){
+  "use strict";
+  if(window.RainbowWorkspace?.version)return;
+  const modules=new Map(),listeners=new Map(),PREFIX="rainbow_workspace_v1:";
+  const catalog=[["chat","Rainbow Chat","core"],["projects","Rainbow Projects","core"],["nova","Nova","core"],["agents","Rainbow Agents","active"],["prompt-studio","Prompt Studio","core"],["canvas","Rainbow Canvas","core"],["truthlens","TruthLens","active"],["knowledge-graph","Knowledge Graph","planned"],["memory-vault","Memory Vault","planned"],["decision-lab","Decision Lab","planned"],["multi-ai-debate","Multi-AI Debate","planned"],["document-intelligence","Document Intelligence","planned"],["flowforge","FlowForge","planned"],["code-arena","Code Arena","planned"],["simulator","Rainbow Simulator","planned"],["storyworld","StoryWorld","planned"],["dashboard","Personal Dashboard","planned"],["api-playground","API Playground","planned"],["focus-mode","Focus Mode","planned"],["study-mode","Study Mode","core"]];
+  catalog.forEach(([id,name,status])=>modules.set(id,{id,name,status,capabilities:[]}));
+  function emit(name,detail={}){(listeners.get(name)||[]).forEach(fn=>{try{fn(detail);}catch(error){console.error("[RainbowWorkspace event]",error);}});}
+  function on(name,fn){if(typeof fn!=="function")return()=>{};const set=listeners.get(name)||new Set();set.add(fn);listeners.set(name,set);return()=>{set.delete(fn);if(!set.size)listeners.delete(name);};}
+  function register(id,descriptor={}){const current=modules.get(id)||{id,name:descriptor.name||id,capabilities:[]};const next={...current,...descriptor,id,status:"active"};modules.set(id,next);emit("module:registered",next);return next;}
+  function getModules(){return [...modules.values()].map(x=>({...x,capabilities:[...(x.capabilities||[])]}));}
+  function getContext(){return {model:"Rainbow-AI-Unified-12B",theme:document.documentElement.dataset.theme||"dark",studyMode:document.documentElement.classList.contains("study-mode")};}
+  function storageKey(key){if(!/^[a-z0-9._-]{1,100}$/i.test(String(key)))throw new Error("Invalid workspace storage key.");return PREFIX+key;}
+  const storage={get(key,fallback=null){try{const raw=localStorage.getItem(storageKey(key));return raw===null?fallback:JSON.parse(raw);}catch{return fallback;}},set(key,value){try{localStorage.setItem(storageKey(key),JSON.stringify(value));return true;}catch(error){console.warn("[RainbowWorkspace] Storage write failed.",error);return false;}},remove(key){try{localStorage.removeItem(storageKey(key));return true;}catch{return false;}}};
+  async function request(path,options={}){if(typeof path!=="string"||!path.startsWith("/api/")||path.startsWith("//"))throw new Error("Workspace API paths must begin with /api/.");const gateway=String((typeof state!=="undefined"&&state.gateway)||"").trim();let base;try{base=new URL(gateway);if(!["http:","https:"].includes(base.protocol)||base.username||base.password)throw new Error();}catch{throw new Error("Configure a valid http(s) Rainbow gateway in Settings.");}const url=new URL(path,base);if(url.origin!==base.origin)throw new Error("Cross-origin workspace API requests are blocked.");const timeout=Math.min(120000,Math.max(1000,Number(options.timeout)||45000)),controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeout);try{const response=await fetch(url.href,{method:options.method||"POST",headers:{"Content-Type":"application/json",...(options.headers||{})},body:options.body===undefined?undefined:JSON.stringify(options.body),signal:options.signal||controller.signal});const data=await response.json().catch(()=>null);if(!response.ok)throw new Error(data?.detail||data?.error||("Rainbow API returned HTTP "+response.status));return data;}catch(error){if(error.name==="AbortError")throw new Error("Rainbow API request timed out.");throw error;}finally{clearTimeout(timer);}}
+  window.RainbowWorkspace=Object.freeze({version:"1.0.0",catalog:getModules,register,on,emit,getContext,storage,api:Object.freeze({request,post:(path,body,opts={})=>request(path,{...opts,method:"POST",body})})});
+  emit("workspace:ready",{version:"1.0.0"});
+})();
+/* END RAINBOW_WORKSPACE_CORE_V1 */
 /* RAINBOW_AGENTS_STUDIO_V1 */
 (function(){
 const KEY="rainbow_agents_studio_v1",defaults=[
@@ -6760,6 +6779,7 @@ const KEY="rainbow_agents_studio_v1",defaults=[
 {id:"analyst",name:"Rainbow Analyst",role:"Review and quality assurance",description:"Checks results for gaps, risks and consistency.",instructions:"Review the previous output against the original task. Identify defects, missing requirements, security concerns and concrete improvements.",knowledge:"",tools:"",color:"#e18b48"},
 {id:"writer",name:"Rainbow Writer",role:"Writing and documentation",description:"Creates clear explanations and documentation.",instructions:"Produce polished documentation and a concise final summary based on the supplied work.",knowledge:"",tools:"",color:"#dc6fa7"},
 {id:"tutor",name:"Rainbow Tutor",role:"Learning and explanations",description:"Explains complex ideas through guided learning.",instructions:"Teach in small steps, adapt to the learner, use examples and check understanding.",knowledge:"",tools:"",color:"#36b6c8"}];
+window.RainbowWorkspace?.register("agents",{name:"Rainbow Agents",capabilities:["agent-library","sequential-workflows","local-agent-notes","run-history"]});
 let d={agents:defaults,workflows:[{id:"default",name:"Build and Review",agentIds:["researcher","architect","coder","analyst","writer"]}],runs:[],page:"overview",busy:false};try{const x=JSON.parse(localStorage.getItem(KEY)||"null");if(x&&Array.isArray(x.agents)&&Array.isArray(x.workflows)&&Array.isArray(x.runs))d={...d,...x};}catch{}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(d));}catch{notify("Agent storage is full; clear old run history.");}};
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -6789,6 +6809,7 @@ document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=
 
 /* TRUTHLENS_V1 — evidence-first client */
 (function(){
+  window.RainbowWorkspace?.register("truthlens",{name:"TruthLens",capabilities:["claim-analysis","source-links","evidence-report"]});
   const trigger=document.getElementById("truthLensSidebarBtn");
   if(!trigger)return;
   const modal=document.createElement("section");
@@ -6825,18 +6846,12 @@ document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=
     const claim=$("#tlClaim").value.trim();if(!claim){$("#tlStatus").textContent="Enter a claim first.";$("#tlClaim").focus();return;}
     const urls=$("#tlUrls").value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
     const valid=urls.map(safeUrl);if(valid.some(x=>!x)){ $("#tlStatus").textContent="One or more links are invalid. Only public http(s) URLs are accepted.";return;}
-    const gateway=String((typeof state!=="undefined"&&state.gateway)||"").trim();
-    if(!gateway){$("#tlStatus").textContent="TruthLens needs the Rainbow evidence API. Configure your gateway in Settings; the analysis endpoint is /api/truthlens/analyze. No verdict has been generated.";return;}
-    let endpoint;try{const base=new URL(gateway);if(!["http:","https:"].includes(base.protocol))throw new Error();endpoint=new URL("/api/truthlens/analyze",base).href;}catch{$("#tlStatus").textContent="Your configured gateway URL is invalid. Check Settings.";return;}
     const btn=$("#tlAnalyzeBtn");btn.disabled=true;btn.textContent="Investigating…";$("#tlReport").replaceChildren();$("#tlStatus").textContent="Submitting claim and source links to the evidence service…";
-    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),60000);
-    try{
-      const response=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({claim,sources:valid,mode:"evidence_first",require_citations:true}),signal:controller.signal});
-      const payload=await response.json().catch(()=>null);if(!response.ok)throw new Error(payload?.detail||payload?.error||("Evidence service returned HTTP "+response.status));
+    try{const payload=await window.RainbowWorkspace.api.post("/api/truthlens/analyze",{claim,sources:valid,mode:"evidence_first",require_citations:true},{timeout:60000});
       if(!payload||typeof payload!=="object"||!payload.verdict)throw new Error("The evidence service returned an incomplete report. No verdict was displayed.");
       renderReport(payload);$("#tlStatus").textContent="Analysis returned. Review each source and its relevance before relying on the verdict.";
-    }catch(error){$("#tlStatus").textContent=error.name==="AbortError"?"Analysis timed out. No verdict was generated.":"TruthLens could not complete the analysis: "+(error.message||"Evidence service unavailable")+". No unsupported verdict was generated.";}
-    finally{clearTimeout(timer);btn.disabled=false;btn.textContent="Analyze claim";}
+    }catch(error){$("#tlStatus").textContent="TruthLens could not complete the analysis: "+(error.message||"Evidence service unavailable")+". No unsupported verdict was generated."; }
+    finally{btn.disabled=false;btn.textContent="Analyze claim";}
   });
 })();
 
