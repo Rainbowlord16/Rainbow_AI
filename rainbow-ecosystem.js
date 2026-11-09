@@ -46,6 +46,7 @@
   });
   bar.appendChild(ask);
   document.addEventListener("DOMContentLoaded", () => {
+    document.body.dataset.rwPage = page.replace(/\.html$/, "");
     document.body.appendChild(bar);
   });
   window.RainbowBridge = {
