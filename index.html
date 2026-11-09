@@ -3049,6 +3049,43 @@ svg[data-rw-motion="generic"]:hover path,svg[data-rw-motion="generic"]:hover cir
 @media(max-width:680px){.rw2-backdrop{padding:8px}.rw2-panel{padding:16px;width:100%;max-height:94vh}.rw2-grid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){svg[data-rw-motion],svg[data-rw-motion] *,.rw2-panel *{animation:none!important;transition:none!important}}
 
+
+/* RAINBOW_LAST_WAVE_HUB */
+#rainbowHubOverlay{position:fixed;inset:0;z-index:10030;background:rgba(2,5,14,.78);backdrop-filter:blur(14px);display:none;padding:clamp(8px,2vw,24px);color:var(--text-primary,#f8fafc)}
+#rainbowHubOverlay.open{display:flex}
+.rh-shell{width:min(1420px,100%);height:min(940px,100%);margin:auto;display:grid;grid-template-columns:218px minmax(0,1fr);overflow:hidden;border:1px solid var(--border-default,rgba(255,255,255,.14));border-radius:22px;background:var(--bg-surface-1,#111520);box-shadow:0 26px 100px #0008}
+.rh-rail{background:var(--bg-sidebar,#0d1018);border-right:1px solid var(--border-default,rgba(255,255,255,.1));padding:15px;display:flex;flex-direction:column;gap:6px;overflow:auto}
+.rh-brand{font-weight:850;letter-spacing:-.03em;padding:8px 10px 15px;background:linear-gradient(100deg,#fb7185,#f59e0b,#34d399,#60a5fa,#a78bfa);background-clip:text;color:transparent;font-size:1.12rem}
+.rh-tab{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--text-secondary,#aab0c0);text-align:left;cursor:pointer;font:inherit;font-size:.88rem}
+.rh-tab:hover,.rh-tab.active{background:var(--bg-surface-2,rgba(255,255,255,.08));border-color:var(--border-default,rgba(255,255,255,.1));color:var(--text-primary,#fff)}
+.rh-main{min-width:0;display:flex;flex-direction:column;overflow:hidden}
+.rh-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 22px;border-bottom:1px solid var(--border-default,rgba(255,255,255,.1))}
+.rh-head h2{margin:0;font-size:1.12rem}.rh-sub{color:var(--text-secondary,#aab0c0);font-size:.8rem;margin-top:4px}
+.rh-close,.rh-btn{border:1px solid var(--border-default,rgba(255,255,255,.15));background:var(--bg-surface-2,#202635);color:inherit;border-radius:9px;padding:8px 11px;cursor:pointer;font:inherit}
+.rh-btn.primary{background:linear-gradient(110deg,#2563eb,#7c3aed);border-color:transparent;color:white}
+.rh-btn:disabled{opacity:.5;cursor:not-allowed}
+.rh-content{padding:20px;overflow:auto;min-height:0}
+.rh-panel{display:none}.rh-panel.active{display:block}
+.rh-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.rh-card{min-width:0;padding:15px;border:1px solid var(--border-default,rgba(255,255,255,.12));border-radius:14px;background:var(--bg-surface-2,rgba(255,255,255,.035))}
+.rh-card h3{margin:0 0 8px;font-size:.98rem}.rh-muted{color:var(--text-secondary,#aab0c0);font-size:.84rem;line-height:1.5}
+.rh-field{display:flex;flex-direction:column;gap:6px;margin:10px 0}.rh-field label{font-size:.8rem;color:var(--text-secondary,#aab0c0)}
+.rh-field input,.rh-field textarea,.rh-field select,.rh-code{width:100%;min-width:0;border:1px solid var(--border-default,rgba(255,255,255,.15));border-radius:9px;background:var(--bg-surface-3,#171d2a);color:inherit;padding:10px;font:inherit}
+.rh-field textarea,.rh-code{min-height:115px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.83rem}
+.rh-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.rh-row>*{min-width:0}
+.rh-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.rh-item{padding:10px 12px;border-radius:10px;background:var(--bg-surface-3,#171d2a);border:1px solid var(--border-default,rgba(255,255,255,.08));overflow-wrap:anywhere}
+.rh-item strong{font-size:.88rem}.rh-item pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto;font-size:.78rem}
+.rh-output{white-space:pre-wrap;overflow-wrap:anywhere;padding:12px;border-radius:10px;background:#070b13;border:1px solid #64748b44;color:#dbeafe;min-height:72px;font: .8rem/1.55 ui-monospace,monospace}
+.rh-stat{font-size:1.5rem;font-weight:800;letter-spacing:-.04em}.rh-step{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:9px;align-items:center;padding:9px;border:1px solid var(--border-default,rgba(255,255,255,.1));border-radius:10px;margin:7px 0}
+.rh-step input{min-width:0;width:100%;background:transparent;border:0;color:inherit;padding:6px}
+.rh-step button{background:transparent;color:inherit;border:0;cursor:pointer}
+.rh-preview{width:100%;height:340px;border:1px solid var(--border-default,rgba(255,255,255,.14));border-radius:10px;background:white}
+.rh-timer{font-size:clamp(2.8rem,9vw,5rem);font-weight:800;letter-spacing:-.06em;text-align:center;font-variant-numeric:tabular-nums;padding:20px}
+.rh-kbd{display:inline-block;padding:2px 6px;border:1px solid #64748b88;border-radius:5px;font: .75rem ui-monospace,monospace}
+@media(max-width:760px){#rainbowHubOverlay{padding:0}.rh-shell{height:100%;border-radius:0;grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}.rh-rail{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--border-default,rgba(255,255,255,.1));padding:7px;gap:5px}.rh-brand{display:none}.rh-tab{white-space:nowrap;padding:8px 10px;font-size:.78rem}.rh-main{min-height:0}.rh-head{padding:12px 15px}.rh-content{padding:12px}.rh-grid{grid-template-columns:1fr}.rh-preview{height:280px}}
+@media(prefers-reduced-motion:reduce){#rainbowHubOverlay *{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
 </style>
   </head>
 
@@ -3299,6 +3336,7 @@ svg[data-rw-motion="generic"]:hover path,svg[data-rw-motion="generic"]:hover cir
           <button id="truthLensSidebarBtn" type="button" class="sidebar-nav-btn" title="Verify claims with traceable evidence" aria-label="Open TruthLens"><span class="sidebar-nav-btn-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="7.3"/><path d="m16.2 16.2 4.3 4.3M7.5 10.8l2.2 2.2 4.5-4.7"/></svg><span class="hide-on-collapse">TruthLens</span></span><span class="nav-badge hide-on-collapse">NEW</span></button>
           <button id="knowledgeGraphSidebarBtn" type="button" class="sidebar-nav-btn" title="Build a local knowledge graph"><span class="sidebar-nav-btn-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="m7 6.5 3 3M17 6.5l-3 3M7 17.5l3-3M17 17.5l-3-3"/></svg><span class="hide-on-collapse">Knowledge Graph</span></span></button><button id="memoryVaultSidebarBtn" type="button" class="sidebar-nav-btn" title="Manage saved knowledge and notes"><span class="sidebar-nav-btn-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/><path d="M3 7v14h14"/></svg><span class="hide-on-collapse">Memory Vault</span></span></button>
           <button id="decisionLabSidebarBtn" type="button" class="sidebar-nav-btn" title="Compare choices with a transparent weighted decision matrix"><span class="sidebar-nav-btn-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5M4 19h16"/><path d="M7 15l4-4 3 2 5-7"/><circle cx="7" cy="15" r="1"/><circle cx="11" cy="11" r="1"/><circle cx="14" cy="13" r="1"/><circle cx="19" cy="6" r="1"/></svg><span class="hide-on-collapse">Decision Lab</span></span></button>
+          <button id="rainbowHubSidebarBtn" type="button" class="sidebar-nav-btn" title="Open the Rainbow unified tools hub"><span class="sidebar-nav-btn-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-rw-icon="hub"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><path d="M10 6.5h4M6.5 10v4M17.5 10v4M10 17.5h4"/></svg><span class="hide-on-collapse">Rainbow Hub</span></span><span class="nav-badge hide-on-collapse">NEW</span></button>
           <button
             id="openPromptStudioBtn"
             type="button"
@@ -7123,5 +7161,64 @@ document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=
         console.info("Rainbow AI Part 3 initialized.");
       })();
     </script>
+
+<div id="rainbowHubOverlay" role="dialog" aria-modal="true" aria-labelledby="rhTitle">
+ <div class="rh-shell">
+  <aside class="rh-rail" aria-label="Rainbow Hub tools">
+   <div class="rh-brand">RAINBOW HUB</div>
+   <button class="rh-tab active" data-rh-tab="overview">✦ Overview</button>
+   <button class="rh-tab" data-rh-tab="files">▤ File Hub</button>
+   <button class="rh-tab" data-rh-tab="flow">⌘ FlowForge</button>
+   <button class="rh-tab" data-rh-tab="code">⌘ Code Arena</button>
+   <button class="rh-tab" data-rh-tab="sim">◈ Simulator</button>
+   <button class="rh-tab" data-rh-tab="story">✎ StoryWorld</button>
+   <button class="rh-tab" data-rh-tab="api">⇄ API Playground</button>
+   <button class="rh-tab" data-rh-tab="focus">◷ Focus Mode</button>
+   <button class="rh-tab" data-rh-tab="dashboard">▦ Dashboard</button>
+  </aside>
+  <section class="rh-main">
+   <header class="rh-head"><div><h2 id="rhTitle">Rainbow Hub</h2><div class="rh-sub" id="rhSubtitle">One workspace. Your tools, connected.</div></div><button class="rh-close" id="rhClose" type="button" aria-label="Close Rainbow Hub">✕</button></header>
+   <main class="rh-content">
+    <section class="rh-panel active" data-rh-panel="overview">
+     <div class="rh-card"><h3>Your unified workspace</h3><p class="rh-muted">The final feature wave adds practical local-first tools while reusing Rainbow's existing document index, gateway and storage. External AI actions remain explicit and backend-dependent.</p></div>
+     <div class="rh-grid" style="margin-top:12px">
+      <div class="rh-card"><h3>File Hub</h3><p class="rh-muted">Find indexed uploads and reuse extracted excerpts across your workspace.</p><button class="rh-btn primary" data-rh-open="files">Open File Hub</button></div>
+      <div class="rh-card"><h3>FlowForge</h3><p class="rh-muted">Build, reorder, save and export repeatable workflows.</p><button class="rh-btn" data-rh-open="flow">Build workflow</button></div>
+      <div class="rh-card"><h3>Code Arena</h3><p class="rh-muted">Run HTML/CSS/JS in an isolated browser preview.</p><button class="rh-btn" data-rh-open="code">Open sandbox</button></div>
+      <div class="rh-card"><h3>Simulator</h3><p class="rh-muted">Experiment with a small interactive system model.</p><button class="rh-btn" data-rh-open="sim">Run simulation</button></div>
+      <div class="rh-card"><h3>StoryWorld</h3><p class="rh-muted">Develop story settings, characters and scenes in a saved local notebook.</p><button class="rh-btn" data-rh-open="story">Create a story</button></div>
+      <div class="rh-card"><h3>API Playground</h3><p class="rh-muted">Test configured same-origin /api endpoints through Rainbow's gateway.</p><button class="rh-btn" data-rh-open="api">Test API</button></div>
+      <div class="rh-card"><h3>Focus Mode</h3><p class="rh-muted">A simple focus timer with persistent session totals.</p><button class="rh-btn" data-rh-open="focus">Start focus</button></div>
+      <div class="rh-card"><h3>Personal Dashboard</h3><p class="rh-muted">A live overview of local workspace activity.</p><button class="rh-btn" data-rh-open="dashboard">View dashboard</button></div>
+     </div>
+    </section>
+    <section class="rh-panel" data-rh-panel="files">
+     <div class="rh-card"><h3>Indexed files</h3><p class="rh-muted">Search extracted text already indexed by Rainbow. Binary media that was only identified by metadata will not appear as readable content.</p><div class="rh-field"><label for="rhFileQuery">Search documents and excerpts</label><input id="rhFileQuery" type="search" placeholder="Search a topic, phrase or filename"></div><div class="rh-row"><button class="rh-btn primary" id="rhFileSearch">Search index</button><button class="rh-btn" id="rhFileList">List indexed files</button></div><div id="rhFileStatus" class="rh-muted" aria-live="polite"></div><div id="rhFileResults" class="rh-list"></div></div>
+    </section>
+    <section class="rh-panel" data-rh-panel="flow">
+     <div class="rh-card"><h3>Workflow builder</h3><p class="rh-muted">Create a reusable sequence. This version saves and exports the workflow locally; it does not pretend to execute external integrations.</p><div class="rh-field"><label for="rhFlowName">Workflow name</label><input id="rhFlowName" value="My Rainbow workflow" maxlength="100"></div><div class="rh-row"><button class="rh-btn" id="rhAddStep">＋ Add step</button><button class="rh-btn" id="rhSaveFlow">Save</button><button class="rh-btn" id="rhExportFlow">Export JSON</button></div><div id="rhFlowSteps" class="rh-list"></div><div id="rhFlowStatus" class="rh-muted" aria-live="polite"></div></div>
+    </section>
+    <section class="rh-panel" data-rh-panel="code">
+     <div class="rh-card"><h3>Code Arena — browser sandbox</h3><p class="rh-muted">HTML, CSS and JavaScript execute inside a sandboxed iframe. Do not paste secrets or untrusted code you do not understand.</p><div class="rh-field"><label for="rhCodeHtml">HTML</label><textarea id="rhCodeHtml" class="rh-code"><main><h1>Hello, Rainbow!</h1><p>Edit this starter and run it.</p><button id="demo">Click me</button></main></textarea></div><div class="rh-field"><label for="rhCodeCss">CSS</label><textarea id="rhCodeCss" class="rh-code">body{font:16px system-ui;padding:2rem;color:#172033}button{padding:.7rem 1rem;border:0;border-radius:10px;background:#6366f1;color:white}</textarea></div><div class="rh-field"><label for="rhCodeJs">JavaScript</label><textarea id="rhCodeJs" class="rh-code">document.querySelector('#demo')?.addEventListener('click',()=>alert('It works!'));</textarea></div><div class="rh-row"><button class="rh-btn primary" id="rhRunCode">▶ Run preview</button><button class="rh-btn" id="rhClearCode">Reset starter</button></div><iframe id="rhCodePreview" class="rh-preview" title="Isolated Code Arena preview" sandbox="allow-scripts"></iframe></div>
+    </section>
+    <section class="rh-panel" data-rh-panel="sim">
+     <div class="rh-card"><h3>Rainbow Simulator — system dynamics</h3><p class="rh-muted">Explore how workload, capacity and incoming demand affect a simple queue. This is a local educational model, not a prediction of your actual infrastructure.</p><div class="rh-grid"><div class="rh-field"><label for="rhDemand">Incoming requests / minute <output id="rhDemandOut">70</output></label><input id="rhDemand" type="range" min="10" max="200" value="70"></div><div class="rh-field"><label for="rhCapacity">Processing capacity / minute <output id="rhCapacityOut">90</output></label><input id="rhCapacity" type="range" min="10" max="200" value="90"></div><div class="rh-field"><label for="rhMinutes">Simulation minutes <output id="rhMinutesOut">10</output></label><input id="rhMinutes" type="range" min="1" max="60" value="10"></div></div><button class="rh-btn primary" id="rhRunSim">Run simulation</button><div id="rhSimOutput" class="rh-output" style="margin-top:12px">Adjust the inputs and run the model.</div></div>
+    </section>
+    <section class="rh-panel" data-rh-panel="story">
+     <div class="rh-card"><h3>StoryWorld notebook</h3><p class="rh-muted">Save story worlds locally, then send a scene brief into Rainbow Chat when you want AI assistance.</p><div class="rh-field"><label for="rhStoryTitle">World / story title</label><input id="rhStoryTitle" maxlength="120" placeholder="The city beyond the aurora"></div><div class="rh-field"><label for="rhStoryWorld">World and characters</label><textarea id="rhStoryWorld" placeholder="Describe the setting, rules, characters and conflict…"></textarea></div><div class="rh-field"><label for="rhStoryScene">Scene or idea</label><textarea id="rhStoryScene" placeholder="What happens next?"></textarea></div><div class="rh-row"><button class="rh-btn primary" id="rhSaveStory">Save story</button><button class="rh-btn" id="rhSendStory">Send scene to chat</button></div><div id="rhStoryList" class="rh-list"></div></div>
+    </section>
+    <section class="rh-panel" data-rh-panel="api">
+     <div class="rh-card"><h3>API Playground</h3><p class="rh-muted">Requests are restricted by the shared Rainbow gateway to same-origin HTTP(S) and paths beginning with /api/. No arbitrary host access.</p><div class="rh-field"><label for="rhApiPath">API path</label><input id="rhApiPath" value="/api/health" spellcheck="false"></div><div class="rh-field"><label for="rhApiMethod">Method</label><select id="rhApiMethod"><option>GET</option><option>POST</option></select></div><div class="rh-field"><label for="rhApiBody">JSON body (POST)</label><textarea id="rhApiBody" class="rh-code">{}</textarea></div><button class="rh-btn primary" id="rhApiRun">Send request</button><div id="rhApiOutput" class="rh-output" style="margin-top:12px">Response will appear here.</div></div>
+    </section>
+    <section class="rh-panel" data-rh-panel="focus">
+     <div class="rh-card"><h3>Focus Mode</h3><p class="rh-muted">A local focus timer. Keep the tab open while a session runs.</p><div class="rh-timer" id="rhTimer">25:00</div><div class="rh-row" style="justify-content:center"><button class="rh-btn primary" id="rhFocusStart">Start</button><button class="rh-btn" id="rhFocusPause">Pause</button><button class="rh-btn" id="rhFocusReset">Reset</button></div><div id="rhFocusStats" class="rh-muted" style="text-align:center;margin-top:12px"></div></div>
+    </section>
+    <section class="rh-panel" data-rh-panel="dashboard">
+     <div class="rh-grid"><div class="rh-card"><div class="rh-muted">Registered modules</div><div class="rh-stat" id="rhModuleCount">—</div></div><div class="rh-card"><div class="rh-muted">Indexed document chunks</div><div class="rh-stat" id="rhChunkCount">—</div></div><div class="rh-card"><div class="rh-muted">Saved workflows</div><div class="rh-stat" id="rhWorkflowCount">—</div></div><div class="rh-card"><div class="rh-muted">Focus minutes completed</div><div class="rh-stat" id="rhFocusCount">—</div></div></div><div class="rh-card" style="margin-top:12px"><h3>Module registry</h3><div id="rhModuleList" class="rh-list"></div></div></section>
+   </main>
+  </section>
+ </div>
+</div>
+
   </body>
 </html>
