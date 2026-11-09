@@ -55,6 +55,11 @@
       referrerpolicy="no-referrer"
     ></script>
 
+    <!-- Optional local document parsers; text fallback remains available if a CDN is offline. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <style>
       /* ==========================================================================
        1. DESIGN TOKENS & CSS CUSTOM PROPERTIES
@@ -2998,6 +3003,52 @@
 .km-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--border-default,rgba(255,255,255,.12))}.km-head h2{margin:0;font-size:1.2rem}.km-head p{margin:4px 0 0;color:var(--text-secondary,#9aa4b8);font-size:.84rem}.km-close,.km-tab,.km-btn{border:1px solid var(--border-default,rgba(255,255,255,.16));border-radius:10px;padding:9px 12px;background:transparent;color:inherit;cursor:pointer}.km-tabs{display:flex;gap:8px;padding:12px 20px;border-bottom:1px solid var(--border-default,rgba(255,255,255,.1))}.km-tab.active{background:var(--accent,#3b82f6);border-color:transparent;color:#fff}.km-content{overflow:auto;padding:18px 22px}.km-panel{display:none}.km-panel.active{display:block}.km-grid{display:grid;grid-template-columns:minmax(250px,.85fr) minmax(0,1.4fr);gap:16px}.km-card{padding:15px;border:1px solid var(--border-default,rgba(255,255,255,.13));border-radius:14px;background:var(--bg-surface-2,rgba(255,255,255,.035));min-width:0}.km-card h3{margin:0 0 12px;font-size:1rem}.km-field{display:grid;gap:6px;margin:10px 0}.km-field label{font-size:.82rem;font-weight:650}.km-field input,.km-field textarea,.km-field select{width:100%;box-sizing:border-box;border:1px solid var(--border-default,rgba(255,255,255,.16));border-radius:9px;padding:10px;background:var(--bg-input,rgba(255,255,255,.04));color:inherit;font:inherit}.km-field textarea{min-height:90px;resize:vertical}.km-primary{background:linear-gradient(110deg,#6366f1,#0ea5e9);color:#fff;border:0}.km-list{display:grid;gap:9px}.km-item{padding:12px;border:1px solid var(--border-default,rgba(255,255,255,.12));border-radius:11px;min-width:0}.km-item-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.km-item p{margin:6px 0;color:var(--text-secondary,#9aa4b8);font-size:.86rem;white-space:pre-wrap;overflow-wrap:anywhere}.km-meta{font-size:.74rem;color:var(--text-secondary,#9aa4b8)}.km-item-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.km-item-actions button{font-size:.75rem;padding:6px 8px}.km-empty{padding:24px;text-align:center;color:var(--text-secondary,#9aa4b8);border:1px dashed var(--border-default,rgba(255,255,255,.2));border-radius:12px}.km-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:12px}.km-toolbar input{flex:1;min-width:0;border:1px solid var(--border-default,rgba(255,255,255,.16));border-radius:9px;padding:9px;background:var(--bg-input,rgba(255,255,255,.04));color:inherit}.km-tag{display:inline-block;margin:3px 4px 0 0;padding:3px 7px;border-radius:20px;background:rgba(99,102,241,.15);font-size:.7rem}
 @media(max-width:700px){.km-shell{height:100%;border-radius:12px}.km-grid{grid-template-columns:1fr}.km-head,.km-content{padding:14px}.km-tabs{padding:10px 14px}.km-tab{flex:1}}
 /* END RAINBOW_KNOWLEDGE_MEMORY_V1 */
+
+/* RAINBOW SECOND WAVE + SEMANTIC SVG MOTION */
+.rw2-backdrop{position:fixed;inset:0;z-index:1200;background:rgba(3,6,14,.68);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:22px}
+.rw2-backdrop.open{display:flex}
+.rw2-panel{width:min(980px,96vw);max-height:min(88vh,900px);overflow:auto;background:var(--panel,#11131a);color:var(--text,#f8fafc);border:1px solid var(--border,rgba(148,163,184,.2));border-radius:22px;box-shadow:0 28px 90px #0008;padding:24px}
+.rw2-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+.rw2-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.rw2-tabs button,.rw2-action{border:1px solid var(--border,rgba(148,163,184,.22));background:var(--panel2,#181b26);color:inherit;border-radius:10px;padding:9px 13px;cursor:pointer}
+.rw2-tabs button.active,.rw2-action.primary{background:var(--accent,#3b82f6);color:white;border-color:transparent}
+.rw2-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.rw2-card{background:var(--panel2,#181b26);border:1px solid var(--border,rgba(148,163,184,.18));border-radius:14px;padding:15px;min-width:0}
+.rw2-field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.rw2-field input,.rw2-field textarea,.rw2-field select{width:100%;box-sizing:border-box;background:var(--panel3,#222736);color:inherit;border:1px solid var(--border,rgba(148,163,184,.25));border-radius:9px;padding:10px;font:inherit}
+.rw2-field textarea{min-height:90px;resize:vertical}
+.rw2-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.rw2-list{display:grid;gap:8px;margin-top:12px}
+.rw2-item{display:flex;align-items:center;gap:8px;background:var(--panel3,#222736);padding:9px;border-radius:9px}
+.rw2-item input{min-width:0;flex:1;background:transparent;color:inherit;border:0;border-bottom:1px solid #64748b66;padding:6px}
+.rw2-muted{color:var(--muted,#94a3b8);font-size:.88rem;line-height:1.5}
+.rw2-result{font-size:1.05rem;font-weight:700}
+.rw2-bar{height:8px;background:#64748b33;border-radius:99px;overflow:hidden;margin-top:6px}.rw2-bar span{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#3b82f6);border-radius:99px}
+.rw2-status{padding:12px;border-radius:10px;background:var(--panel3,#222736);line-height:1.5}
+.rw2-svg-motion{transform-box:fill-box;transform-origin:center}
+svg[data-rw-motion="search"]:hover circle,button:focus-visible svg[data-rw-motion="search"] circle{animation:rw-search-scan .85s ease both}
+svg[data-rw-motion="search"]:hover path,button:focus-visible svg[data-rw-motion="search"] path{animation:rw-search-glint .85s ease both}
+svg[data-rw-motion="send"]:hover path,button:focus-visible svg[data-rw-motion="send"] path{animation:rw-send-flight .65s cubic-bezier(.2,.8,.2,1) both}
+svg[data-rw-motion="voice"]:hover path,button:focus-visible svg[data-rw-motion="voice"] path{animation:rw-voice-wave .8s ease-in-out both}
+svg[data-rw-motion="add"]:hover path,svg[data-rw-motion="add"]:hover line,button:focus-visible svg[data-rw-motion="add"] path{animation:rw-add-draw .5s ease both}
+svg[data-rw-motion="check"]:hover path,button:focus-visible svg[data-rw-motion="check"] path{stroke-dasharray:32;stroke-dashoffset:32;animation:rw-check-draw .55s ease forwards}
+svg[data-rw-motion="alert"]:hover path,button:focus-visible svg[data-rw-motion="alert"] path{animation:rw-alert-ring .8s ease both}
+svg[data-rw-motion="brand"] path{animation:rw-brand-flow 7s ease-in-out infinite}
+svg[data-rw-motion="brand"] circle{animation:rw-brand-spark 3.2s ease-in-out infinite}
+svg[data-rw-motion="generic"]:hover path,svg[data-rw-motion="generic"]:hover circle,svg[data-rw-motion="generic"]:hover rect,svg[data-rw-motion="generic"]:hover polygon,button:focus-visible svg[data-rw-motion="generic"] path{animation:rw-ink-reveal .55s ease both}
+@keyframes rw-search-scan{0%{opacity:.65}45%{opacity:1;filter:drop-shadow(0 0 3px currentColor)}100%{opacity:1}}
+@keyframes rw-search-glint{0%{stroke-dasharray:2 30;stroke-dashoffset:20}100%{stroke-dasharray:30 0;stroke-dashoffset:0}}
+@keyframes rw-send-flight{0%{transform:translate(-1px,1px);opacity:.65}65%{transform:translate(2px,-2px)}100%{transform:translate(0,0);opacity:1}}
+@keyframes rw-voice-wave{0%,100%{opacity:.8}50%{opacity:1;filter:drop-shadow(0 0 3px currentColor)}}
+@keyframes rw-add-draw{from{stroke-dasharray:1 40;stroke-dashoffset:20}to{stroke-dasharray:40 0;stroke-dashoffset:0}}
+@keyframes rw-check-draw{to{stroke-dashoffset:0}}
+@keyframes rw-alert-ring{0%,100%{transform:translateX(0)}25%{transform:translateX(-1px)}50%{transform:translateX(1px)}75%{transform:translateX(-.5px)}}
+@keyframes rw-brand-flow{0%,100%{filter:drop-shadow(0 0 0 transparent)}50%{filter:drop-shadow(0 0 3px #8b5cf688)}}
+@keyframes rw-brand-spark{0%,100%{opacity:.7}50%{opacity:1;filter:drop-shadow(0 0 4px white)}}
+@keyframes rw-ink-reveal{0%{opacity:.65;filter:drop-shadow(0 0 0 transparent)}60%{opacity:1;filter:drop-shadow(0 0 2px currentColor)}100%{opacity:1;filter:none}}
+@media(max-width:680px){.rw2-backdrop{padding:8px}.rw2-panel{padding:16px;width:100%;max-height:94vh}.rw2-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){svg[data-rw-motion],svg[data-rw-motion] *,.rw2-panel *{animation:none!important;transition:none!important}}
+
 </style>
   </head>
 
@@ -3247,6 +3298,7 @@
           <button id="rainbowAgentsSidebarBtn" type="button" class="sidebar-nav-btn" title="Open Rainbow-Agents Studio" aria-label="Open Rainbow-Agents Studio"><span class="sidebar-nav-btn-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="M7 7.5 10 10M17 7.5 14 10M7 16.5 10 14M17 16.5 14 14"/></svg><span class="hide-on-collapse">Rainbow-Agents</span></span></button>
           <button id="truthLensSidebarBtn" type="button" class="sidebar-nav-btn" title="Verify claims with traceable evidence" aria-label="Open TruthLens"><span class="sidebar-nav-btn-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="7.3"/><path d="m16.2 16.2 4.3 4.3M7.5 10.8l2.2 2.2 4.5-4.7"/></svg><span class="hide-on-collapse">TruthLens</span></span><span class="nav-badge hide-on-collapse">NEW</span></button>
           <button id="knowledgeGraphSidebarBtn" type="button" class="sidebar-nav-btn" title="Build a local knowledge graph"><span class="sidebar-nav-btn-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="m7 6.5 3 3M17 6.5l-3 3M7 17.5l3-3M17 17.5l-3-3"/></svg><span class="hide-on-collapse">Knowledge Graph</span></span></button><button id="memoryVaultSidebarBtn" type="button" class="sidebar-nav-btn" title="Manage saved knowledge and notes"><span class="sidebar-nav-btn-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/><path d="M3 7v14h14"/></svg><span class="hide-on-collapse">Memory Vault</span></span></button>
+          <button id="decisionLabSidebarBtn" type="button" class="sidebar-nav-btn" title="Compare choices with a transparent weighted decision matrix"><span class="sidebar-nav-btn-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5M4 19h16"/><path d="M7 15l4-4 3 2 5-7"/><circle cx="7" cy="15" r="1"/><circle cx="11" cy="11" r="1"/><circle cx="14" cy="13" r="1"/><circle cx="19" cy="6" r="1"/></svg><span class="hide-on-collapse">Decision Lab</span></span></button>
           <button
             id="openPromptStudioBtn"
             type="button"
@@ -3886,7 +3938,7 @@
                     type="file"
                     class="hidden"
                     multiple
-                    accept=".txt,.md,.json,.js,.ts,.py,.html,.css,image/png,image/jpeg"
+                    accept="*/*"
                   />
                   <textarea
                     id="composerInput"
@@ -6351,6 +6403,45 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           });
         }
 
+
+/* RAINBOW_FILE_INTELLIGENCE_V1 — shared local format detection and extraction. */
+(function(){
+ "use strict";
+ const textExt=new Set("txt md markdown csv tsv json jsonl xml html htm css js mjs cjs ts tsx jsx py ipynb java c h cpp hpp cs go rs php rb swift kt sql sh bash ps1 bat cmd yaml yml toml ini conf log rtf svg tex rst".split(" "));
+ const extOf=n=>(String(n||"").split(".").pop()||"").toLowerCase();
+ const limit=t=>String(t||"").slice(0,180000);
+ async function extract(file){
+  if(!file)throw new Error("No file selected.");
+  if(file.size>25*1024*1024)throw new Error("File exceeds Rainbow's 25 MB local extraction limit.");
+  const ext=extOf(file.name),type=(file.type||"").toLowerCase(),meta={name:file.name,type:type||"unknown",size:file.size,extension:ext||"none",lastModified:file.lastModified||null};
+  if(textExt.has(ext)||type.startsWith("text/")||type==="application/json"){const raw=await file.text();return{text:limit(raw),meta,status:"extracted",note:raw.length>180000?"Text limited to 180,000 characters.":""};}
+  if(ext==="pdf"||type==="application/pdf"){
+   if(!window.pdfjsLib)throw new Error("PDF parser unavailable; check your connection.");
+   pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+   const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise,parts=[];
+   for(let n=1;n<=Math.min(pdf.numPages,120);n++){const page=await pdf.getPage(n),data=await page.getTextContent();parts.push("[Page "+n+"] "+data.items.map(x=>x.str).join(" "));}
+   return{text:limit(parts.join("\n\n")),meta,status:"extracted",note:pdf.numPages>120?"First 120 pages extracted.":""};
+  }
+  if(ext==="docx"||type.includes("wordprocessingml")){
+   if(!window.mammoth)throw new Error("DOCX parser unavailable; check your connection.");
+   const out=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()});return{text:limit(out.value),meta,status:"extracted",note:out.messages?.map(x=>x.message).join("; ")||""};
+  }
+  if(["xlsx","xls","xlsm","ods"].includes(ext)||type.includes("spreadsheet")){
+   if(!window.XLSX)throw new Error("Spreadsheet parser unavailable; check your connection.");
+   const wb=XLSX.read(await file.arrayBuffer(),{type:"array"}),parts=wb.SheetNames.slice(0,30).map(n=>"[Sheet: "+n+"]\n"+XLSX.utils.sheet_to_csv(wb.Sheets[n]));
+   return{text:limit(parts.join("\n\n")),meta,status:"extracted",note:wb.SheetNames.length>30?"First 30 sheets extracted.":""};
+  }
+  if(["png","jpg","jpeg","gif","webp","bmp","avif","heic","heif","tif","tiff"].includes(ext)||type.startsWith("image/")){
+   let dimensions="";if(type.startsWith("image/")&&"createImageBitmap"in window){try{const b=await createImageBitmap(file);dimensions=b.width+" × "+b.height;b.close();}catch(e){}}
+   return{text:"",meta:{...meta,dimensions},status:"metadata-only",note:"Image accepted. The current chat gateway is text-only; image pixels are not sent to the model."};
+  }
+  if(["mp3","wav","m4a","aac","ogg","flac","mp4","mov","webm","mkv"].includes(ext)||type.startsWith("audio/")||type.startsWith("video/"))
+   return{text:"",meta,status:"metadata-only",note:"Media accepted and identified. Transcription and video understanding need a media backend that is not connected yet."};
+  return{text:"",meta,status:"metadata-only",note:"File accepted and identified; no safe content extractor is available for this format yet."};
+ }
+ window.RainbowFileIntelligence={extract,version:1};
+})();
+
         // Functional handlers for controls that previously had no action.
         // File attachments: read text-based files locally and add their contents to the composer.
         $("#attachFileBtn")?.addEventListener("click", () => {
@@ -6360,26 +6451,25 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
             picker.id = "rainbowAttachmentPicker";
             picker.type = "file";
             picker.multiple = true;
-            picker.accept = ".txt,.md,.csv,.json,.html,.css,.js,.py,.xml,.yaml,.yml,.log";
+            picker.accept = "*/*";
             picker.hidden = true;
             document.body.appendChild(picker);
             picker.addEventListener("change", async () => {
               const files = Array.from(picker.files || []);
               if (!files.length) return;
               const parts = [];
+              let readable=0,metadataOnly=0;
               for (const file of files) {
-                if (file.size > 1024 * 1024) {
-                  notify(file.name + " is larger than 1 MB and was skipped.");
-                  continue;
-                }
-                try { const content=await file.text();indexRainbowText(file.name,content);parts.push("\n\n[Attached file indexed locally: "+file.name+". Relevant passages will be retrieved for your question.]"); }
-                catch { notify("Could not read " + file.name + "."); }
+                try {
+                  const result=await window.RainbowFileIntelligence.extract(file);
+                  if(result.text){indexRainbowText(file.name,result.text);parts.push("\\n\\n[Attached file indexed locally: "+file.name+". Extracted text is available for relevant passage retrieval.]");readable++;}
+                  else{metadataOnly++;parts.push("\\n\\n[File selected: "+file.name+" ("+result.meta.type+", "+file.size+" bytes). "+result.note+"]");}
+                }catch(error){notify(file.name+": "+(error?.message||"could not be processed"));}
               }
-              if (el.input && parts.length) {
-                el.input.value = (el.input.value ? el.input.value + "\n\n" : "") + parts.join("");
-                el.input.dispatchEvent(new Event("input", { bubbles: true }));
-                el.input.focus();
-                notify(files.length + " file(s) added to the message.");
+              if(el.input&&parts.length){
+                el.input.value=(el.input.value?el.input.value+"\\n\\n":"")+parts.join("");
+                el.input.dispatchEvent(new Event("input",{bubbles:true}));el.input.focus();
+                notify(readable+" file(s) indexed; "+metadataOnly+" accepted as metadata only.");
               }
               picker.value = "";
             });
@@ -6896,6 +6986,93 @@ document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=
   renderGraph();renderMemories();
 })();
 /* END RAINBOW_KNOWLEDGE_MEMORY_V1 */
+
+
+/* RAINBOW_SECOND_WAVE_DECISION_LAB_V1 */
+(function(){
+  "use strict";
+  const ws=window.RainbowWorkspace;
+  const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const key="rainbow_ai_decision_lab_v1";
+  let state={question:"",criteria:[{id:"c1",name:"Cost",weight:3},{id:"c2",name:"Quality",weight:5},{id:"c3",name:"Ease of use",weight:2}],options:[{id:"o1",name:"Option A",scores:{c1:3,c2:4,c3:4}},{id:"o2",name:"Option B",scores:{c1:4,c2:5,c3:3}}]};
+  try{const saved=ws?.storage?.get(key);if(saved&&Array.isArray(saved.criteria)&&Array.isArray(saved.options))state=saved;}catch(e){}
+  const backdrop=document.createElement("div");backdrop.className="rw2-backdrop";backdrop.id="rainbowSecondWaveModal";
+  backdrop.innerHTML='<section class="rw2-panel" role="dialog" aria-modal="true" aria-labelledby="rw2Title"><header class="rw2-head"><div><div class="rw2-muted">RAINBOW AI · INTELLIGENCE ECOSYSTEM</div><h2 id="rw2Title" style="margin:4px 0">Decision Lab & Intelligence</h2></div><button class="rw2-action" data-close aria-label="Close">✕</button></header><nav class="rw2-tabs" role="tablist"><button data-tab="decision" class="active">Decision Lab</button><button data-tab="debate">Multi-AI Debate</button><button data-tab="documents">Document Intelligence</button></nav><div id="rw2Content"></div></section>';
+  document.body.appendChild(backdrop);
+  const content=backdrop.querySelector("#rw2Content");
+  const persist=()=>{try{ws?.storage?.set(key,state);}catch(e){}};
+  const id=()=> "x"+Math.random().toString(36).slice(2,10);
+  function score(option){const total=state.criteria.reduce((a,c)=>a+Math.max(0,Number(c.weight)||0),0);if(!total)return 0;return state.criteria.reduce((a,c)=>a+(Math.max(0,Math.min(5,Number(option.scores?.[c.id])||0))*(Math.max(0,Number(c.weight)||0))),0)/total;}
+  function renderDecision(){
+    const ranked=[...state.options].sort((a,b)=>score(b)-score(a));
+    content.innerHTML='<div class="rw2-grid"><div class="rw2-card"><h3>1. Define the decision</h3><label class="rw2-field">Decision question<input id="rw2Question" placeholder="What are you choosing?" value="'+esc(state.question)+'"></label><p class="rw2-muted">Set criteria and importance weights. Weights are relative; scores use a 0–5 scale.</p><div class="rw2-row"><button class="rw2-action" id="rw2AddCriterion">+ Criterion</button><button class="rw2-action" id="rw2AddOption">+ Option</button></div></div><div class="rw2-card"><h3>2. Weighted outcome</h3><p class="rw2-muted">Transparent arithmetic, not an AI-generated recommendation. Review the criteria and scores before deciding.</p><div class="rw2-list">'+ranked.map((o,i)=>'<div><div class="rw2-row" style="justify-content:space-between"><strong>'+esc(o.name)+'</strong><span class="rw2-result">'+score(o).toFixed(2)+' / 5</span></div><div class="rw2-bar"><span style="width:'+Math.max(0,Math.min(100,score(o)*20))+'%"></span></div>'+(i===0?'<span class="rw2-muted">Highest weighted score</span>':'')+'</div>').join("")+'</div></div></div><div class="rw2-grid" style="margin-top:14px"><div class="rw2-card"><h3>Criteria & weights</h3><div class="rw2-list">'+state.criteria.map(c=>'<div class="rw2-item"><input data-criterion-name="'+c.id+'" value="'+esc(c.name)+'" aria-label="Criterion name"><label class="rw2-muted">Weight</label><input style="max-width:62px;flex:0 0 62px" type="number" min="0" max="10" data-weight="'+c.id+'" value="'+esc(c.weight)+'"><button class="rw2-action" data-remove-criterion="'+c.id+'" aria-label="Remove criterion">×</button></div>').join("")+'</div></div><div class="rw2-card"><h3>Options & scores (0–5)</h3><div class="rw2-list">'+state.options.map(o=>'<div class="rw2-item" style="display:block"><div class="rw2-row"><input data-option-name="'+o.id+'" value="'+esc(o.name)+'" aria-label="Option name"><button class="rw2-action" data-remove-option="'+o.id+'" aria-label="Remove option">×</button></div><div class="rw2-row" style="margin-top:8px">'+state.criteria.map(c=>'<label class="rw2-muted" style="display:flex;align-items:center;gap:5px">'+esc(c.name)+'<input style="width:54px;flex:0 0 54px" type="number" min="0" max="5" step=".5" data-score="'+o.id+':'+c.id+'" value="'+esc(o.scores?.[c.id]??0)+'"></label>').join("")+'</div></div>').join("")+'</div></div></div><div class="rw2-row" style="margin-top:14px"><button class="rw2-action primary" id="rw2Save">Save decision</button><button class="rw2-action" id="rw2Export">Export JSON</button><span class="rw2-muted" id="rw2Saved"></span></div>';
+    content.querySelector("#rw2Question").oninput=e=>{state.question=e.target.value;persist();};
+    content.querySelector("#rw2AddCriterion").onclick=()=>{const cid=id();state.criteria.push({id:cid,name:"New criterion",weight:1});state.options.forEach(o=>o.scores[cid]=3);renderDecision();};
+    content.querySelector("#rw2AddOption").onclick=()=>{const oid=id(),scores={};state.criteria.forEach(c=>scores[c.id]=3);state.options.push({id:oid,name:"New option",scores});renderDecision();};
+    content.querySelectorAll("[data-criterion-name]").forEach(el=>el.onchange=()=>{state.criteria.find(c=>c.id===el.dataset.criterionName).name=el.value;persist();renderDecision();});
+    content.querySelectorAll("[data-weight]").forEach(el=>el.onchange=()=>{const c=state.criteria.find(c=>c.id===el.dataset.weight);c.weight=Math.max(0,Math.min(10,Number(el.value)||0));persist();renderDecision();});
+    content.querySelectorAll("[data-score]").forEach(el=>el.onchange=()=>{const [oid,cid]=el.dataset.score.split(":");const o=state.options.find(o=>o.id===oid);o.scores[cid]=Math.max(0,Math.min(5,Number(el.value)||0));persist();renderDecision();});
+    content.querySelectorAll("[data-option-name]").forEach(el=>el.onchange=()=>{state.options.find(o=>o.id===el.dataset.optionName).name=el.value;persist();renderDecision();});
+    content.querySelectorAll("[data-remove-criterion]").forEach(el=>el.onclick=()=>{state.criteria=state.criteria.filter(c=>c.id!==el.dataset.removeCriterion);state.options.forEach(o=>delete o.scores[el.dataset.removeCriterion]);persist();renderDecision();});
+    content.querySelectorAll("[data-remove-option]").forEach(el=>el.onclick=()=>{state.options=state.options.filter(o=>o.id!==el.dataset.removeOption);persist();renderDecision();});
+    content.querySelector("#rw2Save").onclick=()=>{persist();content.querySelector("#rw2Saved").textContent="Saved on this device.";};
+    content.querySelector("#rw2Export").onclick=()=>{const blob=new Blob([JSON.stringify({question:state.question,criteria:state.criteria,options:state.options,weightedScores:ranked.map(o=>({name:o.name,score:Number(score(o).toFixed(3))}))},null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="rainbow-decision.json";a.click();URL.revokeObjectURL(a.href);};
+  }
+  function renderDebate(){content.innerHTML='<div class="rw2-card"><h3>Multi-AI Debate</h3><p class="rw2-muted">A structured debate needs multiple model endpoints and an orchestration backend. That service is not connected in this deployment, so this panel will not invent participants or fabricate a debate.</p><div class="rw2-field"><label for="rw2DebateTopic">Debate topic</label><textarea id="rw2DebateTopic" placeholder="Enter a question or proposition to debate"></textarea></div><div class="rw2-status"><strong>Backend dependency:</strong> multi-model routing, independent responses, rebuttal rounds, and a cited synthesis endpoint are not yet available. Your draft stays in this browser.</div></div>';}
+  function renderDocuments(){content.innerHTML='<div class="rw2-grid"><div class="rw2-card"><h3>Document Intelligence</h3><p class="rw2-muted">Load text-based files or paste content for local inspection. This prototype does not claim AI summarization or parse binary PDF/DOCX files.</p><label class="rw2-field">Choose TXT, MD, CSV or JSON<input id="rw2File" type="file" accept="*/*"></label><label class="rw2-field">Or paste document text<textarea id="rw2DocText" placeholder="Paste text to inspect…"></textarea></label><button class="rw2-action primary" id="rw2Inspect">Inspect locally</button></div><div class="rw2-card"><h3>Inspection report</h3><div id="rw2DocReport" class="rw2-muted">No document loaded yet.</div></div></div>';}
+  function inspect(textValue){const words=textValue.trim()?textValue.trim().split(/\s+/).length:0,lines=textValue?textValue.split(/\r?\n/).length:0,chars=textValue.length;const terms=(textValue.toLowerCase().match(/[a-z][a-z0-9-]{3,}/g)||[]).reduce((m,w)=>(m[w]=(m[w]||0)+1,m),{});const top=Object.entries(terms).sort((a,b)=>b[1]-a[1]).slice(0,8);content.querySelector("#rw2DocReport").innerHTML='<div class="rw2-result">'+words.toLocaleString()+' words</div><p>'+chars.toLocaleString()+' characters · '+lines.toLocaleString()+' lines</p><strong>Frequent terms</strong><p>'+esc(top.map(x=>x[0]+' ('+x[1]+')').join(" · ")||"No recurring terms detected")+'</p><p class="rw2-muted">Local text statistics only. No external source verification or semantic summary was performed.</p>';}
+  function render(tab){backdrop.querySelectorAll("[data-tab]").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));if(tab==="decision")renderDecision();else if(tab==="debate")renderDebate();else renderDocuments();}
+  function open(tab="decision"){backdrop.classList.add("open");render(tab);}
+  function close(){backdrop.classList.remove("open");}
+  backdrop.addEventListener("click",e=>{if(e.target===backdrop||e.target.closest("[data-close]"))close();});
+  backdrop.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>render(b.dataset.tab)));
+  backdrop.addEventListener("change",async e=>{if(e.target.id==="rw2File"&&e.target.files?.[0]){const file=e.target.files[0],report=content.querySelector("#rw2DocReport");report.textContent="Inspecting "+file.name+"…";try{const result=await window.RainbowFileIntelligence.extract(file);if(result.text){content.querySelector("#rw2DocText").value=result.text;inspect(result.text);if(result.note){const note=document.createElement("p");note.className="rw2-muted";note.textContent=result.note;report.appendChild(note);}}else{report.textContent=result.note+" File: "+result.meta.name+" · "+result.meta.type+" · "+result.meta.size.toLocaleString()+" bytes";}}catch(error){report.textContent=error.message||"This file could not be extracted.";}}});
+  backdrop.addEventListener("click",e=>{if(e.target.id==="rw2Inspect")inspect(content.querySelector("#rw2DocText").value);});
+  document.getElementById("decisionLabSidebarBtn")?.addEventListener("click",()=>open());
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&backdrop.classList.contains("open"))close();});
+  ws?.register?.("decision-lab",{name:"Decision Lab",status:"available",capabilities:["weighted-decision-matrix","local-persistence","json-export"]});
+  ws?.register?.("multi-ai-debate",{name:"Multi-AI Debate",status:"backend-required",capabilities:["debate-draft-ui"]});
+  ws?.register?.("document-intelligence",{name:"Document Intelligence",status:"local-preview",capabilities:["text-file-inspection","word-count","term-frequency"]});
+  renderDecision();
+})();
+/* END RAINBOW_SECOND_WAVE_DECISION_LAB_V1 */
+
+/* RAINBOW_SEMANTIC_SVG_MOTION_V1 — every inline SVG receives a role-specific, restrained motion language. */
+(function(){
+  "use strict";
+  const classify=svg=>{
+    if(svg.id==="novaAvatar")return "nova";
+    const host=svg.closest("button,[role='button'],a")||svg.parentElement;
+    const words=[svg.id,svg.getAttribute("aria-label"),svg.getAttribute("class"),svg.getAttribute("data-icon"),host?.getAttribute("aria-label"),host?.getAttribute("title"),host?.textContent].filter(Boolean).join(" ").toLowerCase();
+    if(svg.classList.contains("brand-original-mark")||svg.classList.contains("welcome-original-mark"))return "brand";
+    if(/search|find|lookup|filter/.test(words))return "search";
+    if(/send|submit|paper.?plane|message/.test(words))return "send";
+    if(/microphone|voice|listen|speech|audio/.test(words))return "voice";
+    if(/plus|add|create|new chat|insert/.test(words))return "add";
+    if(/check|verify|success|confirm|done|approve/.test(words))return "check";
+    if(/alert|bell|notification|warning/.test(words))return "alert";
+    return "generic";
+  };
+  const decorate=root=>{
+    const list=[];
+    if(root?.matches?.("svg"))list.push(root);
+    root?.querySelectorAll?.("svg").forEach(svg=>list.push(svg));
+    list.forEach(svg=>{
+      if(svg.dataset.rwMotionReady==="1")return;
+      svg.dataset.rwMotionReady="1";
+      svg.dataset.rwMotion=classify(svg);
+      if(svg.dataset.rwMotion!=="nova")svg.style.setProperty("--rw-motion-ready","1");
+    });
+  };
+  decorate(document);
+  if("MutationObserver" in window){
+    const observer=new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{if(node.nodeType===1)decorate(node);})));
+    observer.observe(document.documentElement,{childList:true,subtree:true});
+  }
+  document.addEventListener("rainbow:svg-refresh",()=>decorate(document));
+})();
+
+
 
         // Global Escape handling: dismiss the topmost Rainbow overlay before anything underneath it.
         document.addEventListener("keydown", (event) => {
