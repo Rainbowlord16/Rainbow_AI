@@ -7594,7 +7594,7 @@ renderFlow();renderStories();renderTimer();
  const nodeMap=new Map(original.map((el,i)=>[idOf(el,i),el]));
  function persist(){try{localStorage.setItem("rainbow.sidebar.personalization.v1",JSON.stringify(config));}catch{}}
  function createCustomNode(item){
-  const a=document.createElement("a");a.className="sidebar-nav-btn";a.href=item.href;a.title=item.label;a.target=/^https?:/i.test(item.href)&&new URL(item.href,location.href).origin!==location.origin?"_blank":"_self";if(a.target==="_blank")a.rel="noopener noreferrer";
+  let parsed;try{parsed=new URL(item.href,location.href);if(!["http:","https:"].includes(parsed.protocol))return null;}catch{return null;}const a=document.createElement("a");a.className="sidebar-nav-btn";a.href=parsed.href;a.title=item.label;a.target=parsed.origin!==location.origin?"_blank":"_self";if(a.target==="_blank")a.rel="noopener noreferrer";
   const left=document.createElement("span");left.className="sidebar-nav-btn-left";const glyph=document.createElement("span");glyph.textContent="✦";glyph.setAttribute("aria-hidden","true");glyph.style.cssText="width:20px;text-align:center;font-size:16px";const label=document.createElement("span");label.className="hide-on-collapse";label.textContent=item.label;left.append(glyph,label);a.append(left);return a;
  }
  function renderNav(){
