@@ -502,7 +502,8 @@
       const wordContent = document.getElementById("word-content");
 
       let mem = 0;
-      let isDark = localStorage.getItem("rainbow-calculator-theme") === "dark";
+      let isDark = false;
+      try { isDark = localStorage.getItem("rainbow-calculator-theme") === "dark"; } catch (_) {}
       if (isDark) document.body.classList.add("dark");
       const HISTORY_KEY = "rainbow-calculator-history-v1";
       function saveHistory() {
@@ -513,7 +514,7 @@
           const entries = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
           if (!Array.isArray(entries)) return;
           entries.slice(-30).forEach(value => { const row=document.createElement("div"); row.className="history-entry"; row.textContent=String(value); h.appendChild(row); });
-        } catch (_) { localStorage.removeItem(HISTORY_KEY); }
+        } catch (_) {}
       }
       function evaluateExpression(source) {
         const input=String(source).replace(/[×]/g,"*").replace(/[÷]/g,"/");
@@ -540,7 +541,15 @@
       // =========================
       function append(v) {
         if (!/^[0-9.+\-*/()]$/.test(String(v))) return;
-        d.value = d.value === "0" || d.value === "Error" ? v : d.value + v;
+        const current = d.value;
+        if (current === "Error" && !/^[0-9]$/.test(String(v))) return;
+        if (v === ".") {
+          const segment = current.split(/[+\-*/()]/).pop();
+          if (segment.includes(".")) return;
+          d.value = current === "0" || current === "Error" ? "0." : /[+\-*/(]$/.test(current) ? current + "0." : current + ".";
+        } else {
+          d.value = current === "0" || current === "Error" ? v : current + v;
+        }
 
         updateDisplayState();
       }
@@ -631,11 +640,11 @@
       // Memory Functions
       // =========================
       function memoryAdd() {
-        mem += parseFloat(d.value) || 0;
+        try { mem += evaluateExpression(d.value); } catch (_) {}
       }
 
       function memorySub() {
-        mem -= parseFloat(d.value) || 0;
+        try { mem -= evaluateExpression(d.value); } catch (_) {}
       }
 
       function memoryRecall() {
