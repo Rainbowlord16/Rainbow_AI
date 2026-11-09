@@ -7581,7 +7581,7 @@ renderFlow();renderStories();renderTimer();
  const original=[...nav.querySelectorAll(":scope > .sidebar-nav-btn")];
  const idOf=(el,i)=>el.id||("rainbow-nav-"+i);
  const labelOf=el=>el.querySelector(".sidebar-nav-btn-left .hide-on-collapse")?.textContent?.trim()||el.getAttribute("aria-label")||el.textContent.trim()||"Untitled";
- const defaults=original.map((el,i)=>({id:idOf(el,i),label:labelOf(el),group:"Main",hidden:false,custom:false,href:el.getAttribute("href")||""}));
+ const defaults=original.map((el,i)=>({id:idOf(el,i),label:labelOf(el),group:"Main",order:i,hidden:false,custom:false,href:el.getAttribute("href")||""}));
  let config={items:defaults,groups:[],collapsed:{}};
  try{const saved=JSON.parse(localStorage.getItem("rainbow.sidebar.personalization.v1")||"null");if(saved&&Array.isArray(saved.items)){config.items=defaults.map(d=>({...d,...(saved.items.find(x=>x.id===d.id)||{})}));config.items.push(...saved.items.filter(x=>x.custom&&!config.items.some(y=>y.id===x.id)));config.groups=Array.isArray(saved.groups)?saved.groups:[];config.collapsed=saved.collapsed||{};}}catch{}
  const nodeMap=new Map(original.map((el,i)=>[idOf(el,i),el]));
@@ -7594,7 +7594,7 @@ renderFlow();renderStories();renderTimer();
   nav.replaceChildren();
   const groups=["Main",...config.groups.filter(x=>x!=="Main")];
   groups.forEach(group=>{
-   const items=config.items.filter(x=>(x.group||"Main")===group).sort((a,b)=>a.order-b.order);
+   const items=config.items.filter(x=>(x.group||"Main")===group).sort((a,b)=>(a.order??config.items.indexOf(a))-(b.order??config.items.indexOf(b)));
    if(!items.length)return;
    const section=document.createElement("section");section.className="rw-nav-group"+(config.collapsed[group]?" is-collapsed":"");
    if(group!=="Main"){const title=document.createElement("button");title.type="button";title.className="rw-nav-group-title";title.textContent=group;title.setAttribute("aria-expanded",String(!config.collapsed[group]));title.addEventListener("click",()=>{config.collapsed[group]=!config.collapsed[group];section.classList.toggle("is-collapsed",!!config.collapsed[group]);title.setAttribute("aria-expanded",String(!config.collapsed[group]));persist();});section.append(title);}
@@ -7622,8 +7622,8 @@ renderFlow();renderStories();renderTimer();
    const group=document.createElement("select");group.setAttribute("aria-label","Move "+item.label+" to submenu");group.innerHTML=groupOptions(item.group||"Main");group.addEventListener("change",()=>{item.group=group.value;renderNav();renderEditor();});
    const hide=document.createElement("label");const check=document.createElement("input");check.type="checkbox";check.checked=!!item.hidden;check.addEventListener("change",()=>{item.hidden=check.checked;renderNav();});hide.append(check,document.createTextNode("Hide"));
    const moves=document.createElement("div");moves.className="rwne-move";
-   const up=document.createElement("button");up.type="button";up.className="rwne-btn";up.textContent="↑";up.title="Move up";up.disabled=index===0;up.addEventListener("click",()=>{const groupItems=config.items.filter(x=>(x.group||"Main")===(item.group||"Main"));const pos=groupItems.indexOf(item);if(pos>0){const other=groupItems[pos-1];const n=other.order??config.items.indexOf(other);other.order=item.order??index;item.order=n;config.items.sort((a,b)=>(a.order??config.items.indexOf(a))-(b.order??config.items.indexOf(b)));}else{const arr=config.items.filter(x=>(x.group||"Main")===(item.group||"Main"));const p=arr.indexOf(item);if(p>0)[arr[p-1],arr[p]]=[arr[p],arr[p-1]];}renderNav();renderEditor();persist();});
-   const down=document.createElement("button");down.type="button";down.className="rwne-btn";down.textContent="↓";down.title="Move down";down.disabled=index===config.items.length-1;down.addEventListener("click",()=>{const arr=config.items.filter(x=>(x.group||"Main")===(item.group||"Main"));const p=arr.indexOf(item);if(p<arr.length-1)[arr[p],arr[p+1]]=[arr[p+1],arr[p]];renderNav();renderEditor();persist();});
+   const up=document.createElement("button");up.type="button";up.className="rwne-btn";up.textContent="↑";up.title="Move up";up.disabled=index===0;up.addEventListener("click",()=>{const arr=config.items.filter(x=>(x.group||"Main")===(item.group||"Main"));const p=arr.indexOf(item);if(p>0){const other=arr[p-1],a=config.items.indexOf(item),b=config.items.indexOf(other);[config.items[a],config.items[b]]=[config.items[b],config.items[a]];arr.forEach((x,i)=>x.order=i);}renderNav();renderEditor();persist();});
+   const down=document.createElement("button");down.type="button";down.className="rwne-btn";down.textContent="↓";down.title="Move down";down.disabled=index===config.items.length-1;down.addEventListener("click",()=>{const arr=config.items.filter(x=>(x.group||"Main")===(item.group||"Main"));const p=arr.indexOf(item);if(p<arr.length-1){const other=arr[p+1],a=config.items.indexOf(item),b=config.items.indexOf(other);[config.items[a],config.items[b]]=[config.items[b],config.items[a]];arr.forEach((x,i)=>x.order=i);}renderNav();renderEditor();persist();});
    moves.append(up,down);row.append(name,group,hide,moves);
    if(item.custom){const remove=document.createElement("button");remove.type="button";remove.className="rwne-btn danger";remove.textContent="Remove";remove.addEventListener("click",()=>{config.items=config.items.filter(x=>x!==item);nodeMap.delete(item.id);renderNav();renderEditor();persist();});row.append(remove);}
    list.append(row);
@@ -7637,7 +7637,7 @@ renderFlow();renderStories();renderTimer();
  editor.querySelector("[data-add-shortcut]").addEventListener("click",()=>{
   const label=editor.querySelector("[data-shortcut-label]").value.trim(),raw=editor.querySelector("[data-shortcut-url]").value.trim();if(!label||!raw)return;
   let url;try{url=new URL(raw,location.href);if(!["http:","https:"].includes(url.protocol))throw 0;}catch{editor.querySelector("[data-shortcut-url]").setCustomValidity("Enter a valid HTTP(S) URL or relative page path.");editor.querySelector("[data-shortcut-url]").reportValidity();return;}
-  const id="custom-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,6);config.items.push({id,label,href:url.href,group:"Main",hidden:false,custom:true});editor.querySelector("[data-shortcut-label]").value="";editor.querySelector("[data-shortcut-url]").value="";nodeMap.set(id,createCustomNode(config.items[config.items.length-1]));renderNav();renderEditor();persist();
+  const id="custom-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,6);config.items.push({id,label,href:url.href,group:"Main",order:config.items.filter(x=>(x.group||"Main")==="Main").length,hidden:false,custom:true});editor.querySelector("[data-shortcut-label]").value="";editor.querySelector("[data-shortcut-url]").value="";nodeMap.set(id,createCustomNode(config.items[config.items.length-1]));renderNav();renderEditor();persist();
  });
  editor.querySelector("[data-reset]").addEventListener("click",()=>{if(!confirm("Restore the original sidebar order and remove custom shortcuts and groups?"))return;config={items:defaults.map(x=>({...x})),groups:[],collapsed:{}};renderNav();renderEditor();persist();});
  renderNav();renderEditor();
