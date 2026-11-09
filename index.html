@@ -3145,8 +3145,8 @@ svg[data-rw-motion="generic"]:hover [data-rw-part="stroke"],button:hover svg[dat
 </style>
   <style id="rw-workspace-window-styles">
 /* Rainbow Workspace Windows — independent, same-origin workspace instances */
-#rwWorkspaceLauncher{position:fixed;z-index:1200;right:22px;top:18px;display:flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid color-mix(in srgb,var(--accent,#3b82f6) 45%,transparent);border-radius:14px;background:color-mix(in srgb,var(--panel,#11131a) 88%,transparent);color:var(--text,#f8fafc);box-shadow:0 8px 28px #0003;backdrop-filter:blur(16px);font:600 13px/1.2 inherit;cursor:pointer}
-#rwWorkspaceLauncher:hover{transform:translateY(-1px);border-color:var(--accent,#3b82f6)}
+#rwWorkspaceLauncher{position:static;z-index:auto;width:100%;min-height:42px;display:flex;align-items:center;justify-content:flex-start;gap:9px;padding:9px 12px;margin:0;border:1px solid color-mix(in srgb,var(--accent,#3b82f6) 38%,transparent);border-radius:11px;background:var(--panel2,#181b26);color:var(--text-primary,var(--text,#f8fafc));box-shadow:none;backdrop-filter:none;font:600 .82rem inherit;cursor:pointer;text-align:left;box-sizing:border-box}
+#rwWorkspaceLauncher:hover{transform:translateY(-1px);border-color:var(--accent,#3b82f6);background:var(--panel3,#222736)}
 #rwWorkspaceLauncher .rw-launch-icon{font-size:17px}
 #rwWorkspaceOverlay{position:fixed;z-index:1199;inset:0;background:rgba(3,6,16,.76);backdrop-filter:blur(12px);display:none;padding:76px 18px 18px;box-sizing:border-box}
 #rwWorkspaceOverlay.open{display:flex;flex-direction:column}
@@ -3176,8 +3176,10 @@ svg[data-rw-motion="generic"]:hover [data-rw-part="stroke"],button:hover svg[dat
 .rw-workspace-empty strong{display:block;color:var(--text,#f8fafc);font-size:18px;margin-bottom:8px}
 .rw-workspace-foot{padding:8px 14px;color:var(--muted,#94a3b8);font-size:11px;border-top:1px solid #64748b33;background:var(--panel,#11131a)}
 .rw-workspace-child #rwWorkspaceLauncher,#rwWorkspaceChild #rwWorkspaceLauncher{display:none!important}
-@media(max-width:760px){#rwWorkspaceLauncher{top:auto;bottom:16px;right:14px}#rwWorkspaceOverlay{padding:12px 8px}#rwWorkspacePanel{border-radius:14px}.rw-window-grid,#rwWorkspaceOverlay[data-layout="three"] .rw-window-grid,#rwWorkspaceOverlay[data-layout="four"] .rw-window-grid{grid-template-columns:minmax(0,1fr);grid-auto-rows:minmax(360px,70vh)}.rw-workspace-head{padding:10px}.rw-workspace-title{width:100%}.rw-workspace-controls{width:100%}.rw-workspace-controls button{flex:1}}
+@media(max-width:760px){#rwWorkspaceOverlay{padding:12px 8px}#rwWorkspacePanel{border-radius:14px}.rw-window-grid,#rwWorkspaceOverlay[data-layout="three"] .rw-window-grid,#rwWorkspaceOverlay[data-layout="four"] .rw-window-grid{grid-template-columns:minmax(0,1fr);grid-auto-rows:minmax(360px,70vh)}.rw-workspace-head{padding:10px}.rw-workspace-title{width:100%}.rw-workspace-controls{width:100%}.rw-workspace-controls button{flex:1}}
 @media(prefers-reduced-motion:no-preference){#rwWorkspaceLauncher,.rw-window,.rw-workspace-controls button{transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}}
+#appShell.sidebar-collapsed #rwWorkspaceLauncher{min-height:48px;justify-content:center;flex-direction:column;gap:3px;padding:5px 2px;font-size:9px}
+#appShell.sidebar-collapsed #rwWorkspaceLauncher .rw-launch-label{display:block;font-size:9px}
 </style>
 <style id="rw-nav-personalization-styles">
 /* Personal navigation editor */
@@ -7541,7 +7543,7 @@ renderFlow();renderStories();renderTimer();
  if(document.getElementById("rwWorkspaceLauncher"))return;
  const state={windows:[],layout:"two",active:null};
  try{const saved=JSON.parse(localStorage.getItem("rainbow.workspace.windows.v1")||"{}");if(saved&&["two","three","four","focus"].includes(saved.layout))state.layout=saved.layout;}catch{}
- const launcher=document.createElement("button");launcher.id="rwWorkspaceLauncher";launcher.type="button";launcher.innerHTML='<span class="rw-launch-icon" aria-hidden="true">▦</span><span>Workspace</span>';launcher.title="Open multi-window workspace";document.body.append(launcher);
+ const launcher=document.createElement("button");launcher.id="rwWorkspaceLauncher";launcher.type="button";launcher.className="sidebar-explore-btn";launcher.innerHTML='<span class="rw-launch-icon" aria-hidden="true">▦</span><span class="rw-launch-label">Workspace</span>';launcher.title="Open multi-window workspace";const launcherHost=document.querySelector(".sidebar-top-actions");if(launcherHost)launcherHost.append(launcher);else document.body.append(launcher);
  const overlay=document.createElement("div");overlay.id="rwWorkspaceOverlay";overlay.dataset.layout=state.layout;overlay.innerHTML='<section id="rwWorkspacePanel" role="dialog" aria-modal="true" aria-label="Rainbow multi-window workspace"><header class="rw-workspace-head"><div class="rw-workspace-title">▦ Rainbow Workspace</div><div class="rw-workspace-controls"><button type="button" data-layout="two" aria-pressed="true">Split 2</button><button type="button" data-layout="three" aria-pressed="false">3 columns</button><button type="button" data-layout="four" aria-pressed="false">2 × 2</button><button type="button" data-layout="focus" aria-pressed="false">Focus</button><button type="button" data-action="close">Close workspace</button></div></header><nav class="rw-window-picker" aria-label="Open a workspace window"></nav><div class="rw-window-grid"><div class="rw-workspace-empty"><strong>Your workspace, your layout.</strong>Open multiple Rainbow tools, duplicate the same tool, and arrange them side-by-side like Windows Snap Layouts.</div></div><footer class="rw-workspace-foot">Each window runs in its own embedded page instance. Some tools may still share saved browser data. Close a window here to remove it from this layout.</footer></section>';document.body.append(overlay);
  const picker=overlay.querySelector(".rw-window-picker"),grid=overlay.querySelector(".rw-window-grid");
  function persist(){try{localStorage.setItem("rainbow.workspace.windows.v1",JSON.stringify({layout:state.layout}));}catch{}}
