@@ -3028,7 +3028,7 @@ svg[data-rw-motion="voice"]:hover path,button:focus-visible svg[data-rw-motion="
 svg[data-rw-motion="add"]:hover path,svg[data-rw-motion="add"]:hover line,button:focus-visible svg[data-rw-motion="add"] path{animation:rw-add-draw .5s ease both}
 svg[data-rw-motion="check"]:hover path,button:focus-visible svg[data-rw-motion="check"] path{stroke-dasharray:32;stroke-dashoffset:32;animation:rw-check-draw .55s ease forwards}
 svg[data-rw-motion="alert"]:hover path,button:focus-visible svg[data-rw-motion="alert"] path{animation:rw-alert-ring .8s ease both}
-svg[data-rw-motion="brand"] path{stroke-dasharray:1;stroke-dashoffset:0;animation:rw-brand-flow 7s ease-in-out infinite}
+svg[data-rw-motion="brand"] path{animation:rw-brand-flow 7s ease-in-out infinite}
 svg[data-rw-motion="brand"] circle{animation:rw-brand-spark 3.2s ease-in-out infinite}
 svg[data-rw-motion="generic"]:hover path,svg[data-rw-motion="generic"]:hover circle,svg[data-rw-motion="generic"]:hover rect,svg[data-rw-motion="generic"]:hover polygon,button:focus-visible svg[data-rw-motion="generic"] path{animation:rw-ink-reveal .55s ease both}
 @keyframes rw-search-scan{0%{opacity:.65}45%{opacity:1;filter:drop-shadow(0 0 3px currentColor)}100%{opacity:1}}
@@ -6993,6 +6993,42 @@ document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=
   renderDecision();
 })();
 /* END RAINBOW_SECOND_WAVE_DECISION_LAB_V1 */
+
+/* RAINBOW_SEMANTIC_SVG_MOTION_V1 — every inline SVG receives a role-specific, restrained motion language. */
+(function(){
+  "use strict";
+  const classify=svg=>{
+    if(svg.id==="novaAvatar")return "nova";
+    const host=svg.closest("button,[role='button'],a")||svg.parentElement;
+    const words=[svg.id,svg.getAttribute("aria-label"),svg.getAttribute("class"),svg.getAttribute("data-icon"),host?.getAttribute("aria-label"),host?.getAttribute("title"),host?.textContent].filter(Boolean).join(" ").toLowerCase();
+    if(svg.classList.contains("brand-original-mark")||svg.classList.contains("welcome-original-mark"))return "brand";
+    if(/search|find|lookup|filter/.test(words))return "search";
+    if(/send|submit|paper.?plane|message/.test(words))return "send";
+    if(/microphone|voice|listen|speech|audio/.test(words))return "voice";
+    if(/plus|add|create|new chat|insert/.test(words))return "add";
+    if(/check|verify|success|confirm|done|approve/.test(words))return "check";
+    if(/alert|bell|notification|warning/.test(words))return "alert";
+    return "generic";
+  };
+  const decorate=root=>{
+    const list=[];
+    if(root?.matches?.("svg"))list.push(root);
+    root?.querySelectorAll?.("svg").forEach(svg=>list.push(svg));
+    list.forEach(svg=>{
+      if(svg.dataset.rwMotionReady==="1")return;
+      svg.dataset.rwMotionReady="1";
+      svg.dataset.rwMotion=classify(svg);
+      if(svg.dataset.rwMotion!=="nova")svg.style.setProperty("--rw-motion-ready","1");
+    });
+  };
+  decorate(document);
+  if("MutationObserver" in window){
+    const observer=new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{if(node.nodeType===1)decorate(node);})));
+    observer.observe(document.documentElement,{childList:true,subtree:true});
+  }
+  document.addEventListener("rainbow:svg-refresh",()=>decorate(document));
+})();
+
 
 
         // Global Escape handling: dismiss the topmost Rainbow overlay before anything underneath it.
