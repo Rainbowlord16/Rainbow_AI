@@ -3143,7 +3143,43 @@ svg[data-rw-motion="generic"]:hover [data-rw-part="stroke"],button:hover svg[dat
       #appShell.sidebar-collapsed .sidebar-explore-btn svg{width:19px;height:19px}
       #sidebarExploreBtn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 </style>
-  </head>
+  <style id="rw-workspace-window-styles">
+/* Rainbow Workspace Windows — independent, same-origin workspace instances */
+#rwWorkspaceLauncher{position:fixed;z-index:1200;right:22px;top:18px;display:flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid color-mix(in srgb,var(--accent,#3b82f6) 45%,transparent);border-radius:14px;background:color-mix(in srgb,var(--panel,#11131a) 88%,transparent);color:var(--text,#f8fafc);box-shadow:0 8px 28px #0003;backdrop-filter:blur(16px);font:600 13px/1.2 inherit;cursor:pointer}
+#rwWorkspaceLauncher:hover{transform:translateY(-1px);border-color:var(--accent,#3b82f6)}
+#rwWorkspaceLauncher .rw-launch-icon{font-size:17px}
+#rwWorkspaceOverlay{position:fixed;z-index:1199;inset:0;background:rgba(3,6,16,.76);backdrop-filter:blur(12px);display:none;padding:76px 18px 18px;box-sizing:border-box}
+#rwWorkspaceOverlay.open{display:flex;flex-direction:column}
+#rwWorkspacePanel{width:min(1500px,100%);height:100%;margin:0 auto;display:flex;flex-direction:column;min-height:0;border:1px solid #64748b55;border-radius:20px;overflow:hidden;background:var(--bg,#090a0f);box-shadow:0 24px 80px #0008}
+.rw-workspace-head{display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--panel,#11131a);border-bottom:1px solid #64748b33;flex-wrap:wrap}
+.rw-workspace-title{font-weight:750;font-size:15px;margin-right:auto;color:var(--text,#f8fafc)}
+.rw-workspace-controls{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.rw-workspace-controls button,.rw-window-actions button,.rw-window-picker button{border:1px solid #64748b55;background:var(--panel2,#181b26);color:var(--text,#f8fafc);border-radius:9px;padding:7px 10px;font:600 12px inherit;cursor:pointer}
+.rw-workspace-controls button:hover,.rw-window-actions button:hover,.rw-window-picker button:hover{border-color:var(--accent,#3b82f6);background:var(--panel3,#222736)}
+.rw-workspace-controls button[aria-pressed=true]{background:var(--accent,#3b82f6);color:white}
+.rw-window-picker{display:flex;gap:7px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid #64748b33;background:var(--panel,#11131a)}
+.rw-window-grid{flex:1;min-height:0;display:grid;gap:10px;padding:10px;overflow:auto;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(250px,1fr)}
+#rwWorkspaceOverlay[data-layout="focus"] .rw-window-grid{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+#rwWorkspaceOverlay[data-layout="three"] .rw-window-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+#rwWorkspaceOverlay[data-layout="four"] .rw-window-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(280px,1fr))}
+.rw-window{min-width:0;min-height:250px;display:flex;flex-direction:column;overflow:hidden;border:1px solid #64748b66;border-radius:13px;background:var(--panel,#11131a);box-shadow:0 8px 26px #0003}
+.rw-window.is-active{border-color:var(--accent,#3b82f6);box-shadow:0 0 0 1px var(--accent,#3b82f6),0 10px 30px #0004}
+.rw-window.is-minimized{min-height:42px;max-height:42px;align-self:start}
+.rw-window.is-minimized .rw-window-frame{display:none}
+.rw-window-head{height:42px;flex:0 0 42px;display:flex;align-items:center;gap:8px;padding:0 9px 0 12px;background:var(--panel2,#181b26);border-bottom:1px solid #64748b33;cursor:grab;user-select:none}
+.rw-window-head:active{cursor:grabbing}
+.rw-window-name{font-size:12px;font-weight:700;color:var(--text,#f8fafc);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:auto}
+.rw-window-actions{display:flex;gap:4px}
+.rw-window-actions button{padding:4px 8px;min-width:27px}
+.rw-window-frame{width:100%;height:100%;flex:1;min-height:0;border:0;background:white}
+.rw-workspace-empty{grid-column:1/-1;align-self:center;justify-self:center;text-align:center;color:var(--muted,#94a3b8);padding:32px;max-width:460px}
+.rw-workspace-empty strong{display:block;color:var(--text,#f8fafc);font-size:18px;margin-bottom:8px}
+.rw-workspace-foot{padding:8px 14px;color:var(--muted,#94a3b8);font-size:11px;border-top:1px solid #64748b33;background:var(--panel,#11131a)}
+.rw-workspace-child #rwWorkspaceLauncher,#rwWorkspaceChild #rwWorkspaceLauncher{display:none!important}
+@media(max-width:760px){#rwWorkspaceLauncher{top:auto;bottom:16px;right:14px}#rwWorkspaceOverlay{padding:12px 8px}#rwWorkspacePanel{border-radius:14px}.rw-window-grid,#rwWorkspaceOverlay[data-layout="three"] .rw-window-grid,#rwWorkspaceOverlay[data-layout="four"] .rw-window-grid{grid-template-columns:minmax(0,1fr);grid-auto-rows:minmax(360px,70vh)}.rw-workspace-head{padding:10px}.rw-workspace-title{width:100%}.rw-workspace-controls{width:100%}.rw-workspace-controls button{flex:1}}
+@media(prefers-reduced-motion:no-preference){#rwWorkspaceLauncher,.rw-window,.rw-workspace-controls button{transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}}
+</style>
+</head>
 
   <body>
     <!-- Skip Navigation Link for Keyboard & Screen Reader Users -->
@@ -7460,5 +7496,61 @@ renderFlow();renderStories();renderTimer();
 })();
 </script>
 
-  </body>
+  <script id="rw-workspace-window-manager">
+/* Rainbow Workspace window manager */
+(function(){
+ "use strict";
+ const params=new URLSearchParams(location.search);
+ if(params.has("rwWorkspaceChild")) document.body.classList.add("rw-workspace-child");
+ const catalog=[
+  {id:"chat",label:"Rainbow AI Chat",url:()=>location.pathname+"?rwWorkspaceChild=1&rwInstance="+encodeURIComponent(makeId())},
+  {id:"language",label:"Language Book",url:()=> "./languagebook.html?rwWorkspaceChild=1&rwInstance="+encodeURIComponent(makeId())},
+  {id:"calculator",label:"Calculator",url:()=> "./calculator.html?rwWorkspaceChild=1&rwInstance="+encodeURIComponent(makeId())},
+  {id:"hub",label:"Rainbow Hub",url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=rainbowHubSidebarBtn&rwInstance="+encodeURIComponent(makeId())},
+  {id:"agents",label:"Rainbow Agents",url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=rainbowAgentsSidebarBtn&rwInstance="+encodeURIComponent(makeId())},
+  {id:"truth",label:"TruthLens",url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=truthLensSidebarBtn&rwInstance="+encodeURIComponent(makeId())},
+  {id:"graph",label:"Knowledge Graph",url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=knowledgeGraphSidebarBtn&rwInstance="+encodeURIComponent(makeId())},
+  {id:"decision",label:"Decision Lab",url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=decisionLabSidebarBtn&rwInstance="+encodeURIComponent(makeId())},
+  {id:"prompts",label:"Prompt Studio",url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=openPromptStudioBtn&rwInstance="+encodeURIComponent(makeId())}
+ ];
+ function makeId(){return "rw"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+ if(params.has("rwWorkspaceChild")){
+  const target=params.get("rwOpen");
+  if(target) setTimeout(()=>{const button=document.getElementById(target);if(button)button.click();},650);
+  return;
+ }
+ if(document.getElementById("rwWorkspaceLauncher"))return;
+ const state={windows:[],layout:"two",active:null};
+ try{const saved=JSON.parse(localStorage.getItem("rainbow.workspace.windows.v1")||"{}");if(saved&&["two","three","four","focus"].includes(saved.layout))state.layout=saved.layout;}catch{}
+ const launcher=document.createElement("button");launcher.id="rwWorkspaceLauncher";launcher.type="button";launcher.innerHTML='<span class="rw-launch-icon" aria-hidden="true">▦</span><span>Workspace</span>';launcher.title="Open multi-window workspace";document.body.append(launcher);
+ const overlay=document.createElement("div");overlay.id="rwWorkspaceOverlay";overlay.dataset.layout=state.layout;overlay.innerHTML='<section id="rwWorkspacePanel" role="dialog" aria-modal="true" aria-label="Rainbow multi-window workspace"><header class="rw-workspace-head"><div class="rw-workspace-title">▦ Rainbow Workspace</div><div class="rw-workspace-controls"><button type="button" data-layout="two" aria-pressed="true">Split 2</button><button type="button" data-layout="three" aria-pressed="false">3 columns</button><button type="button" data-layout="four" aria-pressed="false">2 × 2</button><button type="button" data-layout="focus" aria-pressed="false">Focus</button><button type="button" data-action="close">Close workspace</button></div></header><nav class="rw-window-picker" aria-label="Open a workspace window"></nav><div class="rw-window-grid"><div class="rw-workspace-empty"><strong>Your workspace, your layout.</strong>Open multiple Rainbow tools, duplicate the same tool, and arrange them side-by-side like Windows Snap Layouts.</div></div><footer class="rw-workspace-foot">Each window runs in its own embedded page instance. Some tools may still share saved browser data. Close a window here to remove it from this layout.</footer></section>';document.body.append(overlay);
+ const picker=overlay.querySelector(".rw-window-picker"),grid=overlay.querySelector(".rw-window-grid");
+ function persist(){try{localStorage.setItem("rainbow.workspace.windows.v1",JSON.stringify({layout:state.layout}));}catch{}}
+ function chooseLayout(layout){state.layout=layout;overlay.dataset.layout=layout;overlay.querySelectorAll("[data-layout]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.layout===layout)));persist();}
+ function activate(id){state.active=id;grid.querySelectorAll(".rw-window").forEach(w=>w.classList.toggle("is-active",w.dataset.windowId===id));}
+ function renderEmpty(){if(!state.windows.length)grid.innerHTML='<div class="rw-workspace-empty"><strong>Your workspace, your layout.</strong>Open multiple Rainbow tools, duplicate the same tool, and arrange them side-by-side like Windows Snap Layouts.</div>';}
+ function addWindow(item){
+  const id=makeId(),win={id,label:item.label,url:item.url(),minimized:false};state.windows.push(win);
+  const card=document.createElement("article");card.className="rw-window is-active";card.dataset.windowId=id;
+  const head=document.createElement("div");head.className="rw-window-head";
+  const name=document.createElement("span");name.className="rw-window-name";name.textContent=item.label;
+  const actions=document.createElement("div");actions.className="rw-window-actions";
+  const minimize=document.createElement("button");minimize.type="button";minimize.textContent="−";minimize.title="Minimize window";
+  const maximize=document.createElement("button");maximize.type="button";maximize.textContent="□";maximize.title="Focus this window";
+  const close=document.createElement("button");close.type="button";close.textContent="×";close.title="Close window";
+  const frame=document.createElement("iframe");frame.className="rw-window-frame";frame.title=item.label;frame.loading="eager";frame.referrerPolicy="strict-origin-when-cross-origin";frame.src=win.url;
+  minimize.addEventListener("click",()=>{card.classList.toggle("is-minimized");win.minimized=card.classList.contains("is-minimized");});
+  maximize.addEventListener("click",()=>{activate(id);chooseLayout("focus");});
+  close.addEventListener("click",()=>{state.windows=state.windows.filter(w=>w.id!==id);card.remove();renderEmpty();});
+  head.addEventListener("click",()=>activate(id));actions.append(minimize,maximize,close);head.append(name,actions);card.append(head,frame);grid.append(card);activate(id);if(state.windows.length===1)chooseLayout("focus");else if(state.windows.length===2)chooseLayout("two");else if(state.windows.length===3)chooseLayout("three");else if(state.windows.length>=4)chooseLayout("four");
+ }
+ catalog.forEach(item=>{const b=document.createElement("button");b.type="button";b.textContent="+ "+item.label;b.addEventListener("click",()=>addWindow(item));picker.append(b);});
+ overlay.querySelectorAll("[data-layout]").forEach(b=>b.addEventListener("click",()=>chooseLayout(b.dataset.layout)));
+ overlay.querySelector('[data-action="close"]').addEventListener("click",()=>overlay.classList.remove("open"));
+ overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.classList.remove("open");});
+ launcher.addEventListener("click",()=>overlay.classList.add("open"));
+ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay.classList.contains("open"))overlay.classList.remove("open");});
+})();
+</script>
+</body>
 </html>
