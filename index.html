@@ -3179,6 +3179,25 @@ svg[data-rw-motion="generic"]:hover [data-rw-part="stroke"],button:hover svg[dat
 @media(max-width:760px){#rwWorkspaceLauncher{top:auto;bottom:16px;right:14px}#rwWorkspaceOverlay{padding:12px 8px}#rwWorkspacePanel{border-radius:14px}.rw-window-grid,#rwWorkspaceOverlay[data-layout="three"] .rw-window-grid,#rwWorkspaceOverlay[data-layout="four"] .rw-window-grid{grid-template-columns:minmax(0,1fr);grid-auto-rows:minmax(360px,70vh)}.rw-workspace-head{padding:10px}.rw-workspace-title{width:100%}.rw-workspace-controls{width:100%}.rw-workspace-controls button{flex:1}}
 @media(prefers-reduced-motion:no-preference){#rwWorkspaceLauncher,.rw-window,.rw-workspace-controls button{transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}}
 </style>
+<style id="rw-nav-personalization-styles">
+/* Personal navigation editor */
+#rwCustomizeNavBtn{width:100%;display:flex;align-items:center;gap:9px;padding:8px 12px;margin-top:5px;border:1px solid #64748b55;border-radius:10px;background:var(--panel2,#181b26);color:var(--text-primary,var(--text,#f8fafc));font:600 .8rem inherit;cursor:pointer}
+#rwCustomizeNavBtn:hover{border-color:var(--accent,#3b82f6)}
+#rwNavEditor{position:fixed;z-index:1400;inset:0;background:#020617b8;backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:16px}
+#rwNavEditor.open{display:flex}
+#rwNavEditor .rwne-panel{width:min(760px,100%);max-height:min(88vh,900px);overflow:auto;background:var(--bg,#090a0f);color:var(--text,#f8fafc);border:1px solid #64748b66;border-radius:18px;box-shadow:0 24px 80px #0009;padding:18px}
+.rwne-head{display:flex;align-items:center;gap:12px;margin-bottom:8px}.rwne-head h2{font-size:18px;margin:0 auto 0 0}.rwne-muted{color:var(--muted,#94a3b8);font-size:12px;line-height:1.5}.rwne-actions{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.rwne-btn{border:1px solid #64748b66;border-radius:9px;background:var(--panel2,#181b26);color:var(--text,#f8fafc);padding:8px 11px;font:600 12px inherit;cursor:pointer}.rwne-btn.primary{background:var(--accent,#3b82f6);border-color:transparent;color:white}.rwne-btn.danger{color:#f87171}.rwne-list{display:grid;gap:8px;margin:12px 0}.rwne-item{display:grid;grid-template-columns:minmax(110px,1.2fr) minmax(100px,.8fr) auto auto;align-items:center;gap:7px;padding:9px;border:1px solid #64748b44;border-radius:11px;background:var(--panel,#11131a)}.rwne-item input[type=text],.rwne-item select,.rwne-add input{width:100%;min-width:0;background:var(--panel2,#181b26);color:var(--text,#f8fafc);border:1px solid #64748b66;border-radius:7px;padding:7px;font:12px inherit}.rwne-item label{display:flex;gap:5px;align-items:center;font-size:11px;color:var(--muted,#94a3b8)}.rwne-move{display:flex;gap:3px}.rwne-move button{padding:5px 7px}.rwne-add{display:grid;grid-template-columns:1fr 1fr auto;gap:7px;margin:10px 0}.rwne-group{margin-top:14px;padding-top:12px;border-top:1px solid #64748b44}.rwne-group h3{font-size:13px;margin:0 0 8px}.rwne-group .rwne-add{grid-template-columns:1fr auto}
+.sidebar-modules .rw-nav-group{display:flex;flex-direction:column;gap:2px;margin:2px 0}
+.sidebar-modules .rw-nav-group-title{width:100%;display:flex;align-items:center;gap:8px;padding:7px 12px;border:0;background:transparent;color:var(--text-muted);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;text-align:left;cursor:pointer}
+.sidebar-modules .rw-nav-group-title:after{content:"▾";margin-left:auto}
+.sidebar-modules .rw-nav-group.is-collapsed .rw-nav-group-title:after{content:"▸"}
+.sidebar-modules .rw-nav-group.is-collapsed .rw-nav-group-items{display:none}
+.sidebar-modules .rw-nav-group-items{display:flex;flex-direction:column;gap:2px}
+.sidebar-modules .sidebar-nav-btn[hidden]{display:none!important}
+#appShell.sidebar-collapsed .rw-nav-group-title{display:none}
+#appShell.sidebar-collapsed .rw-nav-group{margin:0}
+@media(max-width:560px){#rwNavEditor{padding:7px}#rwNavEditor .rwne-panel{padding:12px}.rwne-item{grid-template-columns:1fr 1fr}.rwne-item>input{grid-column:1/-1}.rwne-add{grid-template-columns:1fr}.rwne-add button{width:100%}}
+</style>
 </head>
 
   <body>
@@ -7535,14 +7554,21 @@ renderFlow();renderStories();renderTimer();
   const head=document.createElement("div");head.className="rw-window-head";
   const name=document.createElement("span");name.className="rw-window-name";name.textContent=item.label;
   const actions=document.createElement("div");actions.className="rw-window-actions";
+  const rename=document.createElement("button");rename.type="button";rename.textContent="✎";rename.title="Rename this tab";
   const minimize=document.createElement("button");minimize.type="button";minimize.textContent="−";minimize.title="Minimize window";
   const maximize=document.createElement("button");maximize.type="button";maximize.textContent="□";maximize.title="Focus this window";
   const close=document.createElement("button");close.type="button";close.textContent="×";close.title="Close window";
   const frame=document.createElement("iframe");frame.className="rw-window-frame";frame.title=item.label;frame.loading="eager";frame.referrerPolicy="strict-origin-when-cross-origin";frame.src=win.url;
+  rename.addEventListener("click",()=>{const next=prompt("Name this workspace tab:",win.label);if(next&&next.trim()){win.label=next.trim().slice(0,48);name.textContent=win.label;frame.title=win.label;}});
+  name.addEventListener("dblclick",()=>rename.click());
   minimize.addEventListener("click",()=>{card.classList.toggle("is-minimized");win.minimized=card.classList.contains("is-minimized");});
   maximize.addEventListener("click",()=>{activate(id);chooseLayout("focus");});
   close.addEventListener("click",()=>{state.windows=state.windows.filter(w=>w.id!==id);card.remove();renderEmpty();});
-  head.addEventListener("click",()=>activate(id));actions.append(minimize,maximize,close);head.append(name,actions);card.append(head,frame);grid.append(card);activate(id);if(state.windows.length===1)chooseLayout("focus");else if(state.windows.length===2)chooseLayout("two");else if(state.windows.length===3)chooseLayout("three");else if(state.windows.length>=4)chooseLayout("four");
+  head.addEventListener("click",()=>activate(id));actions.append(rename,minimize,maximize,close);head.append(name,actions);card.append(head,frame);
+  head.draggable=true;head.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/rw-window",id);e.dataTransfer.effectAllowed="move";});
+  card.addEventListener("dragover",e=>{e.preventDefault();e.dataTransfer.dropEffect="move";});
+  card.addEventListener("drop",e=>{e.preventDefault();const movingId=e.dataTransfer.getData("text/rw-window");const movingCard=Array.from(grid.children).find(x=>x.dataset.windowId===movingId);if(movingCard&&movingCard!==card){const rect=card.getBoundingClientRect();grid.insertBefore(movingCard,e.clientX>rect.left+rect.width/2?card.nextSibling:card);}});
+  grid.append(card);activate(id);if(state.windows.length===1)chooseLayout("focus");else if(state.windows.length===2)chooseLayout("two");else if(state.windows.length===3)chooseLayout("three");else if(state.windows.length>=4)chooseLayout("four");
  }
  catalog.forEach(item=>{const b=document.createElement("button");b.type="button";b.textContent="+ "+item.label;b.addEventListener("click",()=>addWindow(item));picker.append(b);});
  overlay.querySelectorAll("[data-layout]").forEach(b=>b.addEventListener("click",()=>chooseLayout(b.dataset.layout)));
@@ -7550,6 +7576,78 @@ renderFlow();renderStories();renderTimer();
  overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.classList.remove("open");});
  launcher.addEventListener("click",()=>overlay.classList.add("open"));
  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay.classList.contains("open"))overlay.classList.remove("open");});
+})();
+</script>
+<script id="rw-nav-personalization">
+/* Sidebar personalization: safe DOM moves keep original feature event handlers intact. */
+(function(){
+ "use strict";
+ if(new URLSearchParams(location.search).has("rwWorkspaceChild"))return;
+ const nav=document.querySelector(".sidebar-modules"),top=document.querySelector(".sidebar-top-actions");
+ if(!nav||!top||document.getElementById("rwNavEditor"))return;
+ const original=[...nav.querySelectorAll(":scope > .sidebar-nav-btn")];
+ const idOf=(el,i)=>el.id||("rainbow-nav-"+i);
+ const labelOf=el=>el.querySelector(".sidebar-nav-btn-left .hide-on-collapse")?.textContent?.trim()||el.getAttribute("aria-label")||el.textContent.trim()||"Untitled";
+ const defaults=original.map((el,i)=>({id:idOf(el,i),label:labelOf(el),group:"Main",order:i,hidden:false,custom:false,href:el.getAttribute("href")||""}));
+ let config={items:defaults,groups:[],collapsed:{}};
+ try{const saved=JSON.parse(localStorage.getItem("rainbow.sidebar.personalization.v1")||"null");if(saved&&Array.isArray(saved.items)){config.items=defaults.map(d=>({...d,...(saved.items.find(x=>x.id===d.id)||{})}));config.items.push(...saved.items.filter(x=>x.custom&&!config.items.some(y=>y.id===x.id)));config.groups=Array.isArray(saved.groups)?saved.groups:[];config.collapsed=saved.collapsed||{};}}catch{}
+ const nodeMap=new Map(original.map((el,i)=>[idOf(el,i),el]));
+ function persist(){try{localStorage.setItem("rainbow.sidebar.personalization.v1",JSON.stringify(config));}catch{}}
+ function createCustomNode(item){
+  let parsed;try{parsed=new URL(item.href,location.href);if(!["http:","https:"].includes(parsed.protocol))return null;}catch{return null;}const a=document.createElement("a");a.className="sidebar-nav-btn";a.href=parsed.href;a.title=item.label;a.target=parsed.origin!==location.origin?"_blank":"_self";if(a.target==="_blank")a.rel="noopener noreferrer";
+  const left=document.createElement("span");left.className="sidebar-nav-btn-left";const glyph=document.createElement("span");glyph.textContent="✦";glyph.setAttribute("aria-hidden","true");glyph.style.cssText="width:20px;text-align:center;font-size:16px";const label=document.createElement("span");label.className="hide-on-collapse";label.textContent=item.label;left.append(glyph,label);a.append(left);return a;
+ }
+ function renderNav(){
+  nav.replaceChildren();
+  const groups=["Main",...config.groups.filter(x=>x!=="Main")];
+  groups.forEach(group=>{
+   const items=config.items.filter(x=>(x.group||"Main")===group).sort((a,b)=>(a.order??config.items.indexOf(a))-(b.order??config.items.indexOf(b)));
+   if(!items.length)return;
+   const section=document.createElement("section");section.className="rw-nav-group"+(config.collapsed[group]?" is-collapsed":"");
+   if(group!=="Main"){const title=document.createElement("button");title.type="button";title.className="rw-nav-group-title";title.textContent=group;title.setAttribute("aria-expanded",String(!config.collapsed[group]));title.addEventListener("click",()=>{config.collapsed[group]=!config.collapsed[group];section.classList.toggle("is-collapsed",!!config.collapsed[group]);title.setAttribute("aria-expanded",String(!config.collapsed[group]));persist();});section.append(title);}
+   const itemsWrap=document.createElement("div");itemsWrap.className="rw-nav-group-items";
+   items.forEach(item=>{
+    let el=nodeMap.get(item.id);if(!el&&item.custom){el=createCustomNode(item);nodeMap.set(item.id,el);}
+    if(!el)return;el.hidden=!!item.hidden;
+    const textNode=el.querySelector(".sidebar-nav-btn-left .hide-on-collapse");if(textNode&&textNode.textContent.trim()!==item.label)textNode.textContent=item.label;
+    if(item.custom){el.title=item.label;el.href=item.href;}
+    itemsWrap.append(el);
+   });
+   section.append(itemsWrap);nav.append(section);
+  });
+ }
+ const launch=document.createElement("button");launch.id="rwCustomizeNavBtn";launch.type="button";launch.innerHTML='<span aria-hidden="true">☷</span><span class="hide-on-collapse">Customize menu</span>';launch.title="Personalize sidebar menus and submenus";top.append(launch);
+ const editor=document.createElement("div");editor.id="rwNavEditor";editor.innerHTML='<section class="rwne-panel" role="dialog" aria-modal="true" aria-labelledby="rwneTitle"><header class="rwne-head"><h2 id="rwneTitle">Personalize Rainbow navigation</h2><button class="rwne-btn" type="button" data-close>✕</button></header><p class="rwne-muted">Reorder tools, rename entries, hide items, create submenu groups, and add your own shortcut tabs. Changes are saved on this device. Existing tools keep their original actions.</p><div class="rwne-actions"><button class="rwne-btn" type="button" data-reset>Reset default menu</button></div><div class="rwne-list" data-list></div><div class="rwne-group"><h3>Create a submenu</h3><div class="rwne-add"><input type="text" maxlength="28" placeholder="e.g. Study Tools" data-group-name><button class="rwne-btn primary" type="button" data-add-group>Create group</button></div></div><div class="rwne-group"><h3>Add a custom shortcut tab</h3><p class="rwne-muted">Use a page URL or a full HTTPS link. This creates a navigation shortcut, not a new AI feature.</p><div class="rwne-add"><input type="text" maxlength="36" placeholder="Shortcut name" data-shortcut-label><input type="url" placeholder="https://… or ./page.html" data-shortcut-url><button class="rwne-btn primary" type="button" data-add-shortcut>Add shortcut</button></div></div></section>';
+ document.body.append(editor);
+ const list=editor.querySelector("[data-list]");
+ function groupOptions(selected){return ["Main",...config.groups.filter(x=>x!=="Main")].map(g=>'<option value="'+g.replace(/&/g,"&amp;").replace(/"/g,"&quot;")+'" '+(g===selected?"selected":"")+'>'+g.replace(/&/g,"&amp;").replace(/</g,"&lt;")+'</option>').join("");}
+ function renderEditor(){
+  list.replaceChildren();
+  config.items.forEach((item,index)=>{
+   const row=document.createElement("div");row.className="rwne-item";
+   const name=document.createElement("input");name.type="text";name.maxLength=40;name.value=item.label;name.setAttribute("aria-label","Rename "+item.label);name.addEventListener("change",()=>{item.label=name.value.trim()||item.label;renderNav();});
+   const group=document.createElement("select");group.setAttribute("aria-label","Move "+item.label+" to submenu");group.innerHTML=groupOptions(item.group||"Main");group.addEventListener("change",()=>{item.group=group.value;renderNav();renderEditor();});
+   const hide=document.createElement("label");const check=document.createElement("input");check.type="checkbox";check.checked=!!item.hidden;check.addEventListener("change",()=>{item.hidden=check.checked;renderNav();});hide.append(check,document.createTextNode("Hide"));
+   const moves=document.createElement("div");moves.className="rwne-move";
+   const up=document.createElement("button");up.type="button";up.className="rwne-btn";up.textContent="↑";up.title="Move up";up.disabled=index===0;up.addEventListener("click",()=>{const arr=config.items.filter(x=>(x.group||"Main")===(item.group||"Main"));const p=arr.indexOf(item);if(p>0){const other=arr[p-1],a=config.items.indexOf(item),b=config.items.indexOf(other);[config.items[a],config.items[b]]=[config.items[b],config.items[a]];arr.forEach((x,i)=>x.order=i);}renderNav();renderEditor();persist();});
+   const down=document.createElement("button");down.type="button";down.className="rwne-btn";down.textContent="↓";down.title="Move down";down.disabled=index===config.items.length-1;down.addEventListener("click",()=>{const arr=config.items.filter(x=>(x.group||"Main")===(item.group||"Main"));const p=arr.indexOf(item);if(p<arr.length-1){const other=arr[p+1],a=config.items.indexOf(item),b=config.items.indexOf(other);[config.items[a],config.items[b]]=[config.items[b],config.items[a]];arr.forEach((x,i)=>x.order=i);}renderNav();renderEditor();persist();});
+   moves.append(up,down);row.append(name,group,hide,moves);
+   if(item.custom){const remove=document.createElement("button");remove.type="button";remove.className="rwne-btn danger";remove.textContent="Remove";remove.addEventListener("click",()=>{config.items=config.items.filter(x=>x!==item);nodeMap.delete(item.id);renderNav();renderEditor();persist();});row.append(remove);}
+   list.append(row);
+  });
+ }
+ function open(){editor.classList.add("open");renderEditor();}
+ function close(){editor.classList.remove("open");}
+ launch.addEventListener("click",open);editor.querySelector("[data-close]").addEventListener("click",close);editor.addEventListener("click",e=>{if(e.target===editor)close();});
+ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&editor.classList.contains("open"))close();});
+ editor.querySelector("[data-add-group]").addEventListener("click",()=>{const input=editor.querySelector("[data-group-name]");const name=input.value.trim();if(!name)return;if(name.toLowerCase()==="main"||config.groups.some(g=>g.toLowerCase()===name.toLowerCase())){input.focus();return;}config.groups.push(name);input.value="";persist();renderEditor();});
+ editor.querySelector("[data-add-shortcut]").addEventListener("click",()=>{
+  const label=editor.querySelector("[data-shortcut-label]").value.trim(),raw=editor.querySelector("[data-shortcut-url]").value.trim();if(!label||!raw)return;
+  let url;try{url=new URL(raw,location.href);if(!["http:","https:"].includes(url.protocol))throw 0;}catch{editor.querySelector("[data-shortcut-url]").setCustomValidity("Enter a valid HTTP(S) URL or relative page path.");editor.querySelector("[data-shortcut-url]").reportValidity();return;}
+  const id="custom-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,6);config.items.push({id,label,href:url.href,group:"Main",order:config.items.filter(x=>(x.group||"Main")==="Main").length,hidden:false,custom:true});editor.querySelector("[data-shortcut-label]").value="";editor.querySelector("[data-shortcut-url]").value="";nodeMap.set(id,createCustomNode(config.items[config.items.length-1]));renderNav();renderEditor();persist();
+ });
+ editor.querySelector("[data-reset]").addEventListener("click",()=>{if(!confirm("Restore the original sidebar order and remove custom shortcuts and groups?"))return;config={items:defaults.map(x=>({...x})),groups:[],collapsed:{}};renderNav();renderEditor();persist();});
+ renderNav();renderEditor();
 })();
 </script>
 </body>
