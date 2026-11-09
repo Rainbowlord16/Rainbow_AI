@@ -3108,6 +3108,17 @@ svg[data-rw-motion="generic"]:hover [data-rw-part="stroke"],button:hover svg[dat
 @media(max-width:760px){#rainbowHubOverlay{padding:0}.rh-shell{height:100%;border-radius:0;grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}.rh-rail{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--border-default,rgba(255,255,255,.1));padding:7px;gap:5px}.rh-brand{display:none}.rh-tab{white-space:nowrap;padding:8px 10px;font-size:.78rem}.rh-main{min-height:0}.rh-head{padding:12px 15px}.rh-content{padding:12px}.rh-grid{grid-template-columns:1fr}.rh-preview{height:280px}}
 @media(prefers-reduced-motion:reduce){#rainbowHubOverlay *{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 
+
+      /* Persistent Explore control: visible even in the collapsed rail. */
+      .sidebar-explore-btn{width:100%;min-height:38px;display:flex;align-items:center;justify-content:flex-start;gap:9px;padding:8px 12px;border:1px solid rgba(129,140,248,.28);border-radius:var(--radius-md);color:var(--text-primary);background:linear-gradient(110deg,rgba(59,130,246,.13),rgba(168,85,247,.12));font:650 .82rem var(--font-sans);cursor:pointer;transition:background .18s ease,border-color .18s ease,transform .18s ease}
+      .sidebar-explore-btn:hover{border-color:rgba(167,139,250,.65);background:linear-gradient(110deg,rgba(59,130,246,.22),rgba(168,85,247,.2));transform:translateY(-1px)}
+      .sidebar-explore-btn svg{flex:0 0 auto}
+      .sidebar-section-label{padding:8px 16px 2px;color:var(--text-muted);font-size:.68rem;font-weight:750;letter-spacing:.1em;text-transform:uppercase}
+      #appShell.sidebar-collapsed .sidebar-top-actions{align-items:center;padding-inline:6px}
+      #appShell.sidebar-collapsed .sidebar-explore-btn{min-height:52px;flex-direction:column;justify-content:center;gap:3px;padding:5px 1px;font-size:9px;letter-spacing:-.02em}
+      #appShell.sidebar-collapsed .sidebar-explore-btn span{display:block}
+      #appShell.sidebar-collapsed .sidebar-explore-btn svg{width:19px;height:19px}
+      #sidebarExploreBtn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 </style>
   </head>
 
@@ -3238,6 +3249,11 @@ svg[data-rw-motion="generic"]:hover [data-rw-part="stroke"],button:hover svg[dat
               <span class="hide-on-collapse">New Chat</span>
             </span>
             <kbd class="kbd-badge hide-on-collapse">Ctrl+K</kbd>
+          </button>
+
+          <button id="sidebarExploreBtn" type="button" class="sidebar-explore-btn" aria-label="Explore chats and expand the sidebar" aria-expanded="false" title="Explore — expand chats, search, and tools">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M11 7v8M7 11h8"/></svg>
+            <span>Explore</span>
           </button>
 
           <div class="sidebar-search-wrap hide-on-collapse">
@@ -3530,6 +3546,7 @@ svg[data-rw-motion="generic"]:hover [data-rw-part="stroke"],button:hover svg[dat
         </div>
 
         <!-- Conversation History List -->
+        <div class="sidebar-section-label hide-on-collapse">Your chats</div>
         <div
           id="chatHistoryList"
           class="sidebar-history hide-on-collapse"
@@ -6188,6 +6205,21 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         // Sidebar collapse and mobile navigation.
         $("#sidebarCollapseBtn")?.addEventListener("click", () => {
           $("#appShell")?.classList.toggle("sidebar-collapsed");
+          $("#sidebarExploreBtn")?.setAttribute("aria-expanded", String(!$("#appShell")?.classList.contains("sidebar-collapsed")));
+        });
+
+        $("#sidebarExploreBtn")?.addEventListener("click", () => {
+          const shell = $("#appShell");
+          if (!shell) return;
+          shell.classList.remove("sidebar-collapsed");
+          $("#sidebarExploreBtn")?.setAttribute("aria-expanded", "true");
+          $("#sidebarExploreBtn")?.setAttribute("title", "Sidebar expanded — your chats and tools are visible");
+          const search = $("#sidebarSearchInput");
+          if (search) {
+            search.focus({ preventScroll: true });
+            search.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          }
+          $("#chatHistoryList")?.scrollTo({ top: 0, behavior: "smooth" });
         });
 
         function closeMobileSidebar() {
