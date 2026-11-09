@@ -55,6 +55,11 @@
       referrerpolicy="no-referrer"
     ></script>
 
+    <!-- Optional local document parsers; text fallback remains available if a CDN is offline. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <style>
       /* ==========================================================================
        1. DESIGN TOKENS & CSS CUSTOM PROPERTIES
@@ -3933,7 +3938,7 @@ svg[data-rw-motion="generic"]:hover path,svg[data-rw-motion="generic"]:hover cir
                     type="file"
                     class="hidden"
                     multiple
-                    accept=".txt,.md,.json,.js,.ts,.py,.html,.css,image/png,image/jpeg"
+                    accept="*/*"
                   />
                   <textarea
                     id="composerInput"
@@ -6398,6 +6403,45 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           });
         }
 
+
+/* RAINBOW_FILE_INTELLIGENCE_V1 — shared local format detection and extraction. */
+(function(){
+ "use strict";
+ const textExt=new Set("txt md markdown csv tsv json jsonl xml html htm css js mjs cjs ts tsx jsx py ipynb java c h cpp hpp cs go rs php rb swift kt sql sh bash ps1 bat cmd yaml yml toml ini conf log rtf svg tex rst".split(" "));
+ const extOf=n=>(String(n||"").split(".").pop()||"").toLowerCase();
+ const limit=t=>String(t||"").slice(0,180000);
+ async function extract(file){
+  if(!file)throw new Error("No file selected.");
+  if(file.size>25*1024*1024)throw new Error("File exceeds Rainbow's 25 MB local extraction limit.");
+  const ext=extOf(file.name),type=(file.type||"").toLowerCase(),meta={name:file.name,type:type||"unknown",size:file.size,extension:ext||"none",lastModified:file.lastModified||null};
+  if(textExt.has(ext)||type.startsWith("text/")||type==="application/json"){const raw=await file.text();return{text:limit(raw),meta,status:"extracted",note:raw.length>180000?"Text limited to 180,000 characters.":""};}
+  if(ext==="pdf"||type==="application/pdf"){
+   if(!window.pdfjsLib)throw new Error("PDF parser unavailable; check your connection.");
+   pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+   const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise,parts=[];
+   for(let n=1;n<=Math.min(pdf.numPages,120);n++){const page=await pdf.getPage(n),data=await page.getTextContent();parts.push("[Page "+n+"] "+data.items.map(x=>x.str).join(" "));}
+   return{text:limit(parts.join("\n\n")),meta,status:"extracted",note:pdf.numPages>120?"First 120 pages extracted.":""};
+  }
+  if(ext==="docx"||type.includes("wordprocessingml")){
+   if(!window.mammoth)throw new Error("DOCX parser unavailable; check your connection.");
+   const out=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()});return{text:limit(out.value),meta,status:"extracted",note:out.messages?.map(x=>x.message).join("; ")||""};
+  }
+  if(["xlsx","xls","xlsm","ods"].includes(ext)||type.includes("spreadsheet")){
+   if(!window.XLSX)throw new Error("Spreadsheet parser unavailable; check your connection.");
+   const wb=XLSX.read(await file.arrayBuffer(),{type:"array"}),parts=wb.SheetNames.slice(0,30).map(n=>"[Sheet: "+n+"]\n"+XLSX.utils.sheet_to_csv(wb.Sheets[n]));
+   return{text:limit(parts.join("\n\n")),meta,status:"extracted",note:wb.SheetNames.length>30?"First 30 sheets extracted.":""};
+  }
+  if(["png","jpg","jpeg","gif","webp","bmp","avif","heic","heif","tif","tiff"].includes(ext)||type.startsWith("image/")){
+   let dimensions="";if(type.startsWith("image/")&&"createImageBitmap"in window){try{const b=await createImageBitmap(file);dimensions=b.width+" × "+b.height;b.close();}catch(e){}}
+   return{text:"",meta:{...meta,dimensions},status:"metadata-only",note:"Image accepted. The current chat gateway is text-only; image pixels are not sent to the model."};
+  }
+  if(["mp3","wav","m4a","aac","ogg","flac","mp4","mov","webm","mkv"].includes(ext)||type.startsWith("audio/")||type.startsWith("video/"))
+   return{text:"",meta,status:"metadata-only",note:"Media accepted and identified. Transcription and video understanding need a media backend that is not connected yet."};
+  return{text:"",meta,status:"metadata-only",note:"File accepted and identified; no safe content extractor is available for this format yet."};
+ }
+ window.RainbowFileIntelligence={extract,version:1};
+})();
+
         // Functional handlers for controls that previously had no action.
         // File attachments: read text-based files locally and add their contents to the composer.
         $("#attachFileBtn")?.addEventListener("click", () => {
@@ -6407,26 +6451,25 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
             picker.id = "rainbowAttachmentPicker";
             picker.type = "file";
             picker.multiple = true;
-            picker.accept = ".txt,.md,.csv,.json,.html,.css,.js,.py,.xml,.yaml,.yml,.log";
+            picker.accept = "*/*";
             picker.hidden = true;
             document.body.appendChild(picker);
             picker.addEventListener("change", async () => {
               const files = Array.from(picker.files || []);
               if (!files.length) return;
               const parts = [];
+              let readable=0,metadataOnly=0;
               for (const file of files) {
-                if (file.size > 1024 * 1024) {
-                  notify(file.name + " is larger than 1 MB and was skipped.");
-                  continue;
-                }
-                try { const content=await file.text();indexRainbowText(file.name,content);parts.push("\n\n[Attached file indexed locally: "+file.name+". Relevant passages will be retrieved for your question.]"); }
-                catch { notify("Could not read " + file.name + "."); }
+                try {
+                  const result=await window.RainbowFileIntelligence.extract(file);
+                  if(result.text){indexRainbowText(file.name,result.text);parts.push("\\n\\n[Attached file indexed locally: "+file.name+". Extracted text is available for relevant passage retrieval.]");readable++;}
+                  else{metadataOnly++;parts.push("\\n\\n[File selected: "+file.name+" ("+result.meta.type+", "+file.size+" bytes). "+result.note+"]");}
+                }catch(error){notify(file.name+": "+(error?.message||"could not be processed"));}
               }
-              if (el.input && parts.length) {
-                el.input.value = (el.input.value ? el.input.value + "\n\n" : "") + parts.join("");
-                el.input.dispatchEvent(new Event("input", { bubbles: true }));
-                el.input.focus();
-                notify(files.length + " file(s) added to the message.");
+              if(el.input&&parts.length){
+                el.input.value=(el.input.value?el.input.value+"\\n\\n":"")+parts.join("");
+                el.input.dispatchEvent(new Event("input",{bubbles:true}));el.input.focus();
+                notify(readable+" file(s) indexed; "+metadataOnly+" accepted as metadata only.");
               }
               picker.value = "";
             });
@@ -6976,14 +7019,14 @@ document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=
     content.querySelector("#rw2Export").onclick=()=>{const blob=new Blob([JSON.stringify({question:state.question,criteria:state.criteria,options:state.options,weightedScores:ranked.map(o=>({name:o.name,score:Number(score(o).toFixed(3))}))},null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="rainbow-decision.json";a.click();URL.revokeObjectURL(a.href);};
   }
   function renderDebate(){content.innerHTML='<div class="rw2-card"><h3>Multi-AI Debate</h3><p class="rw2-muted">A structured debate needs multiple model endpoints and an orchestration backend. That service is not connected in this deployment, so this panel will not invent participants or fabricate a debate.</p><div class="rw2-field"><label for="rw2DebateTopic">Debate topic</label><textarea id="rw2DebateTopic" placeholder="Enter a question or proposition to debate"></textarea></div><div class="rw2-status"><strong>Backend dependency:</strong> multi-model routing, independent responses, rebuttal rounds, and a cited synthesis endpoint are not yet available. Your draft stays in this browser.</div></div>';}
-  function renderDocuments(){content.innerHTML='<div class="rw2-grid"><div class="rw2-card"><h3>Document Intelligence</h3><p class="rw2-muted">Load text-based files or paste content for local inspection. This prototype does not claim AI summarization or parse binary PDF/DOCX files.</p><label class="rw2-field">Choose TXT, MD, CSV or JSON<input id="rw2File" type="file" accept=".txt,.md,.csv,.json,text/plain,text/markdown,text/csv,application/json"></label><label class="rw2-field">Or paste document text<textarea id="rw2DocText" placeholder="Paste text to inspect…"></textarea></label><button class="rw2-action primary" id="rw2Inspect">Inspect locally</button></div><div class="rw2-card"><h3>Inspection report</h3><div id="rw2DocReport" class="rw2-muted">No document loaded yet.</div></div></div>';}
+  function renderDocuments(){content.innerHTML='<div class="rw2-grid"><div class="rw2-card"><h3>Document Intelligence</h3><p class="rw2-muted">Load text-based files or paste content for local inspection. This prototype does not claim AI summarization or parse binary PDF/DOCX files.</p><label class="rw2-field">Choose TXT, MD, CSV or JSON<input id="rw2File" type="file" accept="*/*"></label><label class="rw2-field">Or paste document text<textarea id="rw2DocText" placeholder="Paste text to inspect…"></textarea></label><button class="rw2-action primary" id="rw2Inspect">Inspect locally</button></div><div class="rw2-card"><h3>Inspection report</h3><div id="rw2DocReport" class="rw2-muted">No document loaded yet.</div></div></div>';}
   function inspect(textValue){const words=textValue.trim()?textValue.trim().split(/\s+/).length:0,lines=textValue?textValue.split(/\r?\n/).length:0,chars=textValue.length;const terms=(textValue.toLowerCase().match(/[a-z][a-z0-9-]{3,}/g)||[]).reduce((m,w)=>(m[w]=(m[w]||0)+1,m),{});const top=Object.entries(terms).sort((a,b)=>b[1]-a[1]).slice(0,8);content.querySelector("#rw2DocReport").innerHTML='<div class="rw2-result">'+words.toLocaleString()+' words</div><p>'+chars.toLocaleString()+' characters · '+lines.toLocaleString()+' lines</p><strong>Frequent terms</strong><p>'+esc(top.map(x=>x[0]+' ('+x[1]+')').join(" · ")||"No recurring terms detected")+'</p><p class="rw2-muted">Local text statistics only. No external source verification or semantic summary was performed.</p>';}
   function render(tab){backdrop.querySelectorAll("[data-tab]").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));if(tab==="decision")renderDecision();else if(tab==="debate")renderDebate();else renderDocuments();}
   function open(tab="decision"){backdrop.classList.add("open");render(tab);}
   function close(){backdrop.classList.remove("open");}
   backdrop.addEventListener("click",e=>{if(e.target===backdrop||e.target.closest("[data-close]"))close();});
   backdrop.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>render(b.dataset.tab)));
-  backdrop.addEventListener("change",async e=>{if(e.target.id==="rw2File"&&e.target.files?.[0]){const file=e.target.files[0];if(file.size>2*1024*1024){content.querySelector("#rw2DocReport").textContent="File exceeds the 2 MB local inspection limit.";return;}const textValue=await file.text();content.querySelector("#rw2DocText").value=textValue;inspect(textValue);}});
+  backdrop.addEventListener("change",async e=>{if(e.target.id==="rw2File"&&e.target.files?.[0]){const file=e.target.files[0],report=content.querySelector("#rw2DocReport");report.textContent="Inspecting "+file.name+"…";try{const result=await window.RainbowFileIntelligence.extract(file);if(result.text){content.querySelector("#rw2DocText").value=result.text;inspect(result.text);if(result.note){const note=document.createElement("p");note.className="rw2-muted";note.textContent=result.note;report.appendChild(note);}}else{report.textContent=result.note+" File: "+result.meta.name+" · "+result.meta.type+" · "+result.meta.size.toLocaleString()+" bytes";}}catch(error){report.textContent=error.message||"This file could not be extracted.";}}});
   backdrop.addEventListener("click",e=>{if(e.target.id==="rw2Inspect")inspect(content.querySelector("#rw2DocText").value);});
   document.getElementById("decisionLabSidebarBtn")?.addEventListener("click",()=>open());
   document.addEventListener("keydown",e=>{if(e.key==="Escape"&&backdrop.classList.contains("open"))close();});
