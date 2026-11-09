@@ -78,3 +78,15 @@ A local server is recommended over opening files directly with `file://`, especi
 ## Branding
 
 The root folder contains the shared Rainbow SVG logo/favicon assets and the workspace icon. Keep these asset paths intact when moving or deploying the pages.
+
+## Rainbow AI assistance across the ecosystem
+
+The shared ecosystem script adds page-aware AI actions:
+
+- **Language Book:** explain the current question, generate a step-by-step tutorial from visible lesson content, create practice questions with an answer key, and explain selected text.
+- **Calculator:** request a worked solution for the current expression or generate similar practice problems.
+- **Homepage:** ask Rainbow AI to recommend a learning/building path through the available tools.
+- **AI handoff:** actions prepare a contextual prompt in the main workspace composer; the user reviews and sends it. A working model backend is still required for generated answers.
+- **Workspace navigation:** the Explore button expands the collapsed sidebar and exposes chat search/history and module navigation.
+
+AI-generated tutorials and answers are produced only when the main Rainbow model gateway is online. The existing local lessons and calculator continue to work independently.
