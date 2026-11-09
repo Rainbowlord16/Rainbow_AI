@@ -11,6 +11,8 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="./rainbow-ecosystem.css" />
+    <script src="./rainbow-ecosystem.js" defer></script>
     <style>
       /* ===== RESET ===== */
       * {
@@ -426,16 +428,17 @@
         }
       }
       @media (max-width: 500px) {
-        body {
-          padding: 16px;
-        }
-        .calculator {
-          padding: 16px;
-        }
-        button {
-          height: 54px;
-        }
+        body { padding: 88px 12px 18px; }
+        .calculator { padding: 16px; }
+        button { height: 54px; }
       }
+      body { min-height: 100svh; overflow-x: hidden; overflow-y: auto; padding-top: 82px; }
+      .calculator { margin: auto; }
+      #display { width: 100%; min-width: 0; }
+      .buttons button { min-width: 0; touch-action: manipulation; }
+      .history-entry { padding: 3px 0; border-bottom: 1px solid rgba(148,163,184,.12); overflow-wrap: anywhere; }
+      @media (max-width: 720px) { body { padding: 78px 12px 20px; } #word-popup { display: none; } .calculator { width: min(450px,100%); } }
+      @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
     </style>
   </head>
   <body>
@@ -499,7 +502,30 @@
       const wordContent = document.getElementById("word-content");
 
       let mem = 0;
-      let isDark = false;
+      let isDark = localStorage.getItem("rainbow-calculator-theme") === "dark";
+      if (isDark) document.body.classList.add("dark");
+      const HISTORY_KEY = "rainbow-calculator-history-v1";
+      function saveHistory() {
+        try { localStorage.setItem(HISTORY_KEY, JSON.stringify(Array.from(h.children).slice(-30).map(node => node.textContent))); } catch (_) {}
+      }
+      function loadHistory() {
+        try {
+          const entries = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+          if (!Array.isArray(entries)) return;
+          entries.slice(-30).forEach(value => { const row=document.createElement("div"); row.className="history-entry"; row.textContent=String(value); h.appendChild(row); });
+        } catch (_) { localStorage.removeItem(HISTORY_KEY); }
+      }
+      function evaluateExpression(source) {
+        const input=String(source).replace(/[×]/g,"*").replace(/[÷]/g,"/");
+        const tokens=[]; const re=/\s*(?:(\d+(?:\.\d*)?|\.\d+)|([()+\-*/^]))\s*/gy; let at=0;
+        while(at<input.length){re.lastIndex=at;const m=re.exec(input);if(!m)throw new Error("Unsupported character");tokens.push(m[1]!==undefined?{type:"number",value:Number(m[1])}:{type:m[2],value:m[2]});at=re.lastIndex;}
+        let i=0;
+        const primary=()=>{const t=tokens[i];if(!t)throw new Error("Incomplete expression");if(t.type==="+"){i++;return primary();}if(t.type==="-"){i++;return -primary();}if(t.type==="number"){i++;return t.value;}if(t.type==="("){i++;const v=expression();if(tokens[i]?.type!==")")throw new Error("Missing closing parenthesis");i++;return v;}throw new Error("Expected a number");};
+        const power=()=>{let v=primary();if(tokens[i]?.type==="^"){i++;v=Math.pow(v,power());}return v;};
+        const term=()=>{let v=power();while(tokens[i]&&["*","/"].includes(tokens[i].type)){const op=tokens[i++].type;const r=power();v=op==="*"?v*r:v/r;}return v;};
+        const expression=()=>{let v=term();while(tokens[i]&&["+","-"].includes(tokens[i].type)){const op=tokens[i++].type;const r=term();v=op==="+"?v+r:v-r;}return v;};
+        if(!tokens.length)throw new Error("Empty expression");const result=expression();if(i!==tokens.length)throw new Error("Unexpected token");if(!Number.isFinite(result))throw new Error("Result is not finite");return result;
+      }
 
       // =========================
       // Display Update Helper
@@ -513,6 +539,7 @@
       // Basic Input Functions
       // =========================
       function append(v) {
+        if (!/^[0-9.+\-*/()]$/.test(String(v))) return;
         d.value = d.value === "0" || d.value === "Error" ? v : d.value + v;
 
         updateDisplayState();
@@ -536,14 +563,15 @@
         try {
           const exp = d.value;
 
-          const safeExp = exp.replace(/×/g, "*").replace(/÷/g, "/");
-
-          const result = Function('"use strict"; return (' + safeExp + ")")();
-
-          h.innerHTML += `<div>${exp} = ${result}</div>`;
+          const result = evaluateExpression(exp);
+          const row = document.createElement("div");
+          row.className = "history-entry";
+          row.textContent = `${exp} = ${result}`;
+          h.appendChild(row);
+          while (h.children.length > 30) h.firstElementChild.remove();
+          saveHistory();
           h.scrollTop = h.scrollHeight;
-
-          d.value = result;
+          d.value = String(result);
           updateDisplayState();
         } catch {
           d.value = "Error";
@@ -555,32 +583,28 @@
       // Utility Operations
       // =========================
       function percentage() {
-        d.value = parseFloat(d.value) / 100;
-        updateDisplayState();
+        try { d.value = String(evaluateExpression(d.value) / 100); updateDisplayState(); }
+        catch (_) { d.value = "Error"; updateDisplayState(); }
       }
 
       function toggleSign() {
-        let n = parseFloat(d.value);
-
-        if (!isNaN(n)) {
-          d.value = -n;
-        }
-
+        try { d.value = String(-evaluateExpression(d.value)); }
+        catch (_) { d.value = "Error"; }
         updateDisplayState();
       }
 
       function square() {
-        d.value = Math.pow(Number(d.value), 2);
+        try { d.value = String(Math.pow(evaluateExpression(d.value), 2)); } catch (_) { d.value = "Error"; }
         updateDisplayState();
       }
 
       function cube() {
-        d.value = Math.pow(Number(d.value), 3);
+        try { d.value = String(Math.pow(evaluateExpression(d.value), 3)); } catch (_) { d.value = "Error"; }
         updateDisplayState();
       }
 
       function sqrtFn() {
-        d.value = Math.sqrt(Number(d.value));
+        try { const n=evaluateExpression(d.value); if(n<0) throw new Error("Negative square root"); d.value = String(Math.sqrt(n)); } catch (_) { d.value = "Error"; }
         updateDisplayState();
       }
 
@@ -593,9 +617,8 @@
       // Scientific Functions
       // =========================
       function scientific(type) {
-        let n = Number(d.value);
-
-        if (isNaN(n)) return;
+        let n;
+        try { n = evaluateExpression(d.value); } catch (_) { d.value = "Error"; updateDisplayState(); return; }
 
         if (type === "sin") d.value = Math.sin(n);
         if (type === "cos") d.value = Math.cos(n);
@@ -630,6 +653,7 @@
       function toggleTheme() {
         isDark = !isDark;
         document.body.classList.toggle("dark", isDark);
+        try { localStorage.setItem("rainbow-calculator-theme", isDark ? "dark" : "light"); } catch (_) {}
       }
 
       // =========================
@@ -814,6 +838,7 @@
       });
 
       // Initial load
+      loadHistory();
       updateDisplayState();
     </script>
   </body>
