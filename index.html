@@ -6528,8 +6528,11 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         });
         closeMobileSidebar();
         $("#sidebarBackdrop")?.addEventListener("click", () => closeMobileSidebar({ restoreFocus: true }));
+        let mobileNavViewport = window.innerWidth <= 768;
         window.addEventListener("resize", () => {
-          if (window.innerWidth > 768) closeMobileSidebar();
+          const nextMobileViewport = window.innerWidth <= 768;
+          if (nextMobileViewport !== mobileNavViewport || !nextMobileViewport) closeMobileSidebar();
+          mobileNavViewport = nextMobileViewport;
         }, { passive: true });
         $("#sidebar")?.addEventListener("click", event => {
           if (window.innerWidth > 768 || !$("#appShell")?.classList.contains("mobile-sidebar-open")) return;
