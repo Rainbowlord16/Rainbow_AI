@@ -9166,34 +9166,43 @@ body { overflow: hidden; }
   overflow-wrap: anywhere;
   word-break: normal;
 }
+/* Welcome content: preserve comfortable typography; contain width, not text height. */
 #appShell :where(.starter-card) {
+  min-width: 0;
   min-height: 0;
-  max-height: 148px;
-  padding: 12px 14px;
-  overflow: hidden;
+  height: auto;
+  max-height: none;
+  padding: 13px 14px;
+  overflow: visible;
   align-items: flex-start;
+  gap: 8px;
 }
 #appShell :where(.starter-card-title) {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  line-height: 1.4;
+  display: block;
+  max-width: 100%;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  line-height: 1.45;
+  letter-spacing: normal;
 }
 #appShell :where(.starter-card-desc) {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  line-height: 1.5;
+  display: block;
+  max-width: 100%;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  line-height: 1.55;
+  letter-spacing: normal;
 }
 #appShell :where(.capability-chip) {
-  min-height: 36px;
-  max-height: 64px;
-  padding: 8px 10px;
+  min-width: 0;
+  min-height: 40px;
+  max-height: none;
+  height: auto;
+  padding: 9px 10px;
   line-height: 1.4;
-  overflow: hidden;
+  overflow: visible;
   text-align: center;
+  letter-spacing: normal;
 }
 #appShell :where(.message-action-btn, .composer-tool-btn, .canvas-toolbar button) {
   min-height: 36px;
@@ -9246,13 +9255,14 @@ body { overflow: hidden; }
     padding-block: 7px;
   }
   #appShell :where(.starter-card) {
-    max-height: 132px;
-    padding: 10px 12px;
+    max-height: none;
+    padding: 11px 12px;
+    gap: 7px;
   }
   #appShell :where(.capability-chip) {
-    min-height: 34px;
-    max-height: 54px;
-    padding: 7px 8px;
+    min-height: 38px;
+    max-height: none;
+    padding: 8px 9px;
   }
   .canvas-toolbar {
     max-height: min(22vh, 112px);
@@ -9265,8 +9275,8 @@ body { overflow: hidden; }
   }
 }
 @media (max-width: 380px) {
-  #appShell :where(.starter-card) { max-height: 120px; padding: 9px 10px; }
-  #appShell :where(.capability-chip) { max-height: 50px; font-size: .76rem; }
+  #appShell :where(.starter-card) { max-height: none; padding: 10px; }
+  #appShell :where(.capability-chip) { max-height: none; font-size: .78rem; }
 }
 
 </style>
