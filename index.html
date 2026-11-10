@@ -5719,9 +5719,7 @@ svg[data-rw-motion="shield"]:hover [data-rw-part="shield"],button:hover svg[data
         "use strict";
 
         const $ = (selector, root = document) => root.querySelector(selector);
-        const $ = (selector, root = document) => [
-          ...root.querySelectorAll(selector),
-        ];
+        const $ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
         const MODEL = "Rainbow-AI-Unified-12B";
         const DEFAULT_GATEWAY = "https://treatment-excluding-terrain-antibodies.trycloudflare.com";
@@ -6154,20 +6152,7 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
             const label=document.createElement("span");label.className="message-author";label.textContent=message.role==="user"?"You":"Rainbow AI";header.appendChild(label);
             const bubble=document.createElement("div");bubble.className="message-bubble";const content=document.createElement("div");content.className="message-content";
             if(message.role==="assistant"&&typeof window.marked?.parse==="function"&&typeof window.DOMPurify?.sanitize==="function")content.innerHTML=window.DOMPurify.sanitize(window.marked.parse(String(message.content||"")));else content.textContent=String(message.content||"");
-            content.querySelectorAll("pre code.language-mermaid").forEach(code=>{const pre=code.closest("pre");if(!pre||pre.parentElement.dataset.diagramReady)return;pre.parentElement.dataset.diagramReady="1";const button=document.createElement("button");button.type="button";button.className="message-action-btn";button.textContent="Render diagram";button.addEventListener("click",()=>{const frame=document.createElement("iframe");frame.title="Mermaid diagram preview";frame.setAttribute("sandbox","allow-scripts");frame.style.cssText="width:100%;min-height:260px;border:1px solid var(--border-default);border-radius:10px;background:white;margin-top:8px";const encoded=encodeURIComponent(code.textContent||"");frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></scr'+'ipt></head><body><pre class="mermaid" id="diagram"></pre><script>mermaid.initialize({startOnLoad:false,securityLevel:"strict"});document.getElementById("diagram").textContent=decodeURIComponent("'+encoded+'");mermaid.run();</scr'+'ipt><style id="rw-brand-hover-visibility-fix">
-#appShell:not(.sidebar-collapsed) .sidebar-header #brandHomeBtn:hover .brand-icon .brand-logo-image,
-#appShell:not(.sidebar-collapsed) .sidebar-header #brandHomeBtn:focus-visible .brand-icon .brand-logo-image,
-#appShell.sidebar-collapsed .sidebar-header #brandHomeBtn:hover .brand-icon .brand-logo-image,
-#appShell.sidebar-collapsed .sidebar-header #brandHomeBtn:focus-visible .brand-icon .brand-logo-image{display:none!important;opacity:0!important;transform:scale(.78)}
-#appShell:not(.sidebar-collapsed) .sidebar-header #brandHomeBtn:hover .brand-icon .brand-collapse-glyph,
-#appShell:not(.sidebar-collapsed) .sidebar-header #brandHomeBtn:focus-visible .brand-icon .brand-collapse-glyph,
-#appShell.sidebar-collapsed .sidebar-header #brandHomeBtn:hover .brand-icon .brand-collapse-glyph,
-#appShell.sidebar-collapsed .sidebar-header #brandHomeBtn:focus-visible .brand-icon .brand-collapse-glyph{display:block!important;opacity:1!important;visibility:visible!important;transform:scale(1)}
-#brandHomeBtn .brand-icon .brand-collapse-glyph{position:absolute;inset:5px;width:22px;height:22px;color:var(--text-primary,#f8fafc);pointer-events:none;transition:opacity .18s ease,transform .22s ease}
-#brandHomeBtn .brand-icon .brand-logo-image{transition:opacity .18s ease,transform .22s ease}
-.sidebar-header #sidebarCollapseBtn{display:none!important;visibility:hidden!important;pointer-events:none!important}
-@media(prefers-reduced-motion:reduce){#brandHomeBtn .brand-icon .brand-collapse-glyph,#brandHomeBtn .brand-icon .brand-logo-image{transition:none!important}}
-</style></body></html>';pre.parentElement.appendChild(frame);button.disabled=true;button.textContent="Diagram preview";});pre.parentElement.insertBefore(button,pre);});
+            content.querySelectorAll("pre code.language-mermaid").forEach(code=>{const pre=code.closest("pre");if(!pre||pre.parentElement.dataset.diagramReady)return;pre.parentElement.dataset.diagramReady="1";const button=document.createElement("button");button.type="button";button.className="message-action-btn";button.textContent="Render diagram";button.addEventListener("click",()=>{const frame=document.createElement("iframe");frame.title="Mermaid diagram preview";frame.setAttribute("sandbox","allow-scripts");frame.style.cssText="width:100%;min-height:260px;border:1px solid var(--border-default);border-radius:10px;background:white;margin-top:8px";const encoded=encodeURIComponent(code.textContent||"");frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></scr'+'ipt></head><body><pre class="mermaid" id="diagram"></pre><script>mermaid.initialize({startOnLoad:false,securityLevel:"strict"});document.getElementById("diagram").textContent=decodeURIComponent("'+encoded+'");mermaid.run();</scr'+'ipt></body></html>';pre.parentElement.appendChild(frame);button.disabled=true;button.textContent="Diagram preview";});pre.parentElement.insertBefore(button,pre);});
             content.querySelectorAll("pre code").forEach(code=>{const cls=code.className||"",match=cls.match(/language-([a-z0-9_+-]+)/i),lang=(match?.[1]||"").toLowerCase();if(!["html","javascript","js"].includes(lang))return;const pre=code.closest("pre");if(!pre||pre.parentElement.dataset.labReady)return;pre.parentElement.dataset.labReady="1";const run=document.createElement("button");run.type="button";run.className="message-action-btn";run.textContent="Run in sandbox";run.addEventListener("click",()=>{const frame=document.createElement("iframe");frame.title="Sandboxed code preview";frame.setAttribute("sandbox","allow-scripts");frame.style.cssText="width:100%;height:280px;border:1px solid var(--border-default);border-radius:10px;background:white;margin-top:8px";const source=code.textContent||"";frame.srcdoc=lang==="html"?source:"<!doctype html><html><body><pre id='out'></pre><script>const old=console.log;console.log=(...a)=>{document.getElementById('out').textContent+=a.join(' ')+String.fromCharCode(10);old(...a)};</scr"+"ipt><script>"+source.split("<"+"/"+"script").join("<"+String.fromCharCode(92)+"/script")+"</scr"+"ipt></body></html>";pre.parentElement.appendChild(frame);run.disabled=true;run.textContent="Preview running";});pre.parentElement.insertBefore(run,pre);});
             bubble.appendChild(content);
             const actions=document.createElement("div");actions.className="message-actions";            const branchBtn=document.createElement("button");branchBtn.type="button";branchBtn.className="message-action-btn";branchBtn.textContent="Branch";branchBtn.title="Create a new conversation from this turn";branchBtn.addEventListener("click",()=>{const idx=conversation.messages.indexOf(message);if(idx<0)return;const fork={...conversation,id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random(),title:(conversation.title||"Chat")+" — Branch",messages:conversation.messages.slice(0,idx+1).map(m=>({...m})),pinned:false,createdAt:Date.now(),branchOf:conversation.id};state.conversations.unshift(fork);state.activeId=fork.id;save();renderAll();notify("Branch created from this turn. The original chat is unchanged.");});actions.appendChild(branchBtn);const copy=document.createElement("button");copy.type="button";copy.className="message-action-btn";copy.textContent="Copy";copy.addEventListener("click",async()=>{try{await copyTextToClipboard(String(message.content||""));notify("Message copied.");}catch{notify("Clipboard access was blocked.");}});actions.appendChild(copy);
@@ -6549,7 +6534,7 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
 
         // New chat and brand logo
         $("#newChatBtn")?.addEventListener("click", newConversation);
-        $("#brandHomeBtn")?.addEventListener("click", () => { if(window.innerWidth<=768){ $("#mobileMenuBtn")?.click(); return; } $("#sidebarCollapseBtn")?.click(); });
+        $("#brandHomeBtn")?.addEventListener("click", () => { if(window.innerWidth<=768){ $("#mobileMenuBtn")?.click(); return; } const shell=$("#appShell"); if(!shell)return; shell.classList.toggle("sidebar-collapsed"); $("#sidebarExploreBtn")?.setAttribute("aria-expanded",String(!shell.classList.contains("sidebar-collapsed"))); });
 
         // Send with Enter; Shift+Enter inserts a newline.
         el.input?.addEventListener("keydown", (event) => {
@@ -8295,5 +8280,18 @@ svg[data-rw-motion-ready="1"][data-rw-animation="rw-icon-ink-reveal"]{--rw-motio
 @keyframes rw-icon-alert-pop{0%,100%{transform:scale(1)}35%{transform:scale(1.15) rotate(-7deg)}65%{transform:scale(1.08) rotate(7deg)}}
 @keyframes rw-icon-ink-reveal{0%{transform:scale(.92);filter:brightness(1)}55%{transform:scale(1.1);filter:brightness(1.35)}100%{transform:scale(1);filter:brightness(1)}}
 @media(prefers-reduced-motion:reduce){svg[data-rw-motion-ready="1"]{animation:none!important;transition:none!important}}
+</style><style id="rw-brand-hover-visibility-fix">
+#appShell:not(.sidebar-collapsed) .sidebar-header #brandHomeBtn:hover .brand-icon .brand-logo-image,
+#appShell:not(.sidebar-collapsed) .sidebar-header #brandHomeBtn:focus-visible .brand-icon .brand-logo-image,
+#appShell.sidebar-collapsed .sidebar-header #brandHomeBtn:hover .brand-icon .brand-logo-image,
+#appShell.sidebar-collapsed .sidebar-header #brandHomeBtn:focus-visible .brand-icon .brand-logo-image{display:none!important;opacity:0!important;transform:scale(.78)}
+#appShell:not(.sidebar-collapsed) .sidebar-header #brandHomeBtn:hover .brand-icon .brand-collapse-glyph,
+#appShell:not(.sidebar-collapsed) .sidebar-header #brandHomeBtn:focus-visible .brand-icon .brand-collapse-glyph,
+#appShell.sidebar-collapsed .sidebar-header #brandHomeBtn:hover .brand-icon .brand-collapse-glyph,
+#appShell.sidebar-collapsed .sidebar-header #brandHomeBtn:focus-visible .brand-icon .brand-collapse-glyph{display:block!important;opacity:1!important;visibility:visible!important;transform:scale(1)}
+#brandHomeBtn .brand-icon .brand-collapse-glyph{position:absolute;inset:5px;width:22px;height:22px;color:var(--text-primary,#f8fafc);pointer-events:none;transition:opacity .18s ease,transform .22s ease}
+#brandHomeBtn .brand-icon .brand-logo-image{transition:opacity .18s ease,transform .22s ease}
+.sidebar-header #sidebarCollapseBtn{display:none!important;visibility:hidden!important;pointer-events:none!important}
+@media(prefers-reduced-motion:reduce){#brandHomeBtn .brand-icon .brand-collapse-glyph,#brandHomeBtn .brand-icon .brand-logo-image{transition:none!important}}
 </style></body>
 </html>
