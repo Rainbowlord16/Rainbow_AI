@@ -6518,7 +6518,7 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
 
         // New chat and brand logo
         $("#newChatBtn")?.addEventListener("click", newConversation);
-        $("#brandHomeBtn")?.addEventListener("click", () => { const shell=$("#appShell"); if(window.innerWidth<=768){ $("#mobileMenuBtn")?.click(); return; } const collapsed=shell?.classList.toggle("sidebar-collapsed"); $("#sidebarExploreBtn")?.setAttribute("aria-expanded",String(!collapsed)); });
+        $("#brandHomeBtn")?.addEventListener("click", () => { if(window.innerWidth<=768){ $("#mobileMenuBtn")?.click(); return; } $("#sidebarCollapseBtn")?.click(); });
 
         // Send with Enter; Shift+Enter inserts a newline.
         el.input?.addEventListener("keydown", (event) => {
