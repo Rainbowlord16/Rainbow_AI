@@ -7578,15 +7578,15 @@ renderFlow();renderStories();renderTimer();
  const params=new URLSearchParams(location.search);
  if(params.has("rwWorkspaceChild")) document.body.classList.add("rw-workspace-child");
  const catalog=[
-  {id:"chat",label:"Rainbow AI Chat",url:()=>location.pathname+"?rwWorkspaceChild=1&rwInstance="+encodeURIComponent(makeId())},
-  {id:"language",label:"Language Book",url:()=> "./languagebook.html?rwWorkspaceChild=1&rwInstance="+encodeURIComponent(makeId())},
-  {id:"calculator",label:"Calculator",url:()=> "./calculator.html?rwWorkspaceChild=1&rwInstance="+encodeURIComponent(makeId())},
-  {id:"hub",label:"Rainbow Hub",url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=rainbowHubSidebarBtn&rwInstance="+encodeURIComponent(makeId())},
-  {id:"agents",label:"Rainbow Agents",url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=rainbowAgentsSidebarBtn&rwInstance="+encodeURIComponent(makeId())},
-  {id:"truth",label:"TruthLens",url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=truthLensSidebarBtn&rwInstance="+encodeURIComponent(makeId())},
-  {id:"graph",label:"Knowledge Graph",url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=knowledgeGraphSidebarBtn&rwInstance="+encodeURIComponent(makeId())},
-  {id:"decision",label:"Decision Lab",url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=decisionLabSidebarBtn&rwInstance="+encodeURIComponent(makeId())},
-  {id:"prompts",label:"Prompt Studio",url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=openPromptStudioBtn&rwInstance="+encodeURIComponent(makeId())}
+  {id:"chat",label:"Rainbow AI Chat",path:()=>new URL(location.pathname,location.href).pathname,url:()=>location.pathname+"?rwWorkspaceChild=1&rwInstance="+encodeURIComponent(makeId())},
+  {id:"language",label:"Language Book",path:()=>new URL("./languagebook.html",location.href).pathname,url:()=> "./languagebook.html?rwWorkspaceChild=1&rwInstance="+encodeURIComponent(makeId())},
+  {id:"calculator",label:"Calculator",path:()=>new URL("./calculator.html",location.href).pathname,url:()=> "./calculator.html?rwWorkspaceChild=1&rwInstance="+encodeURIComponent(makeId())},
+  {id:"hub",label:"Rainbow Hub",openId:"rainbowHubSidebarBtn",path:()=>new URL(location.pathname,location.href).pathname,url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=rainbowHubSidebarBtn&rwInstance="+encodeURIComponent(makeId())},
+  {id:"agents",label:"Rainbow Agents",openId:"rainbowAgentsSidebarBtn",path:()=>new URL(location.pathname,location.href).pathname,url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=rainbowAgentsSidebarBtn&rwInstance="+encodeURIComponent(makeId())},
+  {id:"truth",label:"TruthLens",openId:"truthLensSidebarBtn",path:()=>new URL(location.pathname,location.href).pathname,url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=truthLensSidebarBtn&rwInstance="+encodeURIComponent(makeId())},
+  {id:"graph",label:"Knowledge Graph",openId:"knowledgeGraphSidebarBtn",path:()=>new URL(location.pathname,location.href).pathname,url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=knowledgeGraphSidebarBtn&rwInstance="+encodeURIComponent(makeId())},
+  {id:"decision",label:"Decision Lab",openId:"decisionLabSidebarBtn",path:()=>new URL(location.pathname,location.href).pathname,url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=decisionLabSidebarBtn&rwInstance="+encodeURIComponent(makeId())},
+  {id:"prompts",label:"Prompt Studio",openId:"openPromptStudioBtn",path:()=>new URL(location.pathname,location.href).pathname,url:()=>location.pathname+"?rwWorkspaceChild=1&rwOpen=openPromptStudioBtn&rwInstance="+encodeURIComponent(makeId())}
  ];
  function makeId(){return "rw"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
  if(params.has("rwWorkspaceChild")){
@@ -7600,7 +7600,8 @@ renderFlow();renderStories();renderTimer();
   const saved=JSON.parse(localStorage.getItem("rainbow.workspace.windows.v1")||"{}");
   if(saved&&["two","three","four","focus"].includes(saved.layout))state.layout=saved.layout;
   if(saved&&Array.isArray(saved.windows)){
-   state.windows=saved.windows.filter(w=>w&&typeof w.id==="string"&&catalog.some(c=>c.id===w.catalogId)&&typeof w.url==="string").slice(0,12).map(w=>({...w,label:String(w.label||catalog.find(c=>c.id===w.catalogId).label).slice(0,48),minimized:!!w.minimized}));
+   const seenIds=new Set();
+   state.windows=saved.windows.filter(w=>{if(!w||typeof w.id!=="string"||!/^[A-Za-z0-9_-]{1,64}$/.test(w.id)||seenIds.has(w.id)||typeof w.url!=="string")return false;const item=catalog.find(c=>c.id===w.catalogId);if(!item)return false;seenIds.add(w.id);return true;}).slice(0,12).map(w=>({...w,label:String(w.label||catalog.find(c=>c.id===w.catalogId).label).trim().slice(0,48)||catalog.find(c=>c.id===w.catalogId).label,minimized:!!w.minimized}));
    if(saved.active&&state.windows.some(w=>w.id===saved.active))state.active=saved.active;
   }
  }catch{state.windows=[];}
@@ -7618,7 +7619,7 @@ renderFlow();renderStories();renderTimer();
  function addWindow(item,restored){
   const win=restored||{id:makeId(),catalogId:item.id,label:item.label,url:item.url(),minimized:false};
   if(!restored)state.windows.push(win);
-  let safeUrl;try{safeUrl=new URL(win.url,location.href);if(!["http:","https:"].includes(safeUrl.protocol)||safeUrl.origin!==location.origin)throw new Error("Invalid workspace URL");}catch{state.windows=state.windows.filter(w=>w.id!==win.id);return;}
+  let safeUrl;try{const item=catalog.find(c=>c.id===win.catalogId);safeUrl=new URL(win.url,location.href);const queryKeys=Array.from(safeUrl.searchParams.keys());const instance=safeUrl.searchParams.get("rwInstance")||"";const validQuery=safeUrl.searchParams.get("rwWorkspaceChild")==="1"&&/^rw[a-z0-9]+$/i.test(instance)&&queryKeys.every(k=>["rwWorkspaceChild","rwInstance","rwOpen"].includes(k))&&(item.openId?safeUrl.searchParams.get("rwOpen")===item.openId:!safeUrl.searchParams.has("rwOpen"));if(!item||!["http:","https:"].includes(safeUrl.protocol)||safeUrl.origin!==location.origin||safeUrl.pathname!==item.path()||safeUrl.hash||!validQuery)throw new Error("Invalid workspace URL");}catch{state.windows=state.windows.filter(w=>w.id!==win.id);return;}
   win.url=safeUrl.href;
   const card=document.createElement("article");card.className="rw-window"+(win.minimized?" is-minimized":"");card.dataset.windowId=win.id;
   const head=document.createElement("div");head.className="rw-window-head";
