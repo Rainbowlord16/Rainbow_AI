@@ -6828,6 +6828,10 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
                 createdAt: Number.isFinite(c.createdAt) ? c.createdAt : Date.now()
               }));
             if (!normalized.length) throw new Error("The backup contains no valid conversations.");
+            // Imported lock state must be re-authenticated in this browser. Never
+            // carry unlock grants or an in-progress prompt edit across a full import.
+            state.unlockedIds.clear();
+            state.pendingEdit = null;
             state.conversations = normalized;
             state.activeId = normalized.some(c => c.id === imported.activeId) ? imported.activeId : normalized[0].id;
             if (["dark","midnight","light"].includes(imported.theme)) state.theme = imported.theme;
