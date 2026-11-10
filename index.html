@@ -8753,7 +8753,7 @@ body { overflow: hidden; }
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-areas: "left left" "model nova" "actions actions";
     gap: 8px;
-    padding: 9px max(10px, var(--rw-safe-left)) 9px max(10px, var(--rw-safe-right));
+    padding: 9px max(10px, var(--rw-safe-right)) 9px max(10px, var(--rw-safe-left));
   }
   .header-left { width: 100%; }
   .header-center { width: 100%; max-width: none; }
@@ -8907,7 +8907,7 @@ body { overflow: hidden; }
   .control-pill-select, .control-pill-select select { width: 100%; min-width: 0; max-width: 100%; }
   .chat-scroll-container { padding: 7px 6px 10px; }
   .chat-stream-inner { gap: 10px; }
-  .welcome-screen { display: flex !important; width: 100%; padding: 10px 2px; gap: 9px; }
+  .welcome-screen { width: 100%; padding: 10px 2px; gap: 9px; }
   .welcome-heading { font-size: 1.05rem; line-height: 1.2; }
   .welcome-subtext { font-size: .76rem; line-height: 1.4; padding-inline: 2px; }
   .welcome-prism-badge { width: 36px; height: 36px; }
@@ -8933,7 +8933,7 @@ body { overflow: hidden; }
     overflow-x: auto;
     gap: 3px;
   }
-  .composer-tools-left button, #attachFileBtn {
+  .composer-tools-left button, .composer-tools-left button:not(#attachFileBtn), #attachFileBtn {
     display: inline-flex !important;
     flex: 0 0 40px;
     width: 40px;
@@ -8944,6 +8944,7 @@ body { overflow: hidden; }
   }
   .composer-tool-btn > span { display: none !important; }
   .composer-tools-right { display: flex !important; flex: 0 0 auto; }
+  .composer-tools-right button:not(#sendMessageBtn):not(.hidden) { display: inline-flex !important; }
   #sendMessageBtn, .send-btn, .stop-btn {
     display: inline-flex !important;
     min-width: 40px;
