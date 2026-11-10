@@ -6992,9 +6992,16 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
   if(ext==="pdf"||type==="application/pdf"){
    if(!window.pdfjsLib)throw new Error("PDF parser unavailable; check your connection.");
    pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-   const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise,parts=[];
-   for(let n=1;n<=Math.min(pdf.numPages,120);n++){const page=await pdf.getPage(n),data=await page.getTextContent();parts.push("[Page "+n+"] "+data.items.map(x=>x.str).join(" "));}
-   return{text:limit(parts.join("\n\n")),meta,status:"extracted",note:pdf.numPages>120?"First 120 pages extracted.":""};
+   const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer(),maxImageSize:1024*1024}).promise,parts=[];
+   let extractedChars=0,pagesRead=0;
+   for(let n=1;n<=Math.min(pdf.numPages,120)&&extractedChars<180000;n++){
+    const page=await pdf.getPage(n),data=await page.getTextContent();
+    const pageText="[Page "+n+"] "+data.items.map(x=>x.str).join(" ");
+    const remaining=180000-extractedChars,chunk=pageText.slice(0,remaining);
+    parts.push(chunk);extractedChars+=chunk.length;pagesRead=n;
+    if(chunk.length<pageText.length)break;
+   }
+   return{text:parts.join("\n\n"),meta,status:"extracted",note:pdf.numPages>pagesRead?"Extracted the first "+pagesRead+" pages, up to the 180,000-character safety limit.":""};
   }
   if(ext==="docx"||type.includes("wordprocessingml")){
    if(!window.mammoth)throw new Error("DOCX parser unavailable; check your connection.");
