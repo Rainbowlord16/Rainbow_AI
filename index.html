@@ -6925,6 +6925,10 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         $("#privacyClearHistoryBtn")?.addEventListener("click", async () => {
           if (!await window.confirm("Delete all conversations from this browser? This cannot be undone.")) return;
           state.conversations = [];
+          state.unlockedIds.clear();
+          state.pendingEdit = null;
+          if (state.controller) state.controller.abort();
+          if (el.input) { el.input.value = ""; el.input.placeholder = "Message Rainbow AI… (Enter to send)"; }
           state.activeId = null;
           save(); newConversation(); closeModal("privacyModal");
           notify("Chat history deleted.");
