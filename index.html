@@ -3150,7 +3150,7 @@ svg[data-rw-motion="generic"]:hover [data-rw-part="stroke"],button:hover svg[dat
 #appShell.sidebar-collapsed .sidebar-top-actions #rwWorkspaceLauncher{min-height:52px;flex-direction:column;justify-content:center;gap:3px;padding:5px 1px;font-size:9px;letter-spacing:-.02em}
 #appShell.sidebar-collapsed .sidebar-top-actions #rwWorkspaceLauncher .rw-launch-icon{font-size:19px}
 #rwWorkspaceLauncher .rw-launch-icon{font-size:17px}
-#rwWorkspaceOverlay{position:fixed;z-index:1199;inset:0;background:rgba(3,6,16,.76);backdrop-filter:blur(12px);display:none;padding:76px 18px 18px;box-sizing:border-box}
+#rwWorkspaceOverlay{position:fixed;z-index:1199;inset:0;background:rgba(3,6,16,.76);backdrop-filter:blur(12px);display:none;padding:18px;box-sizing:border-box}
 #rwWorkspaceOverlay.open{display:flex;flex-direction:column}
 #rwWorkspacePanel{width:min(1500px,100%);height:100%;margin:0 auto;display:flex;flex-direction:column;min-height:0;border:1px solid #64748b55;border-radius:20px;overflow:hidden;background:var(--bg,#090a0f);box-shadow:0 24px 80px #0008}
 .rw-workspace-head{display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--panel,#11131a);border-bottom:1px solid #64748b33;flex-wrap:wrap}
@@ -7559,7 +7559,7 @@ renderFlow();renderStories();renderTimer();
  if(document.getElementById("rwWorkspaceLauncher"))return;
  const state={windows:[],layout:"two",active:null};
  try{const saved=JSON.parse(localStorage.getItem("rainbow.workspace.windows.v1")||"{}");if(saved&&["two","three","four","focus"].includes(saved.layout))state.layout=saved.layout;}catch{}
- const launcher=document.createElement("button");launcher.id="rwWorkspaceLauncher";launcher.type="button";launcher.innerHTML='<span class="rw-launch-icon" aria-hidden="true">▦</span><span>Workspace</span>';launcher.title="Open multi-window workspace";launcher.className="rw-sidebar-launcher";const launcherHost=document.querySelector(".sidebar-top-actions");if(launcherHost)launcherHost.append(launcher);else document.body.append(launcher);
+ const launcher=document.createElement("button");launcher.id="rwWorkspaceLauncher";launcher.type="button";launcher.innerHTML='<span class="rw-launch-icon" aria-hidden="true">▦</span><span>Workspace</span>';launcher.title="Open multi-window workspace";launcher.setAttribute("aria-label","Open Rainbow Workspace");launcher.setAttribute("aria-haspopup","dialog");launcher.className="rw-sidebar-launcher";const launcherHost=document.querySelector(".sidebar-top-actions");if(launcherHost)launcherHost.append(launcher);else document.body.append(launcher);
  const overlay=document.createElement("div");overlay.id="rwWorkspaceOverlay";overlay.dataset.layout=state.layout;overlay.innerHTML='<section id="rwWorkspacePanel" role="dialog" aria-modal="true" aria-label="Rainbow multi-window workspace"><header class="rw-workspace-head"><div class="rw-workspace-title">▦ Rainbow Workspace</div><div class="rw-workspace-controls"><button type="button" data-layout="two" aria-pressed="true">Split 2</button><button type="button" data-layout="three" aria-pressed="false">3 columns</button><button type="button" data-layout="four" aria-pressed="false">2 × 2</button><button type="button" data-layout="focus" aria-pressed="false">Focus</button><button type="button" data-action="close">Close workspace</button></div></header><nav class="rw-window-picker" aria-label="Open a workspace window"></nav><div class="rw-window-grid"><div class="rw-workspace-empty"><strong>Your workspace, your layout.</strong>Open multiple Rainbow tools, duplicate the same tool, and arrange them side-by-side like Windows Snap Layouts.</div></div><footer class="rw-workspace-foot">Each window runs in its own embedded page instance. Some tools may still share saved browser data. Close a window here to remove it from this layout.</footer></section>';document.body.append(overlay);
  const picker=overlay.querySelector(".rw-window-picker"),grid=overlay.querySelector(".rw-window-grid");
  function persist(){try{localStorage.setItem("rainbow.workspace.windows.v1",JSON.stringify({layout:state.layout}));}catch{}}
@@ -7592,7 +7592,7 @@ renderFlow();renderStories();renderTimer();
  overlay.querySelectorAll("[data-layout]").forEach(b=>b.addEventListener("click",()=>chooseLayout(b.dataset.layout)));
  overlay.querySelector('[data-action="close"]').addEventListener("click",()=>overlay.classList.remove("open"));
  overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.classList.remove("open");});
- launcher.addEventListener("click",()=>overlay.classList.add("open"));
+ launcher.addEventListener("click",()=>{overlay.classList.add("open");if(innerWidth<=768)document.getElementById("appShell")?.classList.remove("mobile-sidebar-open");});
  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay.classList.contains("open"))overlay.classList.remove("open");});
 })();
 </script>
