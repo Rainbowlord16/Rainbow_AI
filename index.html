@@ -6067,10 +6067,10 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         }
 
         function setPromptEditMode(enabled) {
-          if (el.input) el.input.placeholder = enabled ? "Edit the original prompt, then choose Save edit (no new response will be sent)" : "Message Rainbow AI… (Enter to send)";
+          if (el.input) el.input.placeholder = enabled ? "Correct the prompt, then choose Save & Regenerate" : "Message Rainbow AI… (Enter to send)";
           const label = el.send?.querySelector("span");
-          if (label) label.textContent = enabled ? "Save edit" : "Send";
-          if (el.send) el.send.setAttribute("aria-label", enabled ? "Save edited prompt" : "Send message");
+          if (label) label.textContent = enabled ? "Save & Regenerate" : "Send";
+          if (el.send) el.send.setAttribute("aria-label", enabled ? "Save edited prompt and regenerate response" : "Send message");
         }
 
         function newConversation() {
@@ -6404,7 +6404,7 @@ button,input,select,textarea{min-width:0;max-width:100%}
             content.querySelectorAll("pre code").forEach(code=>{const cls=code.className||"",match=cls.match(/language-([a-z0-9_+-]+)/i),lang=(match?.[1]||"").toLowerCase();if(!["html","javascript","js"].includes(lang))return;const pre=code.closest("pre");if(!pre||pre.parentElement.dataset.labReady)return;pre.parentElement.dataset.labReady="1";const run=document.createElement("button");run.type="button";run.className="message-action-btn";run.textContent="Run in sandbox";run.addEventListener("click",()=>{const frame=document.createElement("iframe");frame.title="Sandboxed code preview";frame.setAttribute("sandbox","allow-scripts");frame.style.cssText="width:100%;height:280px;border:1px solid var(--border-default);border-radius:10px;background:white;margin-top:8px";const source=code.textContent||"";frame.srcdoc=lang==="html"?source:"<!doctype html><html><body><pre id='out'></pre><script>const old=console.log;console.log=(...a)=>{document.getElementById('out').textContent+=a.join(' ')+String.fromCharCode(10);old(...a)};</scr"+"ipt><script>"+source.split("<"+"/"+"script").join("<"+String.fromCharCode(92)+"/script")+"</scr"+"ipt></body></html>";pre.parentElement.appendChild(frame);run.disabled=true;run.textContent="Preview running";});pre.parentElement.insertBefore(run,pre);});
             bubble.appendChild(content);
             const actions=document.createElement("div");actions.className="message-actions";            const branchBtn=document.createElement("button");branchBtn.type="button";branchBtn.className="message-action-btn";branchBtn.textContent="Branch";branchBtn.title="Create a new conversation from this turn";branchBtn.addEventListener("click",()=>{const idx=conversation.messages.indexOf(message);if(idx<0)return;const fork={...conversation,id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random(),title:(conversation.title||"Chat")+" — Branch",messages:conversation.messages.slice(0,idx+1).map(m=>({...m})),pinned:false,createdAt:Date.now(),branchOf:conversation.id};state.conversations.unshift(fork);state.activeId=fork.id;save();renderAll();notify("Branch created from this turn. The original chat is unchanged.");});actions.appendChild(branchBtn);const copy=document.createElement("button");copy.type="button";copy.className="message-action-btn";copy.textContent="Copy";copy.addEventListener("click",async()=>{try{await copyTextToClipboard(String(message.content||""));notify("Message copied.");}catch{notify("Clipboard access was blocked.");}});actions.appendChild(copy);
-            if(message.role==="user"){const edit=document.createElement("button");edit.type="button";edit.className="message-action-btn";edit.textContent="Edit";edit.title="Edit this prompt without sending a new request";edit.addEventListener("click",()=>{if(state.busy)return notify("Wait for the current response to finish before editing.");const messageIndex=conversation.messages.indexOf(message);if(messageIndex<0||!el.input)return;state.pendingEdit={conversationId:conversation.id,messageIndex};el.input.value=String(message.content||"");setPromptEditMode(true);el.input.dispatchEvent(new Event("input",{bubbles:true}));el.input.focus();notify("Edit mode: Save edit updates the original prompt only. No new AI response will be requested.");});actions.appendChild(edit);}
+            if(message.role==="user"){const edit=document.createElement("button");edit.type="button";edit.className="message-action-btn";edit.textContent="Edit";edit.title="Edit this prompt and regenerate the response";edit.addEventListener("click",()=>{if(state.busy)return notify("Wait for the current response to finish before editing.");const messageIndex=conversation.messages.indexOf(message);if(messageIndex<0||!el.input)return;state.pendingEdit={conversationId:conversation.id,messageIndex};el.input.value=String(message.content||"");setPromptEditMode(true);el.input.dispatchEvent(new Event("input",{bubbles:true}));el.input.focus();notify("Edit mode: saving will replace this prompt and regenerate its response. Later turns in this chat will be removed.");});actions.appendChild(edit);}
             if(message.role==="assistant" && conversation?.messages?.[conversation.messages.length-1]===message){
               const regenerate=document.createElement("button");regenerate.type="button";regenerate.className="message-action-btn";regenerate.textContent="Regenerate";
               regenerate.addEventListener("click",()=>{
@@ -6634,10 +6634,12 @@ button,input,select,textarea{min-width:0;max-width:100%}
               state.pendingEdit=null;setPromptEditMode(false);
               notify("The chat changed, so the pending edit was cancelled. Select the prompt again to edit it.");return;
             }
-            original.content=visibleUserText;state.pendingEdit=null;
-            if(el.input){el.input.value="";el.input.style.height="auto";}
-            setPromptEditMode(false);save();renderAll();
-            notify("Original prompt updated. No new AI request was sent.");return;
+            // Replace the selected prompt and discard its old answer plus every later turn.
+            // The normal send path below then submits the corrected prompt as a fresh request.
+            editingChat.messages.splice(pendingEdit.messageIndex);
+            state.pendingEdit=null;
+            setPromptEditMode(false);
+            save();
           }
           const professionalProfile=readProfessionalPersonalization();
           const professionalContext=[professionalProfile.profession&&"Occupation: "+professionalProfile.profession,professionalProfile.industry&&"Industry: "+professionalProfile.industry,professionalProfile.expertise&&"Experience level: "+professionalProfile.expertise,professionalProfile.expertiseAreas&&"Skills and expertise: "+professionalProfile.expertiseAreas,professionalProfile.goals&&"Goals and interests: "+professionalProfile.goals].filter(Boolean).join("\n");
