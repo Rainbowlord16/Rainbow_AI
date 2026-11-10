@@ -2808,6 +2808,9 @@
       @media (max-width: 768px) {
         #appShell .sidebar { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
         #appShell.mobile-sidebar-open .sidebar { touch-action: pan-y; }
+        .icon-btn { width: 44px; height: 44px; min-width: 44px; }
+        .sidebar-nav-btn { min-height: 44px; }
+        .composer-tool-btn { min-height: 40px; padding: 8px 10px; }
       }
       #profileModal { position: fixed; inset: 0; z-index: 1000; }
       #profileModal.hidden { display: none !important; }
@@ -6414,6 +6417,9 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           }
         });
         $("#sidebarBackdrop")?.addEventListener("click", () => closeMobileSidebar({ restoreFocus: true }));
+        window.addEventListener("resize", () => {
+          if (window.innerWidth > 768) closeMobileSidebar();
+        }, { passive: true });
         $("#sidebar")?.addEventListener("click", event => {
           if (window.innerWidth > 768 || !$("#appShell")?.classList.contains("mobile-sidebar-open")) return;
           if (event.target.closest("button, a[href], [role='menuitem']")) closeMobileSidebar();
