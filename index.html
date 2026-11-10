@@ -7054,7 +7054,7 @@ button,input,select,textarea{min-width:0;max-width:100%}
             notify("The active chat changed while confirmation was open. Nothing was cleared; please select the conversation and try again.");
             return;
           }
-          if (state.busy && state.controller) state.controller.abort();
+          if (state.activeGeneration?.conversationId === conversationId && state.controller) state.controller.abort();
           latest.messages = [];
           latest.title = "New Conversation";
           latest.titleAttempted = false;
