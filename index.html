@@ -2907,7 +2907,7 @@
       /* Mobile-first workspace refinements: safe viewport, scrollable welcome area and a compact composer. */
       @media (max-width: 768px) {
         html, body { min-height: 100%; height: 100%; height: 100dvh; }
-        .app-shell { height: 100%; height: 100dvh; min-height: 0; }
+        .app-shell { height: 100%; height: 100dvh; min-height: 0; padding-top: max(2px, env(safe-area-inset-top, 0px)); }
         .workspace, .workspace-main, .workspace-body, .chat-column { min-height: 0; min-width: 0; }
         .workspace-header { min-width: 0; gap: 6px; padding-inline: 8px; }
         .header-left, .header-center, .header-right { min-width: 0; }
@@ -6486,6 +6486,7 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         function closeMobileSidebar({ restoreFocus = false } = {}) {
           const wasOpen = $("#appShell")?.classList.contains("mobile-sidebar-open");
           const sidebar = $("#sidebar");
+          const main = $(".workspace-main");
           $("#appShell")?.classList.remove("mobile-sidebar-open");
           $("#sidebarBackdrop")?.classList.remove("visible");
           document.body.classList.remove("mobile-nav-open");
@@ -6495,6 +6496,10 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
             sidebar.inert = hiddenOnMobile;
             sidebar.setAttribute("aria-hidden", String(hiddenOnMobile));
           }
+          if (main) {
+            main.inert = false;
+            main.removeAttribute("aria-hidden");
+          }
           if (restoreFocus && wasOpen && window.innerWidth <= 768) $("#mobileMenuBtn")?.focus({ preventScroll: true });
         }
         $("#mobileMenuBtn")?.addEventListener("click", () => {
@@ -6502,9 +6507,15 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           if (!shell) return;
           const opening = !shell.classList.contains("mobile-sidebar-open");
           const sidebar = $("#sidebar");
+          const main = $(".workspace-main");
           if (sidebar) {
             sidebar.inert = !opening && window.innerWidth <= 768;
             sidebar.setAttribute("aria-hidden", String(!opening && window.innerWidth <= 768));
+          }
+          if (main) {
+            main.inert = opening && window.innerWidth <= 768;
+            if (opening && window.innerWidth <= 768) main.setAttribute("aria-hidden", "true");
+            else main.removeAttribute("aria-hidden");
           }
           shell.classList.toggle("mobile-sidebar-open", opening);
           $("#sidebarBackdrop")?.classList.toggle("visible", opening);
