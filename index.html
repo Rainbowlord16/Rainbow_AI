@@ -6163,6 +6163,12 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         let savedAccent = "rainbow";
         try { savedAccent = localStorage.getItem(ACCENT_KEY) || "rainbow"; } catch {}
         applyAccent(savedAccent, false);
+        const CUSTOM_SYSTEM_PROMPT_KEY = "rainbow_ai_custom_system_prompt";
+        const customSystemPromptInput = $("#customSystemPromptInput");
+        if (customSystemPromptInput) {
+          try { customSystemPromptInput.value = localStorage.getItem(CUSTOM_SYSTEM_PROMPT_KEY) || ""; } catch {}
+          customSystemPromptInput.addEventListener("input", () => { try { localStorage.setItem(CUSTOM_SYSTEM_PROMPT_KEY, customSystemPromptInput.value.slice(0, 12000)); } catch {} });
+        }
         const BUBBLE_PREFS_KEY="rainbow_ai_bubble_preferences";
         function applyBubblePreferences(prefs){let p=prefs; if(!p){try{p=JSON.parse(localStorage.getItem(BUBBLE_PREFS_KEY)||"{}");}catch{p={};}} const root=document.documentElement; if(p.shape)root.style.setProperty("--rainbow-bubble-radius",p.shape); if(p.userColor)root.style.setProperty("--rainbow-user-bubble",p.userColor); if(p.aiColor)root.style.setProperty("--rainbow-ai-bubble",p.aiColor); if($("#chatBubbleShapeSelect")&&p.shape)$("#chatBubbleShapeSelect").value=p.shape; if($("#userBubbleColorInput")&&p.userColor)$("#userBubbleColorInput").value=p.userColor; if($("#aiBubbleColorInput")&&p.aiColor)$("#aiBubbleColorInput").value=p.aiColor; }
         ["chatBubbleShapeSelect","userBubbleColorInput","aiBubbleColorInput"].forEach(id=>document.getElementById(id)?.addEventListener("input",()=>{const p={shape:$("#chatBubbleShapeSelect")?.value||"16px",userColor:$("#userBubbleColorInput")?.value||"#263a5c",aiColor:$("#aiBubbleColorInput")?.value||"#171923"};try{localStorage.setItem(BUBBLE_PREFS_KEY,JSON.stringify(p));}catch{}applyBubblePreferences(p);}));
@@ -6718,6 +6724,7 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
               gateway: state.gateway,
               theme: state.theme,
               accent: document.documentElement.dataset.accent || "rainbow",
+              customSystemPrompt: $("#customSystemPromptInput")?.value || "",
               studyMode: state.studyMode
             },
             profile: (() => { try { return JSON.parse(localStorage.getItem("rainbow_ai_profile") || "{}"); } catch { return {}; } })()
@@ -6749,6 +6756,7 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
             state.activeId = normalized.some(c => c.id === imported.activeId) ? imported.activeId : normalized[0].id;
             if (["dark","midnight","light"].includes(imported.theme)) state.theme = imported.theme;
             if (["rainbow","ocean","emerald","sunset","violet"].includes(imported.accent)) applyAccent(imported.accent);
+            if (typeof imported.customSystemPrompt === "string" && $("#customSystemPromptInput")) { $("#customSystemPromptInput").value = imported.customSystemPrompt.slice(0, 12000); try { localStorage.setItem(CUSTOM_SYSTEM_PROMPT_KEY, $("#customSystemPromptInput").value); } catch {} }
             if (typeof imported.gateway === "string") {
               try { state.gateway = safeGateway(imported.gateway); } catch {}
             }
@@ -6769,13 +6777,14 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
             localStorage.removeItem("rainbow_ai_profile");
             localStorage.removeItem("rainbow_ai_canvas_snapshot");
             localStorage.removeItem(ACCENT_KEY);
+            localStorage.removeItem(CUSTOM_SYSTEM_PROMPT_KEY);
           } catch {}
           state.conversations = [];
           state.activeId = null;
           state.gateway = DEFAULT_GATEWAY;
           state.theme = "dark";
           state.studyMode = false;
-          newConversation(); setTheme("dark"); applyAccent("rainbow"); syncProfile();
+          newConversation(); setTheme("dark"); applyAccent("rainbow"); if ($("#customSystemPromptInput")) $("#customSystemPromptInput").value = ""; syncProfile();
           if (el.gateway) el.gateway.value = state.gateway;
           notify("Local Rainbow AI data erased.");
         });
