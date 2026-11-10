@@ -3358,7 +3358,25 @@ svg[data-rw-motion="menu"]:hover,button:hover svg[data-rw-motion="menu"],svg[dat
 svg[data-rw-motion="filter"]:hover,button:hover svg[data-rw-motion="filter"],svg[data-rw-motion="filter"][data-rw-active="1"]{animation:rw-icon-filter .55s ease both}
 svg[data-rw-motion="message"]:hover,button:hover svg[data-rw-motion="message"],svg[data-rw-motion="message"][data-rw-active="1"]{animation:rw-icon-message .55s ease both}
 @keyframes rw-icon-close{50%{transform:rotate(90deg) scale(.82)}}@keyframes rw-icon-refresh{to{transform:rotate(360deg)}}@keyframes rw-icon-download{50%{transform:translateY(2px)}}@keyframes rw-icon-trash{35%{transform:rotate(-8deg)}70%{transform:rotate(6deg)}}@keyframes rw-icon-copy{50%{transform:translate(-1px,-1px) scale(1.06)}}@keyframes rw-icon-edit{50%{transform:rotate(-12deg)}}@keyframes rw-icon-lock{50%{transform:translateY(-2px)}}@keyframes rw-icon-unlock{50%{transform:rotate(-12deg)}}@keyframes rw-icon-play{50%{transform:scale(1.16)}}@keyframes rw-icon-stop{50%{transform:scale(.82)}}@keyframes rw-icon-pause{50%{transform:scale(.9)}}@keyframes rw-icon-eye{50%{transform:scaleY(.7)}}@keyframes rw-icon-calendar{50%{transform:translateY(-2px)}}@keyframes rw-icon-clock{to{transform:rotate(360deg)}}@keyframes rw-icon-globe{50%{transform:rotateY(65deg)}}@keyframes rw-icon-link{50%{transform:rotate(-12deg) scale(1.08)}}@keyframes rw-icon-image{50%{transform:scale(1.08) rotate(-3deg)}}@keyframes rw-icon-code{50%{transform:scaleX(.82)}}@keyframes rw-icon-chart{50%{transform:translateY(-2px) scaleY(1.08)}}@keyframes rw-icon-pin{50%{transform:translateY(-3px) rotate(7deg)}}@keyframes rw-icon-home{50%{transform:translateY(-2px)}}@keyframes rw-icon-menu{50%{transform:scaleX(.78)}}@keyframes rw-icon-filter{50%{transform:translateY(2px)}}@keyframes rw-icon-message{50%{transform:translateY(-2px) scale(1.06)}}</style>
-</head>
+<style id="rw-crafted-icon-motion">
+svg[data-rw-motion="book"]:hover [data-rw-part="cover"],button:hover svg[data-rw-motion="book"] [data-rw-part="cover"]{animation:rw-book-open .72s cubic-bezier(.2,.8,.2,1) both;transform-origin:left center}
+svg[data-rw-motion="book"]:hover [data-rw-part="pages"],button:hover svg[data-rw-motion="book"] [data-rw-part="pages"]{animation:rw-pages-fan .72s ease both}
+svg[data-rw-motion="history"]:hover [data-rw-part="orbit"],button:hover svg[data-rw-motion="history"] [data-rw-part="orbit"]{animation:rw-history-sweep .85s ease both}
+svg[data-rw-motion="folder"]:hover [data-rw-part="flap"],button:hover svg[data-rw-motion="folder"] [data-rw-part="flap"]{animation:rw-folder-open .55s ease both;transform-origin:left bottom}
+svg[data-rw-motion="sparkle"]:hover [data-rw-part="spark"],button:hover svg[data-rw-motion="sparkle"] [data-rw-part="spark"]{animation:rw-sparkle-burst .7s ease both;animation-delay:calc(var(--rw-key-index,0)*65ms)}
+svg[data-rw-motion="brain"]:hover [data-rw-part="node"],button:hover svg[data-rw-motion="brain"] [data-rw-part="node"]{animation:rw-brain-pulse .8s ease both;animation-delay:calc(var(--rw-key-index,0)*55ms)}
+svg[data-rw-motion="sidebar"]:hover [data-rw-part="panel"],button:hover svg[data-rw-motion="sidebar"] [data-rw-part="panel"]{animation:rw-sidebar-slide .58s ease both}
+svg[data-rw-motion="shield"]:hover [data-rw-part="shield"],button:hover svg[data-rw-motion="shield"] [data-rw-part="shield"]{animation:rw-shield-check .72s ease both}
+@keyframes rw-book-open{0%{transform:perspective(80px) rotateY(0)}65%{transform:perspective(80px) rotateY(-28deg)}100%{transform:perspective(80px) rotateY(-18deg)}}
+@keyframes rw-pages-fan{0%{transform:translateX(0)}55%{transform:translateX(2px)}100%{transform:translateX(1px)}}
+@keyframes rw-history-sweep{0%{transform:rotate(0)}70%{transform:rotate(35deg)}100%{transform:rotate(22deg)}}
+@keyframes rw-folder-open{0%{transform:rotate(0) translateY(0)}65%{transform:rotate(-9deg) translateY(-2px)}100%{transform:rotate(-6deg) translateY(-1px)}}
+@keyframes rw-sparkle-burst{0%{transform:scale(.55) rotate(-20deg);opacity:.45}65%{transform:scale(1.35) rotate(12deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+@keyframes rw-brain-pulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.22);opacity:1}}
+@keyframes rw-sidebar-slide{0%{transform:translateX(0)}60%{transform:translateX(3px)}100%{transform:translateX(1px)}}
+@keyframes rw-shield-check{0%{transform:scale(.94)}55%{transform:scale(1.1)}100%{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){[data-rw-motion]{animation:none!important}}
+</style></head>
 
   <body>
     <!-- Skip Navigation Link for Keyboard & Screen Reader Users -->
@@ -5701,7 +5719,7 @@ svg[data-rw-motion="message"]:hover,button:hover svg[data-rw-motion="message"],s
         "use strict";
 
         const $ = (selector, root = document) => root.querySelector(selector);
-        const $$ = (selector, root = document) => [
+        const $ = (selector, root = document) => [
           ...root.querySelectorAll(selector),
         ];
 
@@ -6722,7 +6740,7 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         // Search/filter conversation history.
         $("#sidebarSearchInput")?.addEventListener("input", (event) => {
           const query = event.target.value.trim().toLowerCase();
-          $$(".history-item", el.history || document).forEach((item) => {
+          $(".history-item", el.history || document).forEach((item) => {
             item.hidden = !item.textContent.toLowerCase().includes(query);
           });
           $("#sidebarSearchClearBtn")?.classList.toggle("hidden", !query);
@@ -6979,12 +6997,12 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         }
 
         function showSettingsTab(tabName) {
-          $$("[data-settings-tab]").forEach((button) => {
+          $("[data-settings-tab]").forEach((button) => {
             const active = button.dataset.settingsTab === tabName;
             button.classList.toggle("active", active);
             button.setAttribute("aria-selected", String(active));
           });
-          $$("[data-settings-panel]").forEach((panel) => {
+          $("[data-settings-panel]").forEach((panel) => {
             const active = panel.dataset.settingsPanel === tabName;
             panel.classList.toggle("hidden", !active);
             panel.style.display = active ? "flex" : "none";
@@ -6993,12 +7011,12 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         }
 
         function showPromptCategory(category) {
-          $$("[data-prompt-cat]").forEach((button) => {
+          $("[data-prompt-cat]").forEach((button) => {
             const active = button.dataset.promptCat === category;
             button.classList.toggle("active", active);
             button.setAttribute("aria-selected", String(active));
           });
-          $$("[data-prompt-category]").forEach((item) => {
+          $("[data-prompt-category]").forEach((item) => {
             item.classList.toggle("hidden", category !== "all" && item.dataset.promptCategory !== category);
           });
         }
@@ -7096,8 +7114,8 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         // Clear active project filter.
         $("#clearActiveProjectBtn")?.addEventListener("click", () => {
           $("#activeProjectBanner")?.classList.add("hidden");
-          $$(".history-item").forEach(item => item.hidden = false);
-          $$("[data-filter]").forEach(item => {
+          $(".history-item").forEach(item => item.hidden = false);
+          $("[data-filter]").forEach(item => {
             item.classList.toggle("active", item.dataset.filter === "all");
             item.setAttribute("aria-selected", String(item.dataset.filter === "all"));
           });
@@ -7333,7 +7351,7 @@ addCanvasTool("canvasFormatBtn","Executive format",()=>{const e=$("#canvasTextar
 addCanvasTool("canvasTestsBtn","Extract tests",()=>{const e=$("#canvasTextarea");if(!e||!e.value.trim())return notify("Paste code into Canvas first.");if(el.input)el.input.value="Review this code and generate a practical unit-test suite and useful docstrings. Preserve the original code and clearly label assumptions.\n\n"+e.value;sendMessage();});
 addCanvasTool("canvasDiffBtn","Suggest patch",()=>{const e=$("#canvasTextarea");if(!e||!e.value.trim())return notify("Canvas is empty.");if(el.input)el.input.value="Review this document and return a unified diff patch. Use - lines for removals and + lines for additions, then explain the changes.\n\n"+e.value;sendMessage();});}
         // Settings tabs and save action.
-        $$("[data-settings-tab]").forEach((button) => button.addEventListener("click", () => showSettingsTab(button.dataset.settingsTab)));
+        $("[data-settings-tab]").forEach((button) => button.addEventListener("click", () => showSettingsTab(button.dataset.settingsTab)));
         $("#saveSettingsBtn")?.addEventListener("click", () => {
           const theme = $("#themeSelect")?.value;
           if (theme) setTheme(theme);
@@ -7348,7 +7366,7 @@ addCanvasTool("canvasDiffBtn","Suggest patch",()=>{const e=$("#canvasTextarea");
         });
 
         // Prompt Studio category tabs and create-template form visibility.
-        $$("[data-prompt-cat]").forEach(button => button.addEventListener("click", () => showPromptCategory(button.dataset.promptCat)));
+        $("[data-prompt-cat]").forEach(button => button.addEventListener("click", () => showPromptCategory(button.dataset.promptCat)));
         $("#toggleNewPromptFormBtn")?.addEventListener("click", () => { $("#editPromptIdInput").value=""; $("#newPromptTitleInput").value=""; $("#newPromptContentInput").value=""; togglePanel("promptEditorForm", true); });
         $("#cancelPromptFormBtn")?.addEventListener("click", () => togglePanel("promptEditorForm", false));
         const TEMPLATE_KEY="rainbow_ai_custom_templates"; let customTemplates=[]; try{const saved=JSON.parse(localStorage.getItem(TEMPLATE_KEY)||"[]");if(Array.isArray(saved))customTemplates=saved;}catch{}
@@ -7408,14 +7426,14 @@ addCanvasTool("canvasDiffBtn","Suggest patch",()=>{const e=$("#canvasTextarea");
         });
 
         // History filters and utility buttons.
-        $$("[data-filter]").forEach((button) => button.addEventListener("click", () => {
+        $("[data-filter]").forEach((button) => button.addEventListener("click", () => {
           const filter = button.dataset.filter;
-          $$("[data-filter]").forEach((item) => {
+          $("[data-filter]").forEach((item) => {
             const active = item === button;
             item.classList.toggle("active", active);
             item.setAttribute("aria-selected", String(active));
           });
-          $$(".history-item", el.history || document).forEach((item) => {
+          $(".history-item", el.history || document).forEach((item) => {
             const conversation = state.conversations.find((c) => c.title === item.textContent);
             item.hidden = filter === "pinned" ? !conversation?.pinned : filter === "archived" ? !conversation?.archived : filter === "project" ? !conversation?.projectId : false;
           });
@@ -7434,7 +7452,7 @@ addCanvasTool("canvasDiffBtn","Suggest patch",()=>{const e=$("#canvasTextarea");
         const PROFILE_KEY = "rainbow_ai_profile";
         function readProfile() { try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || "{}"); } catch { return {}; } }
         function setProfileAvatar(imageSrc) {
-          $$(".profile-avatar").forEach(node => {
+          $(".profile-avatar").forEach(node => {
             if (imageSrc) { node.textContent = ""; node.style.backgroundImage = "url("+JSON.stringify(imageSrc)+")"; node.style.backgroundSize = "cover"; node.style.backgroundPosition = "center"; }
             else { node.style.backgroundImage = ""; node.textContent = ((readProfile().name || "Rainbow User")[0] || "R").toUpperCase(); }
           });
@@ -7444,7 +7462,7 @@ addCanvasTool("canvasDiffBtn","Suggest patch",()=>{const e=$("#canvasTextarea");
         function syncProfile() {
           const profile = readProfile(), name = (profile.name || "").trim();
           if ($("#profileDisplayName")) $("#profileDisplayName").textContent = name || "Rainbow User";
-          $$(".profile-avatar").forEach(node => { if(!profile.image) { node.style.backgroundImage=""; node.textContent=(name[0]||"R").toUpperCase(); }});
+          $(".profile-avatar").forEach(node => { if(!profile.image) { node.style.backgroundImage=""; node.textContent=(name[0]||"R").toUpperCase(); }});
           if ($("#profileNameInput")) $("#profileNameInput").value = name;
           if ($("#profileGreetingSelect")) $("#profileGreetingSelect").value = profile.greeting || "random";
           if ($("#profileImageUrlInput")) $("#profileImageUrlInput").value = profile.image && /^https?:/i.test(profile.image) ? profile.image : "";
@@ -7721,6 +7739,13 @@ document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=
 const classify=svg=>{
  const host=svg.closest("button,[role='button'],a,label")||svg.parentElement;
  const words=[svg.id,svg.getAttribute("aria-label"),svg.getAttribute("class"),svg.getAttribute("data-icon"),svg.getAttribute("data-rw-icon"),svg.getAttribute("title"),host?.getAttribute("aria-label"),host?.getAttribute("title"),host?.getAttribute("data-tooltip"),host?.textContent].filter(Boolean).join(" ").toLowerCase();
+ if(/book|library|reading|knowledge|documentation|manual/.test(words))return "book";
+ if(/history|recent|restore|timeline/.test(words))return "history";
+ if(/folder|directory|collection|files/.test(words))return "folder";
+ if(/sparkle|magic|wand|enhance|polish|improve/.test(words))return "sparkle";
+ if(/brain|neural|memory|think|intelligence/.test(words))return "brain";
+ if(/sidebar|panel|collapse|expand|layout/.test(words))return "sidebar";
+ if(/shield|security|privacy|protect/.test(words))return "shield";
  if(svg.classList.contains("brand-original-mark")||svg.classList.contains("welcome-original-mark")||/rainbow logo|brand mark/.test(words))return "brand";
  if(/bell|notification|alert|reminder/.test(words))return "bell";
  if(/gear|settings|system|configure|configuration|preferences|tune/.test(words))return "gears";
@@ -7768,6 +7793,13 @@ const decorateOne=svg=>{
  children.forEach((node,index)=>{
   const tag=node.tagName.toLowerCase();
   let part="stroke";
+  if(role==="book")part=index===0?"cover":"pages";
+  else if(role==="history")part=index===0?"orbit":"stroke";
+  else if(role==="folder")part=index===0?"flap":"stroke";
+  else if(role==="sparkle")part="spark";
+  else if(role==="brain")part="node";
+  else if(role==="sidebar")part="panel";
+  else if(role==="shield")part="shield";
   if(role==="bell"&&(tag==="circle"||/clapper/i.test(node.getAttribute("class")||"")||(tag==="path"&&index>0)))part="clapper";
   else if(role==="gears"&&(tag==="g"||tag==="circle"||tag==="path"))part="gear";
   else if(role==="shortcut"&&(tag==="rect"||tag==="polygon"))part="key";
