@@ -3183,6 +3183,10 @@ svg[data-rw-motion="generic"]:hover [data-rw-part="stroke"],button:hover svg[dat
 .rw-window-head{height:42px;flex:0 0 42px;display:flex;align-items:center;gap:8px;padding:0 9px 0 12px;background:var(--panel2,#181b26);border-bottom:1px solid #64748b33;cursor:grab;user-select:none}
 .rw-window-head:active{cursor:grabbing}
 .rw-window-name{font-size:12px;font-weight:700;color:var(--text,#f8fafc);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:auto}
+.rw-window-status{flex:0 0 auto;font-size:10px;color:var(--muted,#94a3b8);padding:3px 6px;border-radius:6px;background:#64748b18}
+.rw-window-status[data-state="loaded"]{color:#10b981}
+.rw-window-status[data-state="error"],.rw-window-status[data-state="slow"]{color:#f59e0b}
+.rw-window-actions button:focus-visible,.rw-workspace-controls button:focus-visible,.rw-window-picker button:focus-visible{outline:2px solid var(--accent,#3b82f6);outline-offset:2px}
 .rw-window-actions{display:flex;gap:4px}
 .rw-window-actions button{padding:4px 8px;min-width:27px}
 .rw-window-frame{width:100%;height:100%;flex:1;min-height:0;border:0;background:white}
@@ -7612,6 +7616,9 @@ renderFlow();renderStories();renderTimer();
   try{localStorage.setItem("rainbow.workspace.windows.v1",JSON.stringify({layout:state.layout,active:state.active,windows:state.windows.map((w,index)=>({...w,order:index}))}));}
   catch{ }
  }
+ let returnFocus=null,loadingTimers=new Map();
+ function openWorkspace(){returnFocus=document.activeElement;overlay.classList.add("open");overlay.setAttribute("aria-hidden","false");overlay.querySelector('[data-action="close"]')?.focus();}
+ function closeWorkspace(){overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true");if(returnFocus&&typeof returnFocus.focus==="function")returnFocus.focus();returnFocus=null;}
  function chooseLayout(layout){if(!["two","three","four","focus"].includes(layout))return;state.layout=layout;overlay.dataset.layout=layout;overlay.querySelectorAll("[data-layout]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.layout===layout)));persist();}
  function activate(id){state.active=id;grid.querySelectorAll(".rw-window").forEach(w=>w.classList.toggle("is-active",w.dataset.windowId===id));persist();}
  function renderEmpty(){if(!state.windows.length)grid.innerHTML='<div class="rw-workspace-empty"><strong>Your workspace, your layout.</strong>Open multiple Rainbow tools, duplicate the same tool, and arrange them side-by-side like Windows Snap Layouts.</div>';}
@@ -7629,13 +7636,18 @@ renderFlow();renderStories();renderTimer();
   const minimize=document.createElement("button");minimize.type="button";minimize.textContent=win.minimized?"+":"−";minimize.title=win.minimized?"Restore window":"Minimize window";minimize.setAttribute("aria-label",minimize.title);
   const maximize=document.createElement("button");maximize.type="button";maximize.textContent="□";maximize.title="Focus this window";maximize.setAttribute("aria-label","Focus this window");
   const close=document.createElement("button");close.type="button";close.textContent="×";close.title="Close window";close.setAttribute("aria-label","Close "+win.label);
-  const frame=document.createElement("iframe");frame.className="rw-window-frame";frame.title=win.label;frame.loading="eager";frame.referrerPolicy="strict-origin-when-cross-origin";frame.src=win.url;
+  const status=document.createElement("span");status.className="rw-window-status";status.dataset.state="loading";status.textContent="Loading…";status.setAttribute("role","status");status.setAttribute("aria-live","polite");
+  const frame=document.createElement("iframe");frame.className="rw-window-frame";frame.title=win.label;frame.loading="eager";frame.referrerPolicy="strict-origin-when-cross-origin";
+  const loadTimer=setTimeout(()=>{if(status.dataset.state==="loading"){status.dataset.state="slow";status.textContent="Taking longer than expected";}},15000);loadingTimers.set(win.id,loadTimer);
+  frame.addEventListener("load",()=>{clearTimeout(loadTimer);loadingTimers.delete(win.id);status.dataset.state="loaded";status.textContent="Loaded";});
+  frame.addEventListener("error",()=>{clearTimeout(loadTimer);loadingTimers.delete(win.id);status.dataset.state="error";status.textContent="Could not load";});
+  frame.src=win.url;
   rename.addEventListener("click",e=>{e.stopPropagation();const next=prompt("Name this workspace tab:",win.label);if(next&&next.trim()){win.label=next.trim().slice(0,48);name.textContent=win.label;frame.title=win.label;close.setAttribute("aria-label","Close "+win.label);rename.setAttribute("aria-label","Rename "+win.label);persist();}});
   name.addEventListener("dblclick",()=>rename.click());
   minimize.addEventListener("click",e=>{e.stopPropagation();win.minimized=!win.minimized;card.classList.toggle("is-minimized",win.minimized);minimize.textContent=win.minimized?"+":"−";minimize.title=win.minimized?"Restore window":"Minimize window";minimize.setAttribute("aria-label",minimize.title);persist();});
   maximize.addEventListener("click",e=>{e.stopPropagation();activate(win.id);chooseLayout("focus");});
-  close.addEventListener("click",e=>{e.stopPropagation();state.windows=state.windows.filter(w=>w.id!==win.id);card.remove();if(state.active===win.id)state.active=state.windows.length?state.windows[state.windows.length-1].id:null;activate(state.active);renderEmpty();persist();});
-  head.addEventListener("click",()=>activate(win.id));actions.append(rename,minimize,maximize,close);head.append(name,actions);card.append(head,frame);
+  close.addEventListener("click",e=>{e.stopPropagation();const timer=loadingTimers.get(win.id);if(timer)clearTimeout(timer);loadingTimers.delete(win.id);state.windows=state.windows.filter(w=>w.id!==win.id);card.remove();if(state.active===win.id)state.active=state.windows.length?state.windows[state.windows.length-1].id:null;activate(state.active);renderEmpty();persist();});
+  head.addEventListener("click",()=>activate(win.id));actions.append(rename,minimize,maximize,close);head.append(name,status,actions);card.append(head,frame);
   head.draggable=true;head.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/rw-window",win.id);e.dataTransfer.effectAllowed="move";});
   card.addEventListener("dragover",e=>{e.preventDefault();e.dataTransfer.dropEffect="move";});
   card.addEventListener("drop",e=>{e.preventDefault();const movingId=e.dataTransfer.getData("text/rw-window");const movingCard=Array.from(grid.children).find(x=>x.dataset.windowId===movingId);if(movingCard&&movingCard!==card){const rect=card.getBoundingClientRect();grid.insertBefore(movingCard,e.clientX>rect.left+rect.width/2?card.nextSibling:card);syncOrderFromDOM();}});
@@ -7643,10 +7655,11 @@ renderFlow();renderStories();renderTimer();
  }
  catalog.forEach(item=>{const b=document.createElement("button");b.type="button";b.textContent="+ "+item.label;b.addEventListener("click",()=>{addWindow(item);syncOrderFromDOM();});picker.append(b);});
  overlay.querySelectorAll("[data-layout]").forEach(b=>b.addEventListener("click",()=>chooseLayout(b.dataset.layout)));
- overlay.querySelector('[data-action="close"]').addEventListener("click",()=>overlay.classList.remove("open"));
- overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.classList.remove("open");});
- launcher.addEventListener("click",()=>{overlay.classList.add("open");if(innerWidth<=768)document.getElementById("appShell")?.classList.remove("mobile-sidebar-open");});
- document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay.classList.contains("open"))overlay.classList.remove("open");});
+ overlay.setAttribute("aria-hidden","true");
+ overlay.querySelector('[data-action="close"]').addEventListener("click",closeWorkspace);
+ overlay.addEventListener("click",e=>{if(e.target===overlay)closeWorkspace();});
+ launcher.addEventListener("click",()=>{if(innerWidth<=768)document.getElementById("appShell")?.classList.remove("mobile-sidebar-open");openWorkspace();});
+ document.addEventListener("keydown",e=>{if(!overlay.classList.contains("open"))return;if(e.key==="Escape"){e.preventDefault();closeWorkspace();return;}if(e.key==="Tab"){const focusable=Array.from(overlay.querySelectorAll('button:not([disabled]),[href],input:not([disabled]),[tabindex]:not([tabindex="-1"])')).filter(el=>el.getClientRects().length);if(!focusable.length){e.preventDefault();return;}const first=focusable[0],last=focusable[focusable.length-1];if(e.shiftKey&&(document.activeElement===first||!overlay.contains(document.activeElement))){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
  state.windows.forEach(win=>{const item=catalog.find(c=>c.id===win.catalogId);if(item)addWindow(item,win);});
  chooseLayout(state.layout);if(state.active)activate(state.active);else if(state.windows.length)activate(state.windows[state.windows.length-1].id);
  persist();
