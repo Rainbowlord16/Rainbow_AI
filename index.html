@@ -7771,7 +7771,10 @@ renderFlow();renderStories();renderTimer();
  overlay.addEventListener("click",e=>{if(e.target===overlay)closeWorkspace();});
  launcher.addEventListener("click",()=>{if(innerWidth<=768)document.getElementById("appShell")?.classList.remove("mobile-sidebar-open");openWorkspace();});
  document.addEventListener("keydown",e=>{if(!overlay.classList.contains("open"))return;if(e.key==="Escape"){e.preventDefault();closeWorkspace();return;}if(e.key==="Tab"){const focusable=Array.from(overlay.querySelectorAll('button:not([disabled]),[href],input:not([disabled]),[tabindex]:not([tabindex="-1"])')).filter(el=>el.getClientRects().length);if(!focusable.length){e.preventDefault();return;}const first=focusable[0],last=focusable[focusable.length-1];if(e.shiftKey&&(document.activeElement===first||!overlay.contains(document.activeElement))){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
- state.windows.forEach(win=>{const item=catalog.find(c=>c.id===win.catalogId);if(item)addWindow(item,win);});
+ // Restore from a snapshot: addWindow may discard invalid entries from state.windows.
+ [...state.windows].forEach(win=>{const item=catalog.find(c=>c.id===win.catalogId);if(item)addWindow(item,win);});
+ // A saved active ID may have been rejected with its malformed window URL.
+ if(state.active&&!state.windows.some(win=>win.id===state.active))state.active=null;
  chooseLayout(state.layout);if(state.active)activate(state.active);else if(state.windows.length)activate(state.windows[state.windows.length-1].id);
  persist();
 })();</script>
