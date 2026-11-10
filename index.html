@@ -5781,6 +5781,7 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         }
 
         function newConversation() {
+          state.pendingEdit=null;
           const conversation = {
             id: crypto.randomUUID
               ? crypto.randomUUID()
@@ -5801,7 +5802,7 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
 
         function ensureConversation() { return activeConversation() || newConversation(); }
         async function renameConversation(id) { const chat=state.conversations.find(c=>c.id===id); if(!chat)return; const title=await window.prompt("Edit chat title:",chat.title||"New Conversation"); if(title===null)return; if(!title.trim())return notify("Chat title cannot be empty."); chat.title=title.trim(); save(); renderAll(); notify("Chat title updated."); }
-        async function deleteConversation(id) { const chat=state.conversations.find(c=>c.id===id); if(!chat)return; if(!await window.confirm('Delete the entire chat "'+(chat.title||"New Conversation")+'"? This cannot be undone.'))return; state.conversations=state.conversations.filter(c=>c.id!==id); if(state.activeId===id)state.activeId=state.conversations[0]?.id||null; if(!state.activeId)newConversation();else{save();renderAll();} notify("Chat deleted."); }
+        async function deleteConversation(id) { const chat=state.conversations.find(c=>c.id===id); if(!chat)return; if(!await window.confirm('Delete the entire chat "'+(chat.title||"New Conversation")+'"? This cannot be undone.'))return; state.conversations=state.conversations.filter(c=>c.id!==id);state.unlockedIds.delete(id);if(state.pendingEdit?.conversationId===id)state.pendingEdit=null;if(state.activeId===id)state.activeId=state.conversations.find(c=>!c.hidden&&(!c.locked||state.unlockedIds.has(c.id)))?.id||null;if(!state.activeId)newConversation();else{save();renderAll();} notify("Chat deleted."); }
         function renderHistory() {
           if (!el.history) return; el.history.replaceChildren();
           const visibleChats=state.conversations.filter(c=>Boolean(c.hidden)===showHiddenChats);
