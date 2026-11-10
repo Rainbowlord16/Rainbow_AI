@@ -5777,7 +5777,7 @@ async function askNova(text){
   }
 }
 $("#novaSendBtn")?.addEventListener("click",()=>askNova($("#novaInput")?.value||""));$("#novaInput")?.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();askNova(e.currentTarget.value);}});
-function startNovaMic(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return notify("Voice input is unavailable in this browser.");if(novaRecognition){novaRecognition.stop();novaRecognition=null;return;}try{novaRecognition=new SR();novaRecognition.lang=navigator.language||"en-US";novaRecognition.interimResults=false;novaRecognition.continuous=false;novaMood("listening");novaRecognition.onresult=e=>{const t=e.results?.[0]?.[0]?.transcript||"";if(t)askNova(t);};novaRecognition.onerror=e=>{novaMood("idle");notify(e.error==="not-allowed"?"Allow microphone access to use Nova voice.":"Nova voice input failed.");};novaRecognition.onend=()=>{novaRecognition=null;if(!$("#novaHandsFree")?.checked)novaMood("idle");};novaRecognition.start();}catch{novaRecognition=null;novaMood("idle");notify("Could not start Nova voice input. Check microphone permission.");}}
+function startNovaMic(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return notify("Voice input is unavailable in this browser.");if(novaRecognition){const previous=novaRecognition;novaRecognition=null;try{previous.stop();}catch(error){console.warn("Nova voice input could not stop cleanly.",error);}novaMood("idle");return;}let instance=null;try{instance=new SR();novaRecognition=instance;instance.lang=navigator.language||"en-US";instance.interimResults=false;instance.continuous=false;novaMood("listening");instance.onresult=e=>{if(novaRecognition!==instance)return;const t=e.results?.[0]?.[0]?.transcript||"";if(t)askNova(t);};instance.onerror=e=>{if(novaRecognition!==instance)return;novaMood("idle");notify(e.error==="not-allowed"?"Allow microphone access to use Nova voice.":"Nova voice input failed.");};instance.onend=()=>{if(novaRecognition===instance){novaRecognition=null;if(!$("#novaHandsFree")?.checked)novaMood("idle");}};instance.start();}catch(error){if(novaRecognition===instance)novaRecognition=null;novaMood("idle");console.warn("Nova voice input could not start.",error);notify("Could not start Nova voice input. Check microphone permission.");}}
 $("#novaMicBtn")?.addEventListener("click",startNovaMic);$("#novaStopSpeak")?.addEventListener("click",()=>{window.speechSynthesis?.cancel();novaMood("idle");});
 $("#rainbowPolishBtn")?.addEventListener("click",()=>{if(!el.input?.value.trim())return notify("Write a prompt first.");const raw=el.input.value.trim();el.input.value="Act as a knowledgeable, careful assistant.\nTask: "+raw+"\nState assumptions, organize the answer clearly, include practical examples, and mention important limitations.";el.input.dispatchEvent(new Event("input",{bubbles:true}));notify("Prompt polished. Review it before sending.");});
 $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation();if(!c||!c.messages.length)return notify("There is no conversation to branch.");const fork={...c,id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),title:(c.title||"Chat")+" — Branch",messages:c.messages.map(m=>({...m})),pinned:false,createdAt:Date.now(),branchOf:c.id};state.conversations.unshift(fork);state.activeId=fork.id;save();renderAll();notify("A separate branch was created; the original chat is preserved.");});
@@ -6738,53 +6738,48 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           if (counter) counter.textContent = `${el.input.value.length} chars`;
         });
 
-        // Voice dictation is optional and browser-dependent.
+        // Voice dictation is optional and browser-dependent. Ignore late events from stopped sessions.
         let recognition = null;
         $("#voiceInputBtn")?.addEventListener("click", () => {
-          const SpeechRecognition =
-            window.SpeechRecognition || window.webkitSpeechRecognition;
-
+          const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
           if (!SpeechRecognition) {
             notify("Voice dictation isn't supported by this browser.");
             return;
           }
-
           if (recognition) {
-            recognition.stop();
+            const previous = recognition;
             recognition = null;
+            try { previous.stop(); } catch (error) { console.warn("Voice dictation could not stop cleanly.", error); }
             return;
           }
-
+          let instance = null;
           try {
-            recognition = new SpeechRecognition();
-            recognition.lang = navigator.language || "en-US";
-            recognition.interimResults = true;
-            recognition.continuous = false;
-
-            recognition.onresult = (event) => {
+            instance = new SpeechRecognition();
+            recognition = instance;
+            instance.lang = navigator.language || "en-US";
+            instance.interimResults = true;
+            instance.continuous = false;
+            instance.onresult = (event) => {
+              if (recognition !== instance) return;
               let transcript = "";
-              for (let i = event.resultIndex; i < event.results.length; i++) {
-                transcript += event.results[i][0].transcript;
-              }
+              for (let i = event.resultIndex; i < event.results.length; i++) transcript += event.results[i][0].transcript;
               if (el.input && transcript) {
                 el.input.value = transcript;
                 el.input.dispatchEvent(new Event("input", { bubbles: true }));
               }
             };
-
-            recognition.onerror = (event) => {
+            instance.onerror = (event) => {
+              if (recognition !== instance) return;
               const reason = event?.error === "not-allowed" || event?.error === "service-not-allowed"
                 ? "Allow microphone access in your browser to use voice dictation."
                 : "Voice dictation failed. Please try again or type your message.";
               notify(reason);
             };
-            recognition.onend = () => {
-              recognition = null;
-            };
-            recognition.start();
+            instance.onend = () => { if (recognition === instance) recognition = null; };
+            instance.start();
             notify("Listening…");
           } catch (error) {
-            recognition = null;
+            if (recognition === instance) recognition = null;
             console.warn("Rainbow AI voice dictation could not start.", error);
             notify("Voice dictation couldn't start. Check microphone permission and use HTTPS or localhost.");
           }
