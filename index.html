@@ -7596,44 +7596,60 @@ renderFlow();renderStories();renderTimer();
  }
  if(document.getElementById("rwWorkspaceLauncher"))return;
  const state={windows:[],layout:"two",active:null};
- try{const saved=JSON.parse(localStorage.getItem("rainbow.workspace.windows.v1")||"{}");if(saved&&["two","three","four","focus"].includes(saved.layout))state.layout=saved.layout;}catch{}
+ try{
+  const saved=JSON.parse(localStorage.getItem("rainbow.workspace.windows.v1")||"{}");
+  if(saved&&["two","three","four","focus"].includes(saved.layout))state.layout=saved.layout;
+  if(saved&&Array.isArray(saved.windows)){
+   state.windows=saved.windows.filter(w=>w&&typeof w.id==="string"&&catalog.some(c=>c.id===w.catalogId)&&typeof w.url==="string").slice(0,12).map(w=>({...w,label:String(w.label||catalog.find(c=>c.id===w.catalogId).label).slice(0,48),minimized:!!w.minimized}));
+   if(saved.active&&state.windows.some(w=>w.id===saved.active))state.active=saved.active;
+  }
+ }catch{state.windows=[];}
  const launcher=document.createElement("button");launcher.id="rwWorkspaceLauncher";launcher.type="button";launcher.innerHTML='<span class="rw-launch-icon" aria-hidden="true">▦</span><span>Workspace</span>';launcher.title="Open multi-window workspace";launcher.setAttribute("aria-label","Open Rainbow Workspace");launcher.setAttribute("aria-haspopup","dialog");launcher.className="rw-sidebar-launcher";const launcherHost=document.querySelector(".sidebar-top-actions");if(launcherHost)launcherHost.append(launcher);else document.body.append(launcher);
- const overlay=document.createElement("div");overlay.id="rwWorkspaceOverlay";overlay.dataset.layout=state.layout;overlay.innerHTML='<section id="rwWorkspacePanel" role="dialog" aria-modal="true" aria-label="Rainbow multi-window workspace"><header class="rw-workspace-head"><div class="rw-workspace-title">▦ Rainbow Workspace</div><div class="rw-workspace-controls"><button type="button" data-layout="two" aria-pressed="true">Split 2</button><button type="button" data-layout="three" aria-pressed="false">3 columns</button><button type="button" data-layout="four" aria-pressed="false">2 × 2</button><button type="button" data-layout="focus" aria-pressed="false">Focus</button><button type="button" data-action="close">Close workspace</button></div></header><nav class="rw-window-picker" aria-label="Open a workspace window"></nav><div class="rw-window-grid"><div class="rw-workspace-empty"><strong>Your workspace, your layout.</strong>Open multiple Rainbow tools, duplicate the same tool, and arrange them side-by-side like Windows Snap Layouts.</div></div><footer class="rw-workspace-foot">Each window runs in its own embedded page instance. Some tools may still share saved browser data. Close a window here to remove it from this layout.</footer></section>';document.body.append(overlay);
+ const overlay=document.createElement("div");overlay.id="rwWorkspaceOverlay";overlay.dataset.layout=state.layout;overlay.innerHTML='<section id="rwWorkspacePanel" role="dialog" aria-modal="true" aria-label="Rainbow multi-window workspace"><header class="rw-workspace-head"><div class="rw-workspace-title">▦ Rainbow Workspace</div><div class="rw-workspace-controls"><button type="button" data-layout="two" aria-pressed="false">Split 2</button><button type="button" data-layout="three" aria-pressed="false">3 columns</button><button type="button" data-layout="four" aria-pressed="false">2 × 2</button><button type="button" data-layout="focus" aria-pressed="false">Focus</button><button type="button" data-action="close">Close workspace</button></div></header><nav class="rw-window-picker" aria-label="Open a workspace window"></nav><div class="rw-window-grid"><div class="rw-workspace-empty"><strong>Your workspace, your layout.</strong>Open multiple Rainbow tools, duplicate the same tool, and arrange them side-by-side like Windows Snap Layouts.</div></div><footer class="rw-workspace-foot">Your open tabs, names, layout, and minimized state are saved on this device. Some tools may still share saved browser data.</footer></section>';document.body.append(overlay);
  const picker=overlay.querySelector(".rw-window-picker"),grid=overlay.querySelector(".rw-window-grid");
- function persist(){try{localStorage.setItem("rainbow.workspace.windows.v1",JSON.stringify({layout:state.layout}));}catch{}}
- function chooseLayout(layout){state.layout=layout;overlay.dataset.layout=layout;overlay.querySelectorAll("[data-layout]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.layout===layout)));persist();}
- function activate(id){state.active=id;grid.querySelectorAll(".rw-window").forEach(w=>w.classList.toggle("is-active",w.dataset.windowId===id));}
- function renderEmpty(){if(!state.windows.length)grid.innerHTML='<div class="rw-workspace-empty"><strong>Your workspace, your layout.</strong>Open multiple Rainbow tools, duplicate the same tool, and arrange them side-by-side like Windows Snap Layouts.</div>';}
- function addWindow(item){
-  const id=makeId(),win={id,label:item.label,url:item.url(),minimized:false};state.windows.push(win);
-  const card=document.createElement("article");card.className="rw-window is-active";card.dataset.windowId=id;
-  const head=document.createElement("div");head.className="rw-window-head";
-  const name=document.createElement("span");name.className="rw-window-name";name.textContent=item.label;
-  const actions=document.createElement("div");actions.className="rw-window-actions";
-  const rename=document.createElement("button");rename.type="button";rename.textContent="✎";rename.title="Rename this tab";
-  const minimize=document.createElement("button");minimize.type="button";minimize.textContent="−";minimize.title="Minimize window";
-  const maximize=document.createElement("button");maximize.type="button";maximize.textContent="□";maximize.title="Focus this window";
-  const close=document.createElement("button");close.type="button";close.textContent="×";close.title="Close window";
-  const frame=document.createElement("iframe");frame.className="rw-window-frame";frame.title=item.label;frame.loading="eager";frame.referrerPolicy="strict-origin-when-cross-origin";frame.src=win.url;
-  rename.addEventListener("click",()=>{const next=prompt("Name this workspace tab:",win.label);if(next&&next.trim()){win.label=next.trim().slice(0,48);name.textContent=win.label;frame.title=win.label;}});
-  name.addEventListener("dblclick",()=>rename.click());
-  minimize.addEventListener("click",()=>{card.classList.toggle("is-minimized");win.minimized=card.classList.contains("is-minimized");});
-  maximize.addEventListener("click",()=>{activate(id);chooseLayout("focus");});
-  close.addEventListener("click",()=>{state.windows=state.windows.filter(w=>w.id!==id);card.remove();renderEmpty();});
-  head.addEventListener("click",()=>activate(id));actions.append(rename,minimize,maximize,close);head.append(name,actions);card.append(head,frame);
-  head.draggable=true;head.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/rw-window",id);e.dataTransfer.effectAllowed="move";});
-  card.addEventListener("dragover",e=>{e.preventDefault();e.dataTransfer.dropEffect="move";});
-  card.addEventListener("drop",e=>{e.preventDefault();const movingId=e.dataTransfer.getData("text/rw-window");const movingCard=Array.from(grid.children).find(x=>x.dataset.windowId===movingId);if(movingCard&&movingCard!==card){const rect=card.getBoundingClientRect();grid.insertBefore(movingCard,e.clientX>rect.left+rect.width/2?card.nextSibling:card);}});
-  grid.append(card);activate(id);if(state.windows.length===1)chooseLayout("focus");else if(state.windows.length===2)chooseLayout("two");else if(state.windows.length===3)chooseLayout("three");else if(state.windows.length>=4)chooseLayout("four");
+ function persist(){
+  try{localStorage.setItem("rainbow.workspace.windows.v1",JSON.stringify({layout:state.layout,active:state.active,windows:state.windows.map((w,index)=>({...w,order:index}))}));}
+  catch{ }
  }
- catalog.forEach(item=>{const b=document.createElement("button");b.type="button";b.textContent="+ "+item.label;b.addEventListener("click",()=>addWindow(item));picker.append(b);});
+ function chooseLayout(layout){if(!["two","three","four","focus"].includes(layout))return;state.layout=layout;overlay.dataset.layout=layout;overlay.querySelectorAll("[data-layout]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.layout===layout)));persist();}
+ function activate(id){state.active=id;grid.querySelectorAll(".rw-window").forEach(w=>w.classList.toggle("is-active",w.dataset.windowId===id));persist();}
+ function renderEmpty(){if(!state.windows.length)grid.innerHTML='<div class="rw-workspace-empty"><strong>Your workspace, your layout.</strong>Open multiple Rainbow tools, duplicate the same tool, and arrange them side-by-side like Windows Snap Layouts.</div>';}
+ function syncOrderFromDOM(){const ids=Array.from(grid.querySelectorAll(".rw-window")).map(el=>el.dataset.windowId);state.windows.sort((a,b)=>ids.indexOf(a.id)-ids.indexOf(b.id));persist();}
+ function addWindow(item,restored){
+  const win=restored||{id:makeId(),catalogId:item.id,label:item.label,url:item.url(),minimized:false};
+  if(!restored)state.windows.push(win);
+  let safeUrl;try{safeUrl=new URL(win.url,location.href);if(!["http:","https:"].includes(safeUrl.protocol)||safeUrl.origin!==location.origin)throw new Error("Invalid workspace URL");}catch{state.windows=state.windows.filter(w=>w.id!==win.id);return;}
+  win.url=safeUrl.href;
+  const card=document.createElement("article");card.className="rw-window"+(win.minimized?" is-minimized":"");card.dataset.windowId=win.id;
+  const head=document.createElement("div");head.className="rw-window-head";
+  const name=document.createElement("span");name.className="rw-window-name";name.textContent=win.label;
+  const actions=document.createElement("div");actions.className="rw-window-actions";
+  const rename=document.createElement("button");rename.type="button";rename.textContent="✎";rename.title="Rename this tab";rename.setAttribute("aria-label","Rename "+win.label);
+  const minimize=document.createElement("button");minimize.type="button";minimize.textContent=win.minimized?"+":"−";minimize.title=win.minimized?"Restore window":"Minimize window";minimize.setAttribute("aria-label",minimize.title);
+  const maximize=document.createElement("button");maximize.type="button";maximize.textContent="□";maximize.title="Focus this window";maximize.setAttribute("aria-label","Focus this window");
+  const close=document.createElement("button");close.type="button";close.textContent="×";close.title="Close window";close.setAttribute("aria-label","Close "+win.label);
+  const frame=document.createElement("iframe");frame.className="rw-window-frame";frame.title=win.label;frame.loading="eager";frame.referrerPolicy="strict-origin-when-cross-origin";frame.src=win.url;
+  rename.addEventListener("click",e=>{e.stopPropagation();const next=prompt("Name this workspace tab:",win.label);if(next&&next.trim()){win.label=next.trim().slice(0,48);name.textContent=win.label;frame.title=win.label;close.setAttribute("aria-label","Close "+win.label);rename.setAttribute("aria-label","Rename "+win.label);persist();}});
+  name.addEventListener("dblclick",()=>rename.click());
+  minimize.addEventListener("click",e=>{e.stopPropagation();win.minimized=!win.minimized;card.classList.toggle("is-minimized",win.minimized);minimize.textContent=win.minimized?"+":"−";minimize.title=win.minimized?"Restore window":"Minimize window";minimize.setAttribute("aria-label",minimize.title);persist();});
+  maximize.addEventListener("click",e=>{e.stopPropagation();activate(win.id);chooseLayout("focus");});
+  close.addEventListener("click",e=>{e.stopPropagation();state.windows=state.windows.filter(w=>w.id!==win.id);card.remove();if(state.active===win.id)state.active=state.windows.length?state.windows[state.windows.length-1].id:null;activate(state.active);renderEmpty();persist();});
+  head.addEventListener("click",()=>activate(win.id));actions.append(rename,minimize,maximize,close);head.append(name,actions);card.append(head,frame);
+  head.draggable=true;head.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/rw-window",win.id);e.dataTransfer.effectAllowed="move";});
+  card.addEventListener("dragover",e=>{e.preventDefault();e.dataTransfer.dropEffect="move";});
+  card.addEventListener("drop",e=>{e.preventDefault();const movingId=e.dataTransfer.getData("text/rw-window");const movingCard=Array.from(grid.children).find(x=>x.dataset.windowId===movingId);if(movingCard&&movingCard!==card){const rect=card.getBoundingClientRect();grid.insertBefore(movingCard,e.clientX>rect.left+rect.width/2?card.nextSibling:card);syncOrderFromDOM();}});
+  grid.append(card);activate(win.id);renderEmpty();
+ }
+ catalog.forEach(item=>{const b=document.createElement("button");b.type="button";b.textContent="+ "+item.label;b.addEventListener("click",()=>{addWindow(item);syncOrderFromDOM();});picker.append(b);});
  overlay.querySelectorAll("[data-layout]").forEach(b=>b.addEventListener("click",()=>chooseLayout(b.dataset.layout)));
  overlay.querySelector('[data-action="close"]').addEventListener("click",()=>overlay.classList.remove("open"));
  overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.classList.remove("open");});
  launcher.addEventListener("click",()=>{overlay.classList.add("open");if(innerWidth<=768)document.getElementById("appShell")?.classList.remove("mobile-sidebar-open");});
  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay.classList.contains("open"))overlay.classList.remove("open");});
-})();
-</script>
+ state.windows.forEach(win=>{const item=catalog.find(c=>c.id===win.catalogId);if(item)addWindow(item,win);});
+ chooseLayout(state.layout);if(state.active)activate(state.active);else if(state.windows.length)activate(state.windows[state.windows.length-1].id);
+ persist();
+})();</script>
 <script id="rw-nav-personalization">
 /* Sidebar personalization: safe DOM moves keep original feature event handlers intact. */
 (function(){
