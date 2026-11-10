@@ -6259,6 +6259,61 @@ button,input,select,textarea{min-width:0;max-width:100%}
   .rw-workspace-head,.rw-workspace-controls{gap:5px}
   .rw-workspace-controls button{flex:1 1 calc(50% - 5px)}
 }
+/* Small-phone comfort layer: preserve controls while giving the chat room to breathe. */
+@media (max-width: 380px) and (min-width: 281px) {
+  html,body{width:100%;min-width:0;overflow:hidden}
+  .app-shell{width:100%;min-width:0}
+  .workspace-header{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    grid-template-areas:"left left" "model nova" "actions actions";
+    gap:8px;
+    padding:9px 10px;
+  }
+  .header-left{width:100%;min-width:0}
+  .header-chat-title-wrap{max-width:none;min-width:0}
+  .header-chat-title{max-width:100%;font-size:.95rem}
+  .header-center{width:100%;max-width:none;min-width:0}
+  .control-pill-select{width:100%;max-width:100%;min-width:0;min-height:42px}
+  .control-pill-select select{width:100%;max-width:100%;min-width:0;font-size:14px}
+  #openNovaBtn{min-height:44px;padding-inline:12px}
+  .header-right{width:100%;max-width:none;min-width:0;justify-content:space-between;gap:5px;overflow:visible}
+  .header-right .icon-btn,.header-right .mode-toggle-btn{width:42px;min-width:42px;min-height:44px;padding-inline:8px}
+  .chat-scroll-container{padding:12px 10px 14px}
+  .chat-stream-inner{gap:16px}
+  .welcome-screen{width:100%;max-width:100%;padding:16px 4px;gap:14px}
+  .welcome-heading{font-size:clamp(1.35rem,6vw,1.65rem);line-height:1.2}
+  .welcome-subtext{font-size:.9rem;line-height:1.5}
+  .welcome-capabilities{gap:7px}
+  .capability-chip{font-size:.8rem;padding:8px 10px}
+  .starter-grid{grid-template-columns:minmax(0,1fr);gap:9px}
+  .starter-card{padding:13px;gap:8px}
+  .message-content{font-size:15px;line-height:1.6}
+  .message-content pre,.message-content code{font-size:13px}
+  .composer-region{padding:7px 8px calc(9px + env(safe-area-inset-bottom,0px))}
+  .composer-container{gap:6px}
+  .composer-box{padding:8px;border-radius:16px}
+  .composer-textarea{min-height:46px;max-height:150px;font-size:16px;line-height:1.45}
+  .composer-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:7px}
+  .composer-tools-left{min-width:0;flex-wrap:nowrap;gap:5px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+  .composer-tools-left::-webkit-scrollbar{display:none}
+  .composer-tool-btn{flex:0 0 auto;min-width:40px;min-height:42px;padding:7px 9px;font-size:.78rem}
+  .composer-tools-right{flex:0 0 auto;gap:5px}
+  .send-btn,.stop-btn{min-width:44px;min-height:44px;padding-inline:11px}
+  .composer-footnote{font-size:.7rem;line-height:1.4;flex-wrap:wrap}
+  .message-actions{gap:5px}
+  .message-action-btn{min-height:38px;padding:6px 9px}
+  .modal-backdrop{padding:8px}
+  .modal-panel{width:100%;max-width:100%;max-height:calc(100dvh - 16px);overflow:auto}
+}
+@media (max-width: 340px) and (min-width: 281px) {
+  .composer-tool-btn span{display:none}
+  .composer-tool-btn{width:42px;min-width:42px;justify-content:center;padding:7px}
+  .composer-tools-left{gap:4px}
+  .welcome-capabilities{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .capability-chip{min-width:0;white-space:normal;line-height:1.25}
+  .starter-card{padding:11px}
+  .header-right .icon-btn,.header-right .mode-toggle-btn{width:40px;min-width:40px}
+}
 @media(max-width:280px){
   /* Watch-sized / streamed viewport: prioritize readable conversation content. */
   html,body{width:100%;min-width:0;overflow:hidden}
