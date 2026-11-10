@@ -8851,7 +8851,7 @@ body { overflow: hidden; }
 }
 @media (max-width: 340px) {
   .header-right .hide-on-mobile, #openNovaBtn > span,
-  .composer-tool-btn > span { display: none !important; }
+  .composer-tool-btn > span, .send-btn > span, .stop-btn > span { display: none !important; }
   .header-right .icon-btn, .header-right .mode-toggle-btn,
   .composer-tool-btn { width: 42px; min-width: 42px; justify-content: center; }
   .composer-tools-left { gap: 4px; }
@@ -8933,7 +8933,7 @@ body { overflow: hidden; }
     overflow-x: auto;
     gap: 3px;
   }
-  .composer-tools-left button, .composer-tools-left button:not(#attachFileBtn), #attachFileBtn {
+  .composer-tools-left button:not(.hidden), .composer-tools-left button:not(#attachFileBtn):not(.hidden), #attachFileBtn:not(.hidden) {
     display: inline-flex !important;
     flex: 0 0 40px;
     width: 40px;
