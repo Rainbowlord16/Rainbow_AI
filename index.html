@@ -6803,7 +6803,22 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
               customSystemPrompt: $("#customSystemPromptInput")?.value || "",
               studyMode: state.studyMode
             },
-            profile: (() => { try { return JSON.parse(localStorage.getItem("rainbow_ai_profile") || "{}"); } catch { return {}; } })()
+            profile: (() => { try { return JSON.parse(localStorage.getItem("rainbow_ai_profile") || "{}"); } catch { return {}; } })(),
+            storage: (() => {
+              const data = {};
+              const prefixes = ["rainbow_ai_", "rainbow_nova_", "rainbow_agents_", "rainbow_workspace_v1:"];
+              const keys = new Set(["rainbow.workspace.windows.v1", "rainbow.sidebar.personalization.v1", "knowledge-graph", "memory-vault"]);
+              try {
+                for (let i = 0; i < localStorage.length; i++) {
+                  const key = localStorage.key(i);
+                  if (key && (keys.has(key) || prefixes.some(prefix => key.startsWith(prefix))) && key !== "rainbow:handoff:v1") {
+                    const value = localStorage.getItem(key);
+                    if (value !== null) data[key] = value;
+                  }
+                }
+              } catch (error) { console.warn("Some optional module data could not be included in the backup.", error); }
+              return data;
+            })()
           };
           downloadFile("rainbow-ai-backup.json", JSON.stringify(payload, null, 2), "application/json;charset=utf-8");
           notify("Workspace backup prepared.");
@@ -6857,7 +6872,18 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
               try { state.gateway = safeGateway(imported.gateway); } catch {}
             }
             state.studyMode = Boolean(imported.studyMode);
-            if (parsed.profile && typeof parsed.profile === "object") localStorage.setItem("rainbow_ai_profile", JSON.stringify(parsed.profile));
+            if (parsed.profile && typeof parsed.profile === "object" && !Array.isArray(parsed.profile)) localStorage.setItem("rainbow_ai_profile", JSON.stringify(parsed.profile));
+            // Restore only Rainbow-owned storage namespaces; never import arbitrary
+            // localStorage keys supplied by a backup file.
+            if (parsed.storage && typeof parsed.storage === "object" && !Array.isArray(parsed.storage)) {
+              const allowedPrefixes = ["rainbow_ai_", "rainbow_nova_", "rainbow_agents_", "rainbow_workspace_v1:"];
+              const allowedKeys = new Set(["rainbow.workspace.windows.v1", "rainbow.sidebar.personalization.v1", "knowledge-graph", "memory-vault"]);
+              for (const [key, value] of Object.entries(parsed.storage)) {
+                if (typeof key === "string" && typeof value === "string" && (allowedKeys.has(key) || allowedPrefixes.some(prefix => key.startsWith(prefix))) && key !== "rainbow:handoff:v1") {
+                  try { localStorage.setItem(key, value); } catch (storageError) { console.warn("A module backup item could not be restored:", key, storageError); }
+                }
+              }
+            }
             save(); setTheme(state.theme); renderAll(); syncProfile();
             if (el.gateway) el.gateway.value = state.gateway;
             notify("Backup imported successfully.");
