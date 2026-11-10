@@ -3236,6 +3236,20 @@ svg[data-rw-motion="generic"]:hover [data-rw-part="stroke"],button:hover svg[dat
       #appShell.sidebar-collapsed .sidebar-explore-btn span{display:block}
       #appShell.sidebar-collapsed .sidebar-explore-btn svg{width:19px;height:19px}
       #sidebarExploreBtn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+      /* Mobile viewport polish for full-screen tools and dialogs. */
+      @media (max-width: 768px) {
+        #truthLensModal { padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)); }
+        .tl-dialog { max-height: 100dvh; }
+        #rainbowKnowledgeMemoryModal { padding: 0; }
+        .km-shell { height: 100dvh; max-height: 100dvh; border-radius: 0; }
+        .rw2-backdrop { padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)); }
+        .rw2-panel { max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px); }
+        #rainbowHubOverlay { padding: 0; }
+        .rh-shell { height: 100dvh; max-height: 100dvh; }
+        #rainbowAgentsModal { padding: 0; }
+        .ra-shell { height: 100dvh; max-height: 100dvh; }
+      }
 </style>
   <style id="rw-workspace-window-styles">
 /* Rainbow Workspace Windows — independent, same-origin workspace instances */
@@ -6471,25 +6485,37 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
 
         function closeMobileSidebar({ restoreFocus = false } = {}) {
           const wasOpen = $("#appShell")?.classList.contains("mobile-sidebar-open");
+          const sidebar = $("#sidebar");
           $("#appShell")?.classList.remove("mobile-sidebar-open");
           $("#sidebarBackdrop")?.classList.remove("visible");
           document.body.classList.remove("mobile-nav-open");
           $("#mobileMenuBtn")?.setAttribute("aria-expanded", "false");
+          if (sidebar) {
+            const hiddenOnMobile = window.innerWidth <= 768;
+            sidebar.inert = hiddenOnMobile;
+            sidebar.setAttribute("aria-hidden", String(hiddenOnMobile));
+          }
           if (restoreFocus && wasOpen && window.innerWidth <= 768) $("#mobileMenuBtn")?.focus({ preventScroll: true });
         }
         $("#mobileMenuBtn")?.addEventListener("click", () => {
           const shell = $("#appShell");
           if (!shell) return;
           const opening = !shell.classList.contains("mobile-sidebar-open");
+          const sidebar = $("#sidebar");
+          if (sidebar) {
+            sidebar.inert = !opening && window.innerWidth <= 768;
+            sidebar.setAttribute("aria-hidden", String(!opening && window.innerWidth <= 768));
+          }
           shell.classList.toggle("mobile-sidebar-open", opening);
           $("#sidebarBackdrop")?.classList.toggle("visible", opening);
           document.body.classList.toggle("mobile-nav-open", opening);
           $("#mobileMenuBtn")?.setAttribute("aria-expanded", String(opening));
           if (opening) {
-            const firstAction = $("#sidebar")?.querySelector('button:not([disabled]), a[href], input:not([disabled])');
+            const firstAction = sidebar?.querySelector('button:not([disabled]), a[href], input:not([disabled])');
             firstAction?.focus({ preventScroll: true });
           }
         });
+        closeMobileSidebar();
         $("#sidebarBackdrop")?.addEventListener("click", () => closeMobileSidebar({ restoreFocus: true }));
         window.addEventListener("resize", () => {
           if (window.innerWidth > 768) closeMobileSidebar();
