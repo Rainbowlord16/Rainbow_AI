@@ -5783,7 +5783,7 @@ function novaMood(mood,label){const a=$("#novaAvatar");if(a)a.dataset.mood=mood;
 function speakText(text,who){if(!("speechSynthesis"in window))return notify("Speech output is not supported in this browser.");window.speechSynthesis.cancel();const clean=String(text).replace(/[#*_>]/g," ").slice(0,5000);const u=new SpeechSynthesisUtterance(clean);u.lang=navigator.language||"en-US";u.rate=.96;u.onstart=()=>novaMood("speaking",who+" is speaking.");u.onend=()=>novaMood("idle");u.onerror=()=>novaMood("idle");window.speechSynthesis.speak(u);}
 function openNova(){const log=$("#novaChatLog");if(log&&novaHistory.length&&log.children.length===1&&log.firstElementChild.textContent.startsWith("Hi!")){log.replaceChildren();novaHistory.forEach(m=>{const line=document.createElement("div");line.className="nova-line "+(m.role==="user"?"user":"");line.textContent=m.text||"";log.appendChild(line);});}$("#novaDrawer")?.classList.add("open");$("#novaOverlay")?.classList.add("open");$("#novaDrawer")?.setAttribute("aria-hidden","false");$("#novaInput")?.focus();}
 function closeNova(){novaController?.abort();$("#novaDrawer")?.classList.remove("open");$("#novaOverlay")?.classList.remove("open");$("#novaDrawer")?.setAttribute("aria-hidden","true");if(novaRecognition){try{novaRecognition.stop();}catch{}novaRecognition=null;}novaMood("idle");}
-let novaRecognition=null,novaController=null,novaBusy=false;$("#openNovaBtn")?.addEventListener("click",openNova);$("#openNovaSidebarBtn")?.addEventListener("click",()=>{openNova();if(window.innerWidth<=768)$("#sidebar")?.classList.remove("open");});$("#closeNovaBtn")?.addEventListener("click",closeNova);$("#novaOverlay")?.addEventListener("click",closeNova);
+let novaRecognition=null,novaController=null,novaBusy=false;$("#openNovaBtn")?.addEventListener("click",openNova);$("#openNovaSidebarBtn")?.addEventListener("click",()=>{openNova();if(window.innerWidth<=1024)$("#sidebar")?.classList.remove("open");});$("#closeNovaBtn")?.addEventListener("click",closeNova);$("#novaOverlay")?.addEventListener("click",closeNova);
 let novaHistory=[];try{novaHistory=JSON.parse(localStorage.getItem("rainbow_nova_history_v1")||"[]");if(!Array.isArray(novaHistory))novaHistory=[];}catch{novaHistory=[];}function novaLog(role,text){const log=$("#novaChatLog");if(!log)return;const line=document.createElement("div");line.className="nova-line "+(role==="user"?"user":"");line.textContent=text;log.appendChild(line);log.scrollTop=log.scrollHeight;novaHistory.push({role,text});try{localStorage.setItem("rainbow_nova_history_v1",JSON.stringify(novaHistory.slice(-80)));}catch{}}
 async function askNova(text){
   text=String(text||"").trim();
@@ -6755,7 +6755,7 @@ button,input,select,textarea{min-width:0;max-width:100%}
 
         // New chat and brand logo
         $("#newChatBtn")?.addEventListener("click", newConversation);
-        $("#brandHomeBtn")?.addEventListener("click", () => { if(window.innerWidth<=768){ $("#mobileMenuBtn")?.click(); return; } const shell=$("#appShell"); if(!shell)return; shell.classList.toggle("sidebar-collapsed"); $("#sidebarExploreBtn")?.setAttribute("aria-expanded",String(!shell.classList.contains("sidebar-collapsed"))); });
+        $("#brandHomeBtn")?.addEventListener("click", () => { if(window.innerWidth<=1024){ $("#mobileMenuBtn")?.click(); return; } const shell=$("#appShell"); if(!shell)return; shell.classList.toggle("sidebar-collapsed"); $("#sidebarExploreBtn")?.setAttribute("aria-expanded",String(!shell.classList.contains("sidebar-collapsed"))); });
 
         // Send with Enter; Shift+Enter inserts a newline.
         el.input?.addEventListener("keydown", (event) => {
@@ -6902,7 +6902,7 @@ button,input,select,textarea{min-width:0;max-width:100%}
           document.body.classList.remove("mobile-nav-open");
           $("#mobileMenuBtn")?.setAttribute("aria-expanded", "false");
           if (sidebar) {
-            const hiddenOnMobile = window.innerWidth <= 768;
+            const hiddenOnMobile = window.innerWidth <= 1024;
             sidebar.inert = hiddenOnMobile;
             sidebar.setAttribute("aria-hidden", String(hiddenOnMobile));
           }
@@ -6910,7 +6910,7 @@ button,input,select,textarea{min-width:0;max-width:100%}
             main.inert = false;
             main.removeAttribute("aria-hidden");
           }
-          if (restoreFocus && wasOpen && window.innerWidth <= 768) $("#mobileMenuBtn")?.focus({ preventScroll: true });
+          if (restoreFocus && wasOpen && window.innerWidth <= 1024) $("#mobileMenuBtn")?.focus({ preventScroll: true });
         }
         $("#mobileMenuBtn")?.addEventListener("click", () => {
           const shell = $("#appShell");
@@ -6919,12 +6919,12 @@ button,input,select,textarea{min-width:0;max-width:100%}
           const sidebar = $("#sidebar");
           const main = $(".workspace-main");
           if (sidebar) {
-            sidebar.inert = !opening && window.innerWidth <= 768;
-            sidebar.setAttribute("aria-hidden", String(!opening && window.innerWidth <= 768));
+            sidebar.inert = !opening && window.innerWidth <= 1024;
+            sidebar.setAttribute("aria-hidden", String(!opening && window.innerWidth <= 1024));
           }
           if (main) {
-            main.inert = opening && window.innerWidth <= 768;
-            if (opening && window.innerWidth <= 768) main.setAttribute("aria-hidden", "true");
+            main.inert = opening && window.innerWidth <= 1024;
+            if (opening && window.innerWidth <= 1024) main.setAttribute("aria-hidden", "true");
             else main.removeAttribute("aria-hidden");
           }
           shell.classList.toggle("mobile-sidebar-open", opening);
@@ -6938,14 +6938,14 @@ button,input,select,textarea{min-width:0;max-width:100%}
         });
         closeMobileSidebar();
         $("#sidebarBackdrop")?.addEventListener("click", () => closeMobileSidebar({ restoreFocus: true }));
-        let mobileNavViewport = window.innerWidth <= 768;
+        let mobileNavViewport = window.innerWidth <= 1024;
         window.addEventListener("resize", () => {
-          const nextMobileViewport = window.innerWidth <= 768;
+          const nextMobileViewport = window.innerWidth <= 1024;
           if (nextMobileViewport !== mobileNavViewport || !nextMobileViewport) closeMobileSidebar();
           mobileNavViewport = nextMobileViewport;
         }, { passive: true });
         $("#sidebar")?.addEventListener("click", event => {
-          if (window.innerWidth > 768 || !$("#appShell")?.classList.contains("mobile-sidebar-open")) return;
+          if (window.innerWidth > 1024 || !$("#appShell")?.classList.contains("mobile-sidebar-open")) return;
           if (event.target.closest("button, a[href], [role='menuitem']")) closeMobileSidebar();
         });
         document.addEventListener("keydown", event => {
@@ -7814,7 +7814,7 @@ async function run(){if(d.busy)return;let task=$("#raTask")?.value.trim();if(!ta
 root.addEventListener("change",e=>{if(e.target.id==="raWorkflowEditor"||e.target.id==="raWorkflow"){d.activeWorkflowId=e.target.value;save();if(e.target.id==="raWorkflowEditor")workflow();}});
 root.addEventListener("click",async e=>{const t=e.target.closest("[data-page]");if(t){switchPage(t.dataset.page);return;}if(e.target.closest(".ra-close")){close();return;}const go=e.target.closest("[data-go]");if(go){switchPage(go.dataset.go);return;}const b=e.target.closest("[data-act]");if(!b)return;const w=d.workflows.find(x=>x.id===($("#raWorkflowEditor")?.value||d.activeWorkflowId))||d.workflows[0],i=Number(b.dataset.index),id=b.dataset.id;switch(b.dataset.act){case"create":editAgent();break;case"create-workflow":{const name=await prompt("Name your new workflow","New workflow");if(name===null)return;if(!name.trim())return notify("Enter a workflow name.");const wid="workflow-"+(crypto.randomUUID?.()||Date.now());d.workflows.push({id:wid,name:name.trim().slice(0,80),agentIds:[]});d.activeWorkflowId=wid;save();render();break;}case"edit":editAgent(d.agents.find(a=>a.id===id));break;case"delete":if(await confirm("Delete this agent and remove it from workflows?")){d.agents=d.agents.filter(a=>a.id!==id);d.workflows.forEach(x=>x.agentIds=x.agentIds.filter(v=>v!==id));save();render();}break;case"add":{const v=$("#raAdd")?.value;if(v&&w&&!w.agentIds.includes(v)){w.agentIds.push(v);save();workflow();}}break;case"remove":if(w){w.agentIds.splice(i,1);save();workflow();}break;case"up":if(w&&i>0){[w.agentIds[i-1],w.agentIds[i]]=[w.agentIds[i],w.agentIds[i-1]];save();workflow();}break;case"down":if(w&&i<w.agentIds.length-1){[w.agentIds[i+1],w.agentIds[i]]=[w.agentIds[i],w.agentIds[i+1]];save();workflow();}break;case"save-workflow":if(w){w.name=$("#raWName")?.value.trim()||"My workflow";d.activeWorkflowId=w.id;save();notify("Workflow saved.");workflow();}break;case"run":await run();break;case"save-resources":{const a=d.agents.find(x=>x.id===id);if(a){a.knowledge=root.querySelector('[data-knowledge="'+CSS.escape(id)+'"]')?.value||"";a.tools=root.querySelector('[data-tools="'+CSS.escape(id)+'"]')?.value||"";save();notify("Agent resources saved locally.");}}break;case"clear":if(await confirm("Clear all local agent run history?")){d.runs=[];save();runs();}break;case"rate":{const r=d.runs.find(x=>x.id===id);if(r){r.rating=b.dataset.rating;save();runs();}}break;}});
 root.addEventListener("click",e=>{if(e.target===root)close();});document.addEventListener("keydown",e=>{if(e.key==="Escape"&&root.classList.contains("open"))close();});
-document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=>{open();if(innerWidth<=768)document.getElementById("appShell")?.classList.remove("mobile-sidebar-open");});render();save();
+document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=>{open();if(innerWidth<=1024)document.getElementById("appShell")?.classList.remove("mobile-sidebar-open");});render();save();
 })();
 /* END RAINBOW_AGENTS_STUDIO_V1 */
 
@@ -7837,7 +7837,7 @@ document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=
     </div></div>`;
   document.body.appendChild(modal);
   const $=q=>modal.querySelector(q), esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  function open(){modal.classList.add("open");modal.setAttribute("aria-hidden","false");$("#tlClaim").focus();if(innerWidth<=768)document.getElementById("appShell")?.classList.remove("mobile-sidebar-open");}
+  function open(){modal.classList.add("open");modal.setAttribute("aria-hidden","false");$("#tlClaim").focus();if(innerWidth<=1024)document.getElementById("appShell")?.classList.remove("mobile-sidebar-open");}
   function close(){modal.classList.remove("open");modal.setAttribute("aria-hidden","true");}
   trigger.addEventListener("click",open);modal.addEventListener("click",e=>{if(e.target===modal||e.target.closest("[data-tl-close]"))close();});
   document.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("open"))close();});
@@ -7882,7 +7882,7 @@ document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=
   if(!graph||!Array.isArray(graph.nodes)||!Array.isArray(graph.edges))graph={nodes:[],edges:[]};if(!Array.isArray(memories))memories=[];
   const saveGraph=()=>api.storage.set("knowledge-graph",graph),saveMemories=()=>api.storage.set("memory-vault",memories);
   function switchTab(tab){root.querySelectorAll("[data-km-tab]").forEach(b=>b.classList.toggle("active",b.dataset.kmTab===tab));root.querySelectorAll("[data-km-panel]").forEach(p=>p.classList.toggle("active",p.dataset.kmPanel===tab));if(tab==="graph")renderGraph();else renderMemories();}
-  function open(tab){root.classList.add("open");root.setAttribute("aria-hidden","false");switchTab(tab);if(innerWidth<=768)document.getElementById("appShell")?.classList.remove("mobile-sidebar-open");}
+  function open(tab){root.classList.add("open");root.setAttribute("aria-hidden","false");switchTab(tab);if(innerWidth<=1024)document.getElementById("appShell")?.classList.remove("mobile-sidebar-open");}
   function close(){root.classList.remove("open");root.setAttribute("aria-hidden","true");}
   function renderGraph(){const q=($("#kmGraphSearch").value||"").trim().toLowerCase(),nodes=graph.nodes.filter(n=>(n.title+" "+n.type+" "+n.notes).toLowerCase().includes(q));$("#kmGraphCount").textContent=graph.nodes.length+" nodes";$("#kmNodes").innerHTML=nodes.length?nodes.map(n=>'<article class="km-item"><div class="km-item-head"><strong>'+esc(n.title)+'</strong><span class="km-meta">'+esc(n.type)+'</span></div><p>'+esc(n.notes||"No notes yet.")+'</p><div class="km-item-actions"><button class="km-btn" data-km-action="delete-node" data-id="'+esc(n.id)+'" type="button">Delete node</button></div></article>').join(""):'<div class="km-empty">No matching knowledge nodes yet. Add a node to start connecting ideas.</div>';const edges=graph.edges.filter(e=>{const a=graph.nodes.find(n=>n.id===e.from),b=graph.nodes.find(n=>n.id===e.to);return a&&b&&(a.title+" "+b.title+" "+e.label).toLowerCase().includes(q);});$("#kmEdges").innerHTML=edges.length?edges.map(e=>{const a=graph.nodes.find(n=>n.id===e.from),b=graph.nodes.find(n=>n.id===e.to);return '<article class="km-item"><strong>'+esc(a.title)+'</strong> <span class="km-meta">'+esc(e.label)+' → </span><strong>'+esc(b.title)+'</strong><div class="km-item-actions"><button class="km-btn" data-km-action="delete-edge" data-id="'+esc(e.id)+'" type="button">Remove relationship</button></div></article>';}).join(""):'<div class="km-empty">No relationships yet.</div>';const opts=graph.nodes.map(n=>'<option value="'+esc(n.id)+'">'+esc(n.title)+'</option>').join("");$("#kmFrom").innerHTML=opts;$("#kmTo").innerHTML=opts;}
   function renderMemories(){const q=($("#kmMemorySearch").value||"").trim().toLowerCase(),items=memories.filter(m=>(m.title+" "+m.body+" "+(m.tags||[]).join(" ")).toLowerCase().includes(q)).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||b.createdAt-a.createdAt);$("#kmMemoryCount").textContent=memories.length+" saved";$("#kmMemories").innerHTML=items.length?items.map(m=>'<article class="km-item"><div class="km-item-head"><strong>'+(m.pinned?"★ ":"")+esc(m.title)+'</strong><span class="km-meta">'+new Date(m.createdAt).toLocaleDateString()+'</span></div><p>'+esc(m.body)+'</p><div>'+(m.tags||[]).map(t=>'<span class="km-tag">'+esc(t)+'</span>').join("")+'</div><div class="km-item-actions"><button class="km-btn" data-km-action="pin-memory" data-id="'+esc(m.id)+'" type="button">'+(m.pinned?"Unpin":"Pin")+"</button><button class=\"km-btn\" data-km-action=\"delete-memory\" data-id=\""+esc(m.id)+"\" type=\"button\">Delete</button></div></article>").join(""):'<div class="km-empty">Your Memory Vault is empty. Save a useful note or idea to keep it here.</div>';}
@@ -8364,7 +8364,7 @@ renderFlow();renderStories();renderTimer();
  overlay.setAttribute("aria-hidden","true");
  overlay.querySelector('[data-action="close"]').addEventListener("click",closeWorkspace);
  overlay.addEventListener("click",e=>{if(e.target===overlay)closeWorkspace();});
- launcher.addEventListener("click",()=>{if(innerWidth<=768)document.getElementById("appShell")?.classList.remove("mobile-sidebar-open");openWorkspace();});
+ launcher.addEventListener("click",()=>{if(innerWidth<=1024)document.getElementById("appShell")?.classList.remove("mobile-sidebar-open");openWorkspace();});
  document.addEventListener("keydown",e=>{if(!overlay.classList.contains("open"))return;if(e.key==="Escape"){e.preventDefault();closeWorkspace();return;}if(e.key==="Tab"){const focusable=Array.from(overlay.querySelectorAll('button:not([disabled]),[href],input:not([disabled]),[tabindex]:not([tabindex="-1"])')).filter(el=>el.getClientRects().length);if(!focusable.length){e.preventDefault();return;}const first=focusable[0],last=focusable[focusable.length-1];if(e.shiftKey&&(document.activeElement===first||!overlay.contains(document.activeElement))){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
  // Restore from a snapshot: addWindow may discard invalid entries from state.windows.
  [...state.windows].forEach(win=>{const item=catalog.find(c=>c.id===win.catalogId);if(item)addWindow(item,win);});
@@ -8513,5 +8513,486 @@ svg[data-rw-motion-ready="1"][data-rw-animation="rw-icon-ink-reveal"]{--rw-motio
 #brandHomeBtn .brand-icon .brand-logo-image{transition:opacity .18s ease,transform .22s ease}
 .sidebar-header #sidebarCollapseBtn{display:none!important;visibility:hidden!important;pointer-events:none!important}
 @media(prefers-reduced-motion:reduce){#brandHomeBtn .brand-icon .brand-collapse-glyph,#brandHomeBtn .brand-icon .brand-logo-image{transition:none!important}}
-</style></body>
+</style>
+<style id="rw-responsive-redesign-2026">
+/* Rainbow AI responsive system: one consistent layout contract across devices. */
+:root {
+  --rw-mobile-gutter: clamp(10px, 2.6vw, 22px);
+  --rw-touch-target: 44px;
+  --rw-safe-top: env(safe-area-inset-top, 0px);
+  --rw-safe-right: env(safe-area-inset-right, 0px);
+  --rw-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --rw-safe-left: env(safe-area-inset-left, 0px);
+}
+html, body {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+body { overflow: hidden; }
+#appShell, .app-shell, .workspace-main, .workspace-body, .chat-column,
+.chat-scroll-container, .chat-stream-inner, .composer-region,
+.composer-container, .composer-box, .message-row, .message-bubble,
+.message-content, .starter-prompts-section, .starter-grid,
+.workspace-header, .header-left, .header-center, .header-right {
+  min-width: 0;
+  max-width: 100%;
+}
+.app-shell {
+  width: 100%;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+.workspace-main, .workspace-body, .chat-column { min-height: 0; }
+.chat-column { flex: 1 1 0; }
+.chat-scroll-container {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  scroll-padding-block: 16px;
+}
+.chat-stream-inner {
+  width: min(100%, var(--chat-max-width, 900px));
+  margin-inline: auto;
+}
+.message-content { overflow-wrap: anywhere; }
+.message-content pre, .message-content table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+.message-content img, .message-content video, .message-content iframe {
+  max-width: 100%;
+  height: auto;
+}
+.composer-region {
+  flex: 0 0 auto;
+  width: 100%;
+  padding-inline: var(--rw-mobile-gutter);
+  padding-bottom: max(10px, var(--rw-safe-bottom));
+}
+.composer-container { width: min(100%, var(--composer-max-width, 840px)); }
+.composer-box { width: 100%; }
+.composer-textarea {
+  width: 100%;
+  min-width: 0;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+.modal-backdrop, .modal, .modal-dialog, .modal-panel,
+.modal-body, .modal-header, .modal-footer { min-width: 0; max-width: 100%; }
+.modal-dialog, .modal-panel {
+  max-height: calc(100dvh - 32px - var(--rw-safe-top) - var(--rw-safe-bottom));
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+#novaDrawer, #rainbowExplorePanel, #rwWorkspacePanel,
+#rwNavEditor .rwne-panel { min-width: 0; max-width: 100%; }
+#rainbowExploreOverlay, #rwWorkspaceOverlay, #rwNavEditor {
+  max-width: 100vw;
+  max-height: 100dvh;
+}
+
+/* Tablet and compact laptop: navigation becomes a proper drawer, not a squeezed rail. */
+@media (max-width: 1024px) {
+  html, body { height: 100%; min-height: 100%; }
+  .app-shell {
+    height: 100%;
+    height: 100dvh;
+    padding-top: max(2px, var(--rw-safe-top));
+  }
+  .sidebar {
+    position: fixed;
+    top: max(2px, var(--rw-safe-top));
+    bottom: var(--rw-safe-bottom);
+    left: var(--rw-safe-left);
+    width: min(84vw, 340px);
+    min-width: 0;
+    max-width: min(88vw, 340px);
+    height: auto;
+    transform: translateX(calc(-100% - 14px));
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 60;
+    box-shadow: 0 22px 70px rgba(0,0,0,.42);
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  #appShell.mobile-sidebar-open .sidebar {
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+  }
+  #appShell.sidebar-collapsed .sidebar {
+    width: min(84vw, 340px);
+    min-width: 0;
+    max-width: min(88vw, 340px);
+  }
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: rgba(2, 6, 18, .58);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .2s ease, visibility .2s ease;
+  }
+  .sidebar-backdrop.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .mobile-menu-trigger {
+    display: inline-flex !important;
+    flex: 0 0 var(--rw-touch-target);
+    width: var(--rw-touch-target);
+    min-width: var(--rw-touch-target);
+    min-height: var(--rw-touch-target);
+    align-items: center;
+    justify-content: center;
+  }
+  .workspace-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "left actions" "model nova";
+    align-items: center;
+    gap: 7px 10px;
+    height: auto;
+    min-height: 0;
+    flex: 0 0 auto;
+    padding: 9px var(--rw-mobile-gutter);
+  }
+  .header-left { grid-area: left; width: 100%; min-width: 0; flex: initial; }
+  .header-center {
+    grid-area: model;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    justify-content: flex-start;
+    overflow: visible;
+  }
+  #openNovaBtn {
+    grid-area: nova;
+    justify-self: end;
+    align-self: center;
+    min-width: var(--rw-touch-target);
+    min-height: var(--rw-touch-target);
+    white-space: nowrap;
+  }
+  .header-right {
+    grid-area: actions;
+    display: flex;
+    width: auto;
+    max-width: min(52vw, 360px);
+    min-width: 0;
+    flex: 0 1 auto;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 5px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .header-right::-webkit-scrollbar { display: none; }
+  .header-right > * { flex: 0 0 auto; }
+  .header-right .icon-btn, .header-right .mode-toggle-btn {
+    min-width: 42px;
+    min-height: 44px;
+    width: 42px;
+    justify-content: center;
+  }
+  .header-chat-title-wrap { flex: 1 1 auto; min-width: 0; max-width: none; }
+  .header-chat-title {
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .control-pill-select { min-width: 0; max-width: 100%; }
+  .control-pill-select select { min-width: 0; max-width: 100%; }
+  .chat-scroll-container { padding: 14px var(--rw-mobile-gutter) 18px; }
+  .chat-stream-inner { gap: clamp(14px, 2.5vw, 20px); }
+  .starter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .starter-card { min-width: 0; padding: 12px; }
+  .welcome-screen { width: 100%; max-width: 640px; margin-inline: auto; }
+  .composer-region { padding: 7px var(--rw-mobile-gutter) max(10px, var(--rw-safe-bottom)); }
+  .composer-toolbar { min-width: 0; gap: 8px; }
+  .composer-tools-left, .composer-tools-right { min-width: 0; }
+  .composer-tool-btn, .send-btn, .stop-btn, .message-action-btn,
+  .sidebar-nav-btn { min-height: var(--rw-touch-target); }
+  .staged-file-remove { width: 40px; height: 40px; min-width: 40px; }
+  .canvas-drawer { width: min(94vw, 620px); max-width: 100%; }
+  .modal-backdrop { padding: max(8px, var(--rw-safe-top)) 10px max(8px, var(--rw-safe-bottom)); }
+  .modal-dialog, .modal-panel {
+    width: min(100%, 720px);
+    max-height: calc(100dvh - 20px - var(--rw-safe-top) - var(--rw-safe-bottom));
+  }
+  #novaDrawer { width: min(460px, 92vw); max-width: 100vw; }
+  #rwWorkspacePanel { width: min(96vw, 1200px); max-height: calc(100dvh - 16px); }
+  #rwNavEditor .rwne-panel { width: min(760px, 96vw); max-height: calc(100dvh - 16px); overflow: auto; }
+}
+
+/* Phones: three intentional header rows prevent controls colliding with the chat title. */
+@media (max-width: 560px) {
+  .workspace-header {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "left left" "model nova" "actions actions";
+    gap: 8px;
+    padding: 9px max(10px, var(--rw-safe-left)) 9px max(10px, var(--rw-safe-right));
+  }
+  .header-left { width: 100%; }
+  .header-center { width: 100%; max-width: none; }
+  .header-center .hide-on-mobile { display: none !important; }
+  .control-pill-select { width: 100%; max-width: 100%; min-height: 44px; }
+  .control-pill-select select { width: 100%; max-width: 100%; min-width: 0; font-size: 14px; }
+  #openNovaBtn { justify-self: end; min-height: 44px; padding-inline: 12px; }
+  .header-right {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    justify-content: space-between;
+    gap: 5px;
+    overflow-x: auto;
+  }
+  .header-right .icon-btn, .header-right .mode-toggle-btn {
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .chat-scroll-container { padding: 12px 10px 16px; }
+  .welcome-screen { width: 100%; max-width: 100%; padding: 16px 2px; gap: 14px; }
+  .welcome-heading { font-size: clamp(1.35rem, 6vw, 1.75rem); line-height: 1.2; }
+  .welcome-subtext { font-size: .9rem; line-height: 1.55; }
+  .welcome-capabilities { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .capability-chip { min-width: 0; min-height: 42px; padding: 9px; white-space: normal; line-height: 1.3; }
+  .starter-grid { grid-template-columns: minmax(0, 1fr); gap: 9px; }
+  .starter-card { padding: 13px; gap: 8px; }
+  .starter-card-title { font-size: .92rem; }
+  .starter-card-desc { font-size: .82rem; }
+  .composer-region { padding: 7px 8px max(9px, var(--rw-safe-bottom)); }
+  .composer-box { padding: 8px; border-radius: 16px; }
+  .composer-textarea { min-height: 46px; max-height: 150px; font-size: 16px; line-height: 1.45; }
+  .composer-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 7px; }
+  .composer-tools-left {
+    min-width: 0;
+    flex-wrap: nowrap;
+    gap: 5px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .composer-tools-left::-webkit-scrollbar { display: none; }
+  .composer-tool-btn { flex: 0 0 auto; min-width: 42px; min-height: 44px; padding: 8px 10px; }
+  .composer-tools-right { flex: 0 0 auto; gap: 5px; }
+  .send-btn, .stop-btn { min-width: 44px; min-height: 44px; padding-inline: 11px; }
+  .composer-footnote { font-size: .7rem; line-height: 1.4; flex-wrap: wrap; gap: 4px 8px; }
+  .ai-accuracy-notice { font-size: .72rem; line-height: 1.4; }
+  .message-content { font-size: 15px; line-height: 1.6; }
+  .message-content pre, .message-content code { font-size: 13px; }
+  .message-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+  .message-action-btn { min-height: 40px; padding: 7px 10px; }
+  .modal-backdrop { padding: 8px; }
+  .modal-dialog, .modal-panel {
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100dvh - 16px - var(--rw-safe-top) - var(--rw-safe-bottom));
+    border-radius: 16px;
+  }
+  .modal-header, .modal-body, .modal-footer { padding: 14px; }
+  .modal-body { overflow-x: hidden; }
+  .settings-tabs, .settings-tab-list, [role="tablist"] {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  #novaDrawer { inset: auto 0 0; width: 100%; max-width: 100%; max-height: min(92dvh, 900px); border-radius: 20px 20px 0 0; }
+  #novaOverlay { z-index: 999; }
+  #rainbowExploreOverlay { padding: 0; }
+  #rainbowExplorePanel { width: 100%; max-width: 100%; max-height: 100dvh; border-radius: 0; }
+  #rwWorkspaceOverlay { padding: 0; }
+  #rwWorkspacePanel { width: 100%; max-width: 100%; height: 100dvh; max-height: 100dvh; border-radius: 0; }
+  #rwNavEditor { padding: 0; }
+  #rwNavEditor .rwne-panel { width: 100%; max-width: 100%; max-height: 100dvh; border-radius: 0; }
+}
+
+/* Small phones: retain all actions; labels yield before controls do. */
+@media (max-width: 380px) {
+  .workspace-header { gap: 7px; padding: 8px 8px; }
+  .header-chat-title { font-size: .9rem; }
+  .header-left { gap: 4px; }
+  .header-left .mobile-menu-trigger { width: 42px; min-width: 42px; }
+  .header-right { justify-content: flex-start; }
+  .header-right .icon-btn, .header-right .mode-toggle-btn { width: 42px; min-width: 42px; }
+  .welcome-capabilities { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .capability-chip { font-size: .78rem; padding: 8px 6px; }
+  .composer-tools-left { gap: 4px; }
+  .composer-tool-btn { padding-inline: 8px; }
+  .starter-card { padding: 12px; }
+  .message-content { font-size: 14px; }
+  .message-content pre, .message-content code { font-size: 12px; }
+}
+@media (max-width: 340px) {
+  .header-right .hide-on-mobile, #openNovaBtn > span,
+  .composer-tool-btn > span { display: none !important; }
+  .header-right .icon-btn, .header-right .mode-toggle-btn,
+  .composer-tool-btn { width: 42px; min-width: 42px; justify-content: center; }
+  .composer-tools-left { gap: 4px; }
+  .header-right { gap: 4px; }
+  .starter-card { padding: 11px; }
+}
+
+/* Ultra-narrow and watch-streamed viewports: compact, not feature-stripped. */
+@media (max-width: 280px) {
+  html, body, #appShell, .app-shell {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+  }
+  .sidebar { display: flex !important; }
+  .sidebar-backdrop { display: block !important; }
+  .workspace-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    grid-template-areas: "left left" "model nova" "actions actions" !important;
+    gap: 5px !important;
+    padding: 5px 5px !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+  .header-left { grid-area: left !important; display: flex !important; min-width: 0; }
+  .header-left .mobile-menu-trigger { display: inline-flex !important; }
+  .header-left .icon-btn:not(#mobileMenuBtn) { display: inline-flex !important; }
+  .header-chat-title-wrap { max-width: none !important; min-width: 0; }
+  .header-chat-title { max-width: 100% !important; font-size: 12px !important; }
+  .header-center { display: flex !important; grid-area: model !important; width: 100%; min-width: 0; }
+  #openNovaBtn { display: inline-flex !important; grid-area: nova !important; min-width: 40px; min-height: 40px; padding: 6px; }
+  .header-right {
+    display: flex !important;
+    grid-area: actions !important;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    justify-content: flex-start;
+    gap: 4px;
+  }
+  .header-right .icon-btn, .header-right .mode-toggle-btn {
+    display: inline-flex !important;
+    flex: 0 0 40px;
+    width: 40px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+  .control-pill-select, .control-pill-select select { width: 100%; min-width: 0; max-width: 100%; }
+  .chat-scroll-container { padding: 7px 6px 10px; }
+  .chat-stream-inner { gap: 10px; }
+  .welcome-screen { display: flex !important; width: 100%; padding: 10px 2px; gap: 9px; }
+  .welcome-heading { font-size: 1.05rem; line-height: 1.2; }
+  .welcome-subtext { font-size: .76rem; line-height: 1.4; padding-inline: 2px; }
+  .welcome-prism-badge { width: 36px; height: 36px; }
+  .welcome-capabilities { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+  .capability-chip { min-width: 0; min-height: 38px; padding: 6px 4px; font-size: 10px; white-space: normal; }
+  .starter-prompts-section { display: flex !important; width: 100%; }
+  .starter-grid { display: grid !important; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .starter-card { display: flex !important; min-width: 0; padding: 8px; gap: 5px; }
+  .starter-card-title { font-size: 12px; }
+  .starter-card-desc { font-size: 10px; line-height: 1.35; }
+  .starter-prompts-title { font-size: 9px; }
+  #shuffleStartersBtn { min-height: 36px; padding: 5px 7px; font-size: 10px; }
+  .message-content { font-size: 13px; line-height: 1.5; }
+  .message-content pre, .message-content code, .message-content table { font-size: 11px; }
+  .composer-region { padding: 4px 4px max(5px, var(--rw-safe-bottom)); }
+  .composer-box { padding: 5px; border-radius: 12px; }
+  .composer-textarea { min-height: 38px; max-height: 84px; font-size: 16px; line-height: 1.35; }
+  .composer-toolbar { display: grid !important; grid-template-columns: minmax(0, 1fr) auto; gap: 4px; }
+  .composer-tools-left {
+    display: flex !important;
+    min-width: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 3px;
+  }
+  .composer-tools-left button, #attachFileBtn {
+    display: inline-flex !important;
+    flex: 0 0 40px;
+    width: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 5px;
+    justify-content: center;
+  }
+  .composer-tool-btn > span { display: none !important; }
+  .composer-tools-right { display: flex !important; flex: 0 0 auto; }
+  #sendMessageBtn, .send-btn, .stop-btn {
+    display: inline-flex !important;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 5px;
+    justify-content: center;
+  }
+  .composer-footnote, .ai-accuracy-notice { display: block !important; font-size: 9px; line-height: 1.3; }
+  .message-actions { display: flex; flex-wrap: wrap; gap: 3px; }
+  .message-action-btn { min-height: 34px; padding: 5px 6px; font-size: 10px; }
+  .modal-backdrop { padding: 3px !important; }
+  .modal-dialog, .modal-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: calc(100dvh - 6px) !important;
+    border-radius: 9px !important;
+  }
+  .modal-header, .modal-body, .modal-footer { padding: 8px !important; }
+  #novaDrawer { inset: 0 !important; width: 100% !important; max-width: 100% !important; max-height: 100dvh !important; border-radius: 0 !important; }
+  #rainbowExploreOverlay, #rwWorkspaceOverlay { padding: 0 !important; }
+  #rainbowExplorePanel, #rwWorkspacePanel, #rwNavEditor .rwne-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+  }
+}
+
+/* Landscape phones and compact-height tablets: protect the conversation viewport. */
+@media (max-height: 520px) and (max-width: 1024px) {
+  .workspace-header { gap: 5px; padding-block: 5px; }
+  .welcome-screen { padding-block: 7px; gap: 8px; }
+  .welcome-prism-badge { width: 38px; height: 38px; }
+  .welcome-heading { font-size: clamp(1.15rem, 4vw, 1.5rem); }
+  .welcome-capabilities { gap: 5px; }
+  .composer-textarea { max-height: 88px; }
+  .modal-dialog, .modal-panel { max-height: calc(100dvh - 10px); }
+}
+
+/* Touch devices: comfortably tappable controls without hover-only affordances. */
+@media (hover: none), (pointer: coarse) {
+  button, a, [role="button"], input, select, textarea { touch-action: manipulation; }
+  button, .icon-btn, .sidebar-nav-btn, .capability-chip { -webkit-tap-highlight-color: transparent; }
+  .message-actions { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sidebar, .sidebar-backdrop, .workspace-main, .rw-workspace-panel,
+  #novaDrawer, #rainbowExplorePanel { transition: none !important; }
+}
+</style>
+</body>
 </html>
