@@ -9136,25 +9136,34 @@ body { overflow: hidden; }
 }
 
 
-/* Compact component sizing: keep text readable without letting controls balloon. */
+/* Balanced text containment: wrap labels before they escape narrow cards. */
 #appShell :where(button, .btn, .icon-btn, .mode-toggle-btn, .sidebar-nav-btn,
-  .composer-tool-btn, .message-action-btn, .canvas-toolbar button) {
-  white-space: nowrap;
-  overflow-wrap: normal;
+  .composer-tool-btn, .message-action-btn, .canvas-toolbar button,
+  .capability-chip, .starter-card, .modal button, .settings-tabs button) {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
   word-break: normal;
-  flex: 0 0 auto;
-  min-height: 38px;
+  flex: 0 1 auto;
+  min-height: 36px;
   height: auto;
-  line-height: 1.2;
-  padding-block: 8px;
+  line-height: 1.25;
+  padding-block: 7px;
 }
 #appShell :where(.header-right, .composer-tools-left, .composer-tools-right,
   .canvas-toolbar, .message-actions) {
   align-items: center;
+  min-width: 0;
+  max-width: 100%;
 }
-#appShell :where(.starter-card, .capability-chip, .message-content,
-  .canvas-preview-pane, .modal-body, .settings-section) {
-  overflow-wrap: break-word;
+#appShell :where(.starter-card, .capability-chip, .message-bubble,
+  .message-content, .modal-body, .settings-section, .canvas-preview-pane,
+  .canvas-footer, .canvas-header, .canvas-title-input) {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
   word-break: normal;
 }
 #appShell :where(.starter-card) {
