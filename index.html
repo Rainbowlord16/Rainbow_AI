@@ -6152,7 +6152,139 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
             const label=document.createElement("span");label.className="message-author";label.textContent=message.role==="user"?"You":"Rainbow AI";header.appendChild(label);
             const bubble=document.createElement("div");bubble.className="message-bubble";const content=document.createElement("div");content.className="message-content";
             if(message.role==="assistant"&&typeof window.marked?.parse==="function"&&typeof window.DOMPurify?.sanitize==="function")content.innerHTML=window.DOMPurify.sanitize(window.marked.parse(String(message.content||"")));else content.textContent=String(message.content||"");
-            content.querySelectorAll("pre code.language-mermaid").forEach(code=>{const pre=code.closest("pre");if(!pre||pre.parentElement.dataset.diagramReady)return;pre.parentElement.dataset.diagramReady="1";const button=document.createElement("button");button.type="button";button.className="message-action-btn";button.textContent="Render diagram";button.addEventListener("click",()=>{const frame=document.createElement("iframe");frame.title="Mermaid diagram preview";frame.setAttribute("sandbox","allow-scripts");frame.style.cssText="width:100%;min-height:260px;border:1px solid var(--border-default);border-radius:10px;background:white;margin-top:8px";const encoded=encodeURIComponent(code.textContent||"");frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></scr'+'ipt></head><body><pre class="mermaid" id="diagram"></pre><script>mermaid.initialize({startOnLoad:false,securityLevel:"strict"});document.getElementById("diagram").textContent=decodeURIComponent("'+encoded+'");mermaid.run();</scr'+'ipt></body></html>';pre.parentElement.appendChild(frame);button.disabled=true;button.textContent="Diagram preview";});pre.parentElement.insertBefore(button,pre);});
+            content.querySelectorAll("pre code.language-mermaid").forEach(code=>{const pre=code.closest("pre");if(!pre||pre.parentElement.dataset.diagramReady)return;pre.parentElement.dataset.diagramReady="1";const button=document.createElement("button");button.type="button";button.className="message-action-btn";button.textContent="Render diagram";button.addEventListener("click",()=>{const frame=document.createElement("iframe");frame.title="Mermaid diagram preview";frame.setAttribute("sandbox","allow-scripts");frame.style.cssText="width:100%;min-height:260px;border:1px solid var(--border-default);border-radius:10px;background:white;margin-top:8px";const encoded=encodeURIComponent(code.textContent||"");frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></scr'+'ipt></head><body><pre class="mermaid" id="diagram"></pre><script>mermaid.initialize({startOnLoad:false,securityLevel:"strict"});document.getElementById("diagram").textContent=decodeURIComponent("'+encoded+'");mermaid.run();</scr'+'ipt>
+<style id="rw-universal-responsive-priority-layer">
+/* Responsive priority layer: content-first sizing from narrow phones to watch-sized streamed viewports. */
+#appShell,.workspace-main,.workspace,.workspace-body,.chat-column,.chat-scroll-container,
+.chat-stream-inner,.composer-region,.composer-container,.composer-box{min-width:0;max-width:100%}
+.workspace-main{flex:1 1 0}
+.chat-scroll-container{overscroll-behavior:contain;scrollbar-gutter:stable}
+.chat-stream-inner,.message-content,.message-bubble,.message-content pre,.message-content table{max-width:100%;min-width:0}
+.message-content,.message-bubble,.starter-card,.capability-chip,.workspace-header,
+.composer-toolbar,.composer-tools-left,.composer-tools-right{overflow-wrap:anywhere}
+.message-content pre,.message-content table{overflow-x:auto}
+img,video,canvas,iframe{max-width:100%}
+button,input,select,textarea{min-width:0;max-width:100%}
+.modal,.modal-panel,.modal-body,.modal-footer,.modal-header{min-width:0;max-width:100%}
+.modal-panel{max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain}
+#rwWorkspaceOverlay,#rwNavEditor,#rainbowExploreOverlay{padding:clamp(6px,2.5vw,18px)}
+#rwWorkspacePanel,#rwNavEditor .rwne-panel,#rainbowExplorePanel{min-width:0;max-width:100%;max-height:calc(100dvh - 16px)}
+@media(max-width:768px){
+  .app-shell{width:100%;width:100vw;height:100%;height:100dvh;min-height:0;overflow:hidden}
+  .workspace-main,.workspace-body,.chat-column{min-height:0;min-width:0}
+  .workspace-header{flex:0 0 auto;min-height:52px;height:auto;max-width:100%;gap:5px;padding-inline:7px}
+  .header-left,.header-center,.header-right{min-width:0;max-width:100%;gap:4px}
+  .header-left{flex:1 1 auto}
+  .header-center{flex:0 1 auto;overflow:hidden}
+  .header-right{flex:0 1 auto;justify-content:flex-end}
+  .header-chat-title-wrap{min-width:0;max-width:42vw}
+  .header-chat-title{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .chat-scroll-container{flex:1 1 0;min-height:0;width:100%;padding:12px clamp(8px,2.5vw,16px) 16px}
+  .chat-stream-inner{width:100%;gap:clamp(12px,3vw,20px)}
+  .message-content{font-size: .96rem;line-height:1.6}
+  .message-content pre{max-width:100%;white-space:pre;overscroll-behavior-x:contain}
+  .starter-grid{grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
+  .starter-card{min-width:0}
+  .composer-region{width:100%;padding:6px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+  .composer-container{width:100%;max-width:var(--composer-max-width,840px);margin-inline:auto}
+  .composer-box{width:100%;min-width:0}
+  .composer-textarea{width:100%;min-width:0;font-size:16px;overflow-wrap:anywhere}
+  .composer-toolbar{min-width:0;flex-wrap:wrap;row-gap:5px}
+  .composer-tools-left,.composer-tools-right{min-width:0;flex-wrap:wrap}
+  .modal{padding:8px}
+  .modal-panel{width:100%;max-height:calc(100dvh - 16px);border-radius:14px}
+}
+@media(max-width:560px){
+  .starter-grid{grid-template-columns:minmax(0,1fr)}
+  .workspace-header{gap:3px;padding-inline:5px}
+  .header-chat-title-wrap{max-width:36vw}
+  .header-right .hide-on-mobile,.header-center .hide-on-mobile{display:none!important}
+  .control-pill-select{max-width:min(42vw,160px);min-width:0}
+  .control-pill-select select{max-width:100%;min-width:0;text-overflow:ellipsis}
+  .composer-toolbar{justify-content:space-between}
+  .composer-tools-left{flex:1 1 auto}
+  .composer-tools-right{flex:0 0 auto}
+  .capability-chip{max-width:100%;white-space:normal}
+  .rwne-item{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .rwne-item>*{min-width:0}
+  .rwne-add{grid-template-columns:minmax(0,1fr)}
+  .rw-workspace-controls button{min-width:0}
+}
+@media(max-width:380px){
+  .workspace-header{min-height:48px}
+  .header-chat-title-wrap{max-width:30vw}
+  .header-center{max-width:34vw}
+  .header-right{gap:2px}
+  .header-right .mode-toggle-btn{padding-inline:6px}
+  .starter-grid{grid-template-columns:minmax(0,1fr)}
+  .welcome-screen{padding-inline:4px}
+  .composer-region{padding-inline:5px}
+  .composer-box{padding:6px}
+  .composer-toolbar button,.composer-toolbar .icon-btn{min-width:34px;min-height:34px}
+  .message-content{overflow-wrap:anywhere;word-break:normal}
+  .rw-workspace-head,.rw-workspace-controls{gap:5px}
+  .rw-workspace-controls button{flex:1 1 calc(50% - 5px)}
+}
+@media(max-width:280px){
+  /* Watch-sized / streamed viewport: prioritize readable conversation content. */
+  html,body{width:100%;min-width:0;overflow:hidden}
+  .app-shell{width:100%;min-width:0}
+  .sidebar{display:none!important}
+  .sidebar-backdrop{display:none!important}
+  .workspace-header{min-height:38px;padding:2px 4px;gap:2px}
+  .header-left{flex:1 1 auto;min-width:0}
+  .header-left .mobile-menu-trigger,.header-left .icon-btn:not(#mobileMenuBtn){display:none!important}
+  .header-chat-title-wrap{max-width:100%;min-width:0}
+  .header-chat-title{font-size:11px;max-width:100%}
+  .header-center,.header-right{display:none!important}
+  .chat-scroll-container{padding:6px 5px 8px}
+  .chat-stream-inner{gap:9px}
+  .welcome-screen{padding:8px 2px;gap:8px}
+  .welcome-heading{font-size:1.05rem;line-height:1.2}
+  .welcome-subtext{font-size:.72rem;line-height:1.35}
+  .welcome-prism-badge{width:34px;height:34px}
+  .welcome-capabilities,.starter-grid{display:none!important}
+  .message-content{font-size:12px;line-height:1.45}
+  .message-content pre{font-size:10px}
+  .message-content table{font-size:10px}
+  .composer-region{padding:3px 4px calc(4px + env(safe-area-inset-bottom,0px))}
+  .composer-box{padding:4px 6px;border-radius:11px}
+  .composer-textarea{min-height:30px;max-height:64px;font-size:16px;line-height:1.25}
+  .composer-toolbar{gap:2px}
+  .composer-tools-left button:not(#attachFileBtn),.composer-tools-right button:not(#sendMessageBtn){display:none!important}
+  #attachFileBtn{display:none!important}
+  #sendMessageBtn{min-width:30px;min-height:30px;padding:4px}
+  .composer-footnote,.ai-accuracy-notice{display:none!important}
+  .modal{padding:4px}
+  .modal-panel{border-radius:10px}
+  .modal-header,.modal-body,.modal-footer{padding:8px}
+  #rainbowExplorePanel{border-radius:10px}
+  .rw-explore-head{padding:8px}
+  .rw-explore-search{margin:0 8px 8px;padding:8px}
+  .rw-explore-list{padding:0 5px 8px}
+  .rw-explore-item{padding:7px;gap:6px;font-size:12px}
+  #rwWorkspaceOverlay{padding:3px}
+  #rwWorkspacePanel{border-radius:8px}
+  .rw-workspace-head,.rw-window-picker{padding:6px}
+  .rw-workspace-title{font-size:12px}
+  .rw-workspace-controls button,.rw-window-picker button{font-size:10px;padding:5px}
+}
+@media(max-height:420px) and (max-width:768px){
+  .workspace-header{min-height:42px}
+  .welcome-screen{padding-block:6px;gap:8px}
+  .welcome-prism-badge{width:38px;height:38px}
+  .composer-textarea{max-height:88px}
+  .modal-panel{max-height:calc(100dvh - 8px)}
+}
+@media(hover:none) and (pointer:coarse){
+  button,a,[role=button],input,select{touch-action:manipulation}
+  button,.icon-btn,.sidebar-nav-btn,.capability-chip{ -webkit-tap-highlight-color:transparent }
+}
+@media(prefers-reduced-motion:reduce){
+  #appShell,.sidebar,.workspace-main,.rw-workspace-panel{scroll-behavior:auto!important;transition:none!important}
+}
+</style>
+</body></html>';pre.parentElement.appendChild(frame);button.disabled=true;button.textContent="Diagram preview";});pre.parentElement.insertBefore(button,pre);});
             content.querySelectorAll("pre code").forEach(code=>{const cls=code.className||"",match=cls.match(/language-([a-z0-9_+-]+)/i),lang=(match?.[1]||"").toLowerCase();if(!["html","javascript","js"].includes(lang))return;const pre=code.closest("pre");if(!pre||pre.parentElement.dataset.labReady)return;pre.parentElement.dataset.labReady="1";const run=document.createElement("button");run.type="button";run.className="message-action-btn";run.textContent="Run in sandbox";run.addEventListener("click",()=>{const frame=document.createElement("iframe");frame.title="Sandboxed code preview";frame.setAttribute("sandbox","allow-scripts");frame.style.cssText="width:100%;height:280px;border:1px solid var(--border-default);border-radius:10px;background:white;margin-top:8px";const source=code.textContent||"";frame.srcdoc=lang==="html"?source:"<!doctype html><html><body><pre id='out'></pre><script>const old=console.log;console.log=(...a)=>{document.getElementById('out').textContent+=a.join(' ')+String.fromCharCode(10);old(...a)};</scr"+"ipt><script>"+source.split("<"+"/"+"script").join("<"+String.fromCharCode(92)+"/script")+"</scr"+"ipt></body></html>";pre.parentElement.appendChild(frame);run.disabled=true;run.textContent="Preview running";});pre.parentElement.insertBefore(run,pre);});
             bubble.appendChild(content);
             const actions=document.createElement("div");actions.className="message-actions";            const branchBtn=document.createElement("button");branchBtn.type="button";branchBtn.className="message-action-btn";branchBtn.textContent="Branch";branchBtn.title="Create a new conversation from this turn";branchBtn.addEventListener("click",()=>{const idx=conversation.messages.indexOf(message);if(idx<0)return;const fork={...conversation,id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random(),title:(conversation.title||"Chat")+" — Branch",messages:conversation.messages.slice(0,idx+1).map(m=>({...m})),pinned:false,createdAt:Date.now(),branchOf:conversation.id};state.conversations.unshift(fork);state.activeId=fork.id;save();renderAll();notify("Branch created from this turn. The original chat is unchanged.");});actions.appendChild(branchBtn);const copy=document.createElement("button");copy.type="button";copy.className="message-action-btn";copy.textContent="Copy";copy.addEventListener("click",async()=>{try{await copyTextToClipboard(String(message.content||""));notify("Message copied.");}catch{notify("Clipboard access was blocked.");}});actions.appendChild(copy);
