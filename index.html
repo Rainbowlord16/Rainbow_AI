@@ -6890,7 +6890,7 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
             }
             save(); setTheme(state.theme); renderAll(); syncProfile();
             if (el.gateway) el.gateway.value = state.gateway;
-            notify("Backup imported successfully.");
+            notify("Backup imported successfully. Reload Rainbow AI to apply restored Workspace windows and module settings.");
           } catch (error) { notify(error.message || "Could not import this backup."); }
           finally { event.target.value = ""; }
         });
