@@ -6873,9 +6873,10 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
             // added after the original reset list was written. Leave unrelated
             // applications' localStorage entries untouched.
             const ownedPrefixes = ["rainbow_ai_", "rainbow_nova_", "rainbow_agents_", "rainbow_workspace_"];
+            const ownedKeys = new Set(["rainbow:handoff:v1", "rainbow.workspace.windows.v1", "rainbow.sidebar.personalization.v1", "knowledge-graph", "memory-vault"]);
             for (let i = localStorage.length - 1; i >= 0; i--) {
               const key = localStorage.key(i);
-              if (key && (ownedPrefixes.some(prefix => key.startsWith(prefix)) || key === "rainbow:handoff:v1")) localStorage.removeItem(key);
+              if (key && (ownedKeys.has(key) || ownedPrefixes.some(prefix => key.startsWith(prefix)))) localStorage.removeItem(key);
             }
           } catch (error) { console.warn("Some Rainbow AI browser data could not be cleared.", error); }
           state.conversations = [];
