@@ -6196,11 +6196,28 @@ button,input,select,textarea{min-width:0;max-width:100%}
 }
 @media(max-width:560px){
   .starter-grid{grid-template-columns:minmax(0,1fr)}
-  .workspace-header{gap:3px;padding-inline:5px}
-  .header-chat-title-wrap{max-width:36vw}
+  /* Reflow the crowded desktop toolbar into two deliberate, readable rows. */
+  .workspace-header{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    grid-template-areas:"left actions" "model nova";
+    align-items:center;
+    gap:6px 8px;
+    height:auto;
+    min-height:0;
+    flex:0 0 auto;
+    padding:8px 10px;
+  }
+  .header-left{grid-area:left;width:100%;min-width:0;flex:initial}
+  .header-center{grid-area:model;width:100%;max-width:none;min-width:0;justify-content:flex-start;overflow:visible}
+  #openNovaBtn{grid-area:nova;justify-self:end;align-self:center;margin:0;min-height:40px;white-space:nowrap}
+  .header-right{grid-area:actions;width:auto;max-width:none;min-width:0;flex:initial;justify-content:flex-end;flex-wrap:nowrap;gap:3px}
+  .header-chat-title-wrap{max-width:none;min-width:0;flex:1 1 auto}
+  .header-chat-title{max-width:100%;min-width:0}
   .header-right .hide-on-mobile,.header-center .hide-on-mobile{display:none!important}
-  .control-pill-select{max-width:min(42vw,160px);min-width:0}
-  .control-pill-select select{max-width:100%;min-width:0;text-overflow:ellipsis}
+  .header-right .icon-btn,.header-right .mode-toggle-btn{min-width:38px;min-height:40px;padding-inline:7px}
+  .control-pill-select{width:100%;max-width:min(100%,260px);min-width:0}
+  .control-pill-select select{width:100%;max-width:100%;min-width:0;text-overflow:ellipsis}
   .composer-toolbar{justify-content:space-between}
   .composer-tools-left{flex:1 1 auto}
   .composer-tools-right{flex:0 0 auto}
@@ -6209,6 +6226,23 @@ button,input,select,textarea{min-width:0;max-width:100%}
   .rwne-item>*{min-width:0}
   .rwne-add{grid-template-columns:minmax(0,1fr)}
   .rw-workspace-controls button{min-width:0}
+}
+@media(max-width:420px){
+  /* Three clear rows prevent the model picker and action buttons crushing the title. */
+  .workspace-header{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    grid-template-areas:"left left" "model nova" "actions actions";
+    gap:7px 8px;
+    padding:8px;
+  }
+  .header-left{width:100%}
+  .header-chat-title-wrap{max-width:none;flex:1 1 auto}
+  .header-chat-title{max-width:100%;font-size:.9rem}
+  .header-center{width:100%;max-width:none}
+  .control-pill-select{width:100%;max-width:100%}
+  #openNovaBtn{justify-self:end;min-height:42px}
+  .header-right{width:100%;justify-content:space-between;gap:4px}
+  .header-right .icon-btn,.header-right .mode-toggle-btn{min-width:40px;min-height:42px;padding-inline:8px}
 }
 @media(max-width:380px){
   .workspace-header{min-height:48px}
