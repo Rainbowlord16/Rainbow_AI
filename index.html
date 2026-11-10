@@ -6395,15 +6395,26 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           }
         }
 
+        const modalFocusReturn = new WeakMap();
+        function modalFocusableElements(modal) {
+          return [...modal.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')]
+            .filter(element => element.getClientRects().length && getComputedStyle(element).visibility !== "hidden");
+        }
         function openModal(id) {
           const modal = document.getElementById(id);
           if (!modal) {
             notify("This panel isn't available in the current HTML.");
             return;
           }
-
+          if (modal.classList.contains("hidden")) modalFocusReturn.set(modal, document.activeElement instanceof HTMLElement ? document.activeElement : null);
           modal.classList.remove("hidden");
           modal.setAttribute("aria-hidden", "false");
+          const first = modalFocusableElements(modal)[0];
+          if (first) first.focus();
+          else {
+            if (!modal.hasAttribute("tabindex")) modal.setAttribute("tabindex", "-1");
+            modal.focus();
+          }
         }
 
         function closeModal(id) {
@@ -6411,7 +6422,35 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           if (!modal) return;
           modal.classList.add("hidden");
           modal.setAttribute("aria-hidden", "true");
+          const previous = modalFocusReturn.get(modal);
+          modalFocusReturn.delete(modal);
+          if (previous?.isConnected && previous.getClientRects().length) previous.focus();
         }
+
+        // Keep keyboard focus inside the topmost standard modal until it closes.
+        document.addEventListener("keydown", event => {
+          if (event.key !== "Tab" || document.getElementById("rainbowAlertBackdrop")) return;
+          const visible = [...document.querySelectorAll(".modal-backdrop:not(.hidden), .modal:not(.hidden)")]
+            .filter(modal => modal.id && modal.getClientRects().length && getComputedStyle(modal).visibility !== "hidden")
+            .sort((a, b) => (Number(getComputedStyle(b).zIndex) || 0) - (Number(getComputedStyle(a).zIndex) || 0));
+          const top = visible[0];
+          if (!top) return;
+          const focusable = modalFocusableElements(top);
+          if (!focusable.length) {
+            event.preventDefault();
+            if (!top.hasAttribute("tabindex")) top.setAttribute("tabindex", "-1");
+            top.focus();
+            return;
+          }
+          const first = focusable[0], last = focusable[focusable.length - 1];
+          if (event.shiftKey && (document.activeElement === first || !top.contains(document.activeElement))) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && (document.activeElement === last || !top.contains(document.activeElement))) {
+            event.preventDefault();
+            first.focus();
+          }
+        }, true);
 
         function setTheme(theme) {
           if (!["dark", "midnight", "light"].includes(theme)) return;
