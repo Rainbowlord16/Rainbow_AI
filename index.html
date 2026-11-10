@@ -3379,7 +3379,21 @@ svg[data-rw-motion="shield"]:hover [data-rw-part="shield"],button:hover svg[data
 @keyframes rw-sidebar-slide{0%{transform:translateX(0)}60%{transform:translateX(3px)}100%{transform:translateX(1px)}}
 @keyframes rw-shield-check{0%{transform:scale(.94)}55%{transform:scale(1.1)}100%{transform:scale(1)}}
 @media(prefers-reduced-motion:reduce){[data-rw-motion]{animation:none!important}}
-</style></head>
+</style><style id="rw-ambient-intelligence-and-background-generation">
+html[data-rw-ambient="idle"] #neural-canvas{opacity:.72;filter:saturate(1.04)}
+html[data-rw-ambient="typing"] #neural-canvas{opacity:.84;filter:saturate(1.12)}
+html[data-rw-ambient="thinking"] #neural-canvas{opacity:.96;filter:saturate(1.22)}
+.composer-box{transition:box-shadow .35s ease,border-color .35s ease}
+html[data-rw-ambient="typing"] .composer-box{box-shadow:0 0 0 1px rgba(59,130,246,.16),0 0 22px rgba(59,130,246,.10)}
+html[data-rw-ambient="thinking"] .composer-box{box-shadow:0 0 0 1px rgba(16,185,129,.18),0 0 24px rgba(59,130,246,.12)}
+.bg-generation-indicator{display:inline-flex;align-items:center;gap:5px;flex:0 0 auto;margin-inline-start:5px;padding:3px 7px;border-radius:999px;font-size:10px;line-height:1.3;color:var(--text,#f8fafc);background:rgba(59,130,246,.14);border:1px solid rgba(59,130,246,.24);white-space:nowrap}
+.bg-generation-indicator::before{content:"";width:6px;height:6px;border-radius:50%;background:#3b82f6;box-shadow:0 0 8px rgba(59,130,246,.7);animation:rw-generation-pulse 1.35s ease-in-out infinite}
+.bg-background-generation-banner{position:sticky;top:8px;z-index:2;max-width:min(100%,760px);margin:8px auto 14px;padding:9px 12px;border:1px solid rgba(59,130,246,.22);border-radius:12px;background:rgba(59,130,246,.08);color:var(--text);font-size:12px;line-height:1.5;text-align:center;backdrop-filter:blur(8px)}
+@keyframes rw-generation-pulse{50%{opacity:.38;transform:scale(.78)}}
+@media(prefers-reduced-motion:reduce){.bg-generation-indicator::before{animation:none}.composer-box{transition:none}}
+@media(max-width:560px){.bg-generation-indicator{font-size:9px;padding:2px 5px;margin-inline-start:3px}.bg-background-generation-banner{font-size:11px;margin:5px auto 10px}}
+</style>
+</head>
 
   <body>
     <!-- Skip Navigation Link for Keyboard & Screen Reader Users -->
@@ -5737,6 +5751,7 @@ svg[data-rw-motion="shield"]:hover [data-rw-part="shield"],button:hover svg[data
           activeId: null,
           busy: false,
           controller: null,
+          activeGeneration: null,
           theme: "dark",
           studyMode: false,
           canvasOpen: false,
@@ -6057,8 +6072,16 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           }
         }
 
+        function setPromptEditMode(enabled) {
+          if (el.input) el.input.placeholder = enabled ? "Edit the original prompt, then choose Save edit (no new response will be sent)" : "Message Rainbow AI… (Enter to send)";
+          const label = el.send?.querySelector("span");
+          if (label) label.textContent = enabled ? "Save edit" : "Send";
+          if (el.send) el.send.setAttribute("aria-label", enabled ? "Save edited prompt" : "Send message");
+        }
+
         function newConversation() {
           state.pendingEdit=null;
+          setPromptEditMode(false);
           const conversation = {
             id: crypto.randomUUID
               ? crypto.randomUUID()
@@ -6088,7 +6111,9 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
             const row=document.createElement("div"); row.className="history-item-row";
             const button=document.createElement("button"); button.type="button"; button.className="history-item"; button.textContent=conversation.title||"New Conversation"; button.title=button.textContent;
             button.setAttribute("aria-current",conversation.id===state.activeId?"true":"false"); if(conversation.id===state.activeId)button.classList.add("active");
-            button.addEventListener("click",async()=>{if(conversation.locked&&!await unlockConversation(conversation))return;state.pendingEdit=null;if(el.input)el.input.placeholder="Message Rainbow AI… (Enter to send)";state.activeId=conversation.id;save();renderAll();});
+            const isGenerating=Boolean(state.busy&&state.activeGeneration?.conversationId===conversation.id);
+            if(isGenerating){const indicator=document.createElement("span");indicator.className="bg-generation-indicator";indicator.textContent="Generating";indicator.setAttribute("aria-label","This conversation is generating a response");row.appendChild(button);row.appendChild(indicator);}else row.appendChild(button);
+            button.addEventListener("click",async()=>{if(conversation.locked&&!await unlockConversation(conversation))return;state.pendingEdit=null;setPromptEditMode(false);state.activeId=conversation.id;save();renderAll();});
             const lock=historyAction(conversation.locked?(state.unlockedIds.has(conversation.id)?"Lock chat now":"Unlock chat"):"Lock chat","M5 8h14v13H5zM8 8V5a4 4 0 0 1 8 0v3",e=>{e.stopPropagation();toggleChatLock(conversation.id);});const hide=historyAction(showHiddenChats?"Restore chat":"Hide chat",showHiddenChats?"M4 12h16M8 8l-4 4 4 4":"M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 5.2A10.9 10.9 0 0 1 12 5c5 0 9 7 9 7a14 14 0 0 1-3 3.5",e=>{e.stopPropagation();toggleChatHidden(conversation.id);});
              const edit=document.createElement("button");edit.type="button";edit.className="history-action-btn";edit.textContent="✎";edit.title="Edit chat title";edit.setAttribute("aria-label","Edit chat title");edit.addEventListener("click",e=>{e.stopPropagation();renameConversation(conversation.id);});
             const del=document.createElement("button");del.type="button";del.className="history-action-btn danger";del.textContent="×";del.title="Delete entire chat";del.setAttribute("aria-label","Delete entire chat");del.addEventListener("click",e=>{e.stopPropagation();deleteConversation(conversation.id);});
@@ -6129,6 +6154,11 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
 
           const conversation = activeConversation();
           el.messages.replaceChildren();
+          if(state.busy&&state.activeGeneration&&state.activeGeneration.conversationId!==conversation?.id){
+            const banner=document.createElement("div");banner.className="bg-background-generation-banner";
+            banner.textContent="A response is still generating in another chat. You can keep browsing; its result will be saved there.";
+            el.messages.appendChild(banner);
+          }
           if(conversation?.locked&&!state.unlockedIds.has(conversation.id)){
             if(el.welcome)el.welcome.classList.add("hidden");if(el.title)el.title.textContent="Locked chat";
             const gate=document.createElement("div");gate.className="chat-lock-gate";const heading=document.createElement("h2");heading.textContent="This chat is locked";
@@ -6380,7 +6410,7 @@ button,input,select,textarea{min-width:0;max-width:100%}
             content.querySelectorAll("pre code").forEach(code=>{const cls=code.className||"",match=cls.match(/language-([a-z0-9_+-]+)/i),lang=(match?.[1]||"").toLowerCase();if(!["html","javascript","js"].includes(lang))return;const pre=code.closest("pre");if(!pre||pre.parentElement.dataset.labReady)return;pre.parentElement.dataset.labReady="1";const run=document.createElement("button");run.type="button";run.className="message-action-btn";run.textContent="Run in sandbox";run.addEventListener("click",()=>{const frame=document.createElement("iframe");frame.title="Sandboxed code preview";frame.setAttribute("sandbox","allow-scripts");frame.style.cssText="width:100%;height:280px;border:1px solid var(--border-default);border-radius:10px;background:white;margin-top:8px";const source=code.textContent||"";frame.srcdoc=lang==="html"?source:"<!doctype html><html><body><pre id='out'></pre><script>const old=console.log;console.log=(...a)=>{document.getElementById('out').textContent+=a.join(' ')+String.fromCharCode(10);old(...a)};</scr"+"ipt><script>"+source.split("<"+"/"+"script").join("<"+String.fromCharCode(92)+"/script")+"</scr"+"ipt></body></html>";pre.parentElement.appendChild(frame);run.disabled=true;run.textContent="Preview running";});pre.parentElement.insertBefore(run,pre);});
             bubble.appendChild(content);
             const actions=document.createElement("div");actions.className="message-actions";            const branchBtn=document.createElement("button");branchBtn.type="button";branchBtn.className="message-action-btn";branchBtn.textContent="Branch";branchBtn.title="Create a new conversation from this turn";branchBtn.addEventListener("click",()=>{const idx=conversation.messages.indexOf(message);if(idx<0)return;const fork={...conversation,id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random(),title:(conversation.title||"Chat")+" — Branch",messages:conversation.messages.slice(0,idx+1).map(m=>({...m})),pinned:false,createdAt:Date.now(),branchOf:conversation.id};state.conversations.unshift(fork);state.activeId=fork.id;save();renderAll();notify("Branch created from this turn. The original chat is unchanged.");});actions.appendChild(branchBtn);const copy=document.createElement("button");copy.type="button";copy.className="message-action-btn";copy.textContent="Copy";copy.addEventListener("click",async()=>{try{await copyTextToClipboard(String(message.content||""));notify("Message copied.");}catch{notify("Clipboard access was blocked.");}});actions.appendChild(copy);
-            if(message.role==="user"){const edit=document.createElement("button");edit.type="button";edit.className="message-action-btn";edit.textContent="Edit";edit.title="Edit this prompt and replace the later turns";edit.addEventListener("click",()=>{if(state.busy)return notify("Wait for the current response to finish before editing.");const messageIndex=conversation.messages.indexOf(message);if(messageIndex<0||!el.input)return;state.pendingEdit={conversationId:conversation.id,messageIndex};el.input.value=String(message.content||"");el.input.placeholder="Editing an earlier prompt — send to replace it and later turns";el.input.dispatchEvent(new Event("input",{bubbles:true}));el.input.focus();notify("Edit mode: sending replaces this prompt and removes the later turns in this chat.");});actions.appendChild(edit);}
+            if(message.role==="user"){const edit=document.createElement("button");edit.type="button";edit.className="message-action-btn";edit.textContent="Edit";edit.title="Edit this prompt without sending a new request";edit.addEventListener("click",()=>{if(state.busy)return notify("Wait for the current response to finish before editing.");const messageIndex=conversation.messages.indexOf(message);if(messageIndex<0||!el.input)return;state.pendingEdit={conversationId:conversation.id,messageIndex};el.input.value=String(message.content||"");setPromptEditMode(true);el.input.dispatchEvent(new Event("input",{bubbles:true}));el.input.focus();notify("Edit mode: Save edit updates the original prompt only. No new AI response will be requested.");});actions.appendChild(edit);}
             if(message.role==="assistant" && conversation?.messages?.[conversation.messages.length-1]===message){
               const regenerate=document.createElement("button");regenerate.type="button";regenerate.className="message-action-btn";regenerate.textContent="Regenerate";
               regenerate.addEventListener("click",()=>{
@@ -6578,7 +6608,18 @@ button,input,select,textarea{min-width:0;max-width:100%}
           if (!text) return;
           const visibleUserText=text;
           const pendingEdit=textOverride===null?state.pendingEdit:null;
-          if(pendingEdit){const editingChat=state.conversations.find(c=>c.id===pendingEdit.conversationId);if(!editingChat||editingChat.id!==state.activeId||!editingChat.messages[pendingEdit.messageIndex]||editingChat.messages[pendingEdit.messageIndex].role!=="user"){state.pendingEdit=null;notify("The chat changed, so the pending edit was cancelled. Select the prompt again to edit it.");return;}editingChat.messages=editingChat.messages.slice(0,pendingEdit.messageIndex);state.pendingEdit=null;if(el.input)el.input.placeholder="Message Rainbow AI… (Enter to send)";}
+          if(pendingEdit){
+            const editingChat=state.conversations.find(c=>c.id===pendingEdit.conversationId);
+            const original=editingChat?.messages?.[pendingEdit.messageIndex];
+            if(!editingChat||editingChat.id!==state.activeId||!original||original.role!=="user"){
+              state.pendingEdit=null;setPromptEditMode(false);
+              notify("The chat changed, so the pending edit was cancelled. Select the prompt again to edit it.");return;
+            }
+            original.content=visibleUserText;state.pendingEdit=null;
+            if(el.input){el.input.value="";el.input.style.height="auto";}
+            setPromptEditMode(false);save();renderAll();
+            notify("Original prompt updated. No new AI request was sent.");return;
+          }
           const professionalProfile=readProfessionalPersonalization();
           const professionalContext=[professionalProfile.profession&&"Occupation: "+professionalProfile.profession,professionalProfile.industry&&"Industry: "+professionalProfile.industry,professionalProfile.expertise&&"Experience level: "+professionalProfile.expertise,professionalProfile.expertiseAreas&&"Skills and expertise: "+professionalProfile.expertiseAreas,professionalProfile.goals&&"Goals and interests: "+professionalProfile.goals].filter(Boolean).join("\n");
           const styleGuidance=({professional:"Use a polished, workplace-appropriate professional tone.",concise:"Prefer concise answers and avoid unnecessary elaboration.",detailed:"Give thorough explanations, context and practical examples.",technical:"Use precise technical language and include implementation details where useful.","beginner-friendly":"Explain unfamiliar concepts in accessible steps and define jargon."})[professionalProfile.responseStyle]||"";
@@ -6606,9 +6647,13 @@ button,input,select,textarea{min-width:0;max-width:100%}
           renderAll();
 
           state.busy = true;
+          const generationId = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2));
+          state.activeGeneration = { id: generationId, conversationId: targetId, startedAt: Date.now(), status: "running" };
+          document.documentElement.dataset.rwAmbient = "thinking";
           if (el.send) el.send.disabled = true;
           $("#stopGenerationBtn")?.classList.remove("hidden");
           state.controller = new AbortController();
+          renderAll();
 
           const controller = state.controller;
           let timedOut = false;
@@ -6654,7 +6699,9 @@ button,input,select,textarea{min-width:0;max-width:100%}
           } finally {
             clearTimeout(timeout);
             state.busy = false;
+            if (state.activeGeneration?.id === generationId) state.activeGeneration = null;
             if (state.controller === controller) state.controller = null;
+            document.documentElement.dataset.rwAmbient = el.input?.value?.trim() ? "typing" : "idle";
             if (el.send) el.send.disabled = !String(el.input?.value || "").trim();
             $("#stopGenerationBtn")?.classList.add("hidden");
             renderAll();
@@ -6762,7 +6809,7 @@ button,input,select,textarea{min-width:0;max-width:100%}
 
         // Send with Enter; Shift+Enter inserts a newline.
         el.input?.addEventListener("keydown", (event) => {
-          if(event.key==="Escape"&&state.pendingEdit){state.pendingEdit=null;el.input.placeholder="Message Rainbow AI… (Enter to send)";notify("Edit cancelled. The original conversation is unchanged.");return;}
+          if(event.key==="Escape"&&state.pendingEdit){state.pendingEdit=null;setPromptEditMode(false);notify("Edit cancelled. The original conversation is unchanged.");return;}
           if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
             event.preventDefault();
             sendMessage();
