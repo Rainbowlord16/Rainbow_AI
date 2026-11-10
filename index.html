@@ -5783,23 +5783,103 @@ $("#rainbowPolishBtn")?.addEventListener("click",()=>{if(!el.input?.value.trim()
 $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation();if(!c||!c.messages.length)return notify("There is no conversation to branch.");const fork={...c,id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),title:(c.title||"Chat")+" — Branch",messages:c.messages.map(m=>({...m})),pinned:false,createdAt:Date.now(),branchOf:c.id};state.conversations.unshift(fork);state.activeId=fork.id;save();renderAll();notify("A separate branch was created; the original chat is preserved.");});
 
         // Centered Rainbow AI dialogs for alerts, confirmations, and text prompts.
+        let activeRainbowDialogCancel = null;
         function rainbowDialog(message, mode = "alert", defaultValue = "") {
           return new Promise(resolve => {
-            document.getElementById("rainbowAlertBackdrop")?.remove();
-            const backdrop=document.createElement("div"); backdrop.id="rainbowAlertBackdrop"; backdrop.className="rainbow-alert-backdrop";
-            const card=document.createElement("section"); card.className="rainbow-alert-card"; card.setAttribute("role",mode==="alert"?"alertdialog":"dialog"); card.setAttribute("aria-modal","true");
-            const title=document.createElement("h2"); title.textContent="Rainbow AI";
-            const body=document.createElement("p"); body.textContent=String(message ?? ""); card.append(title,body);
-            let field=null;
-            if(mode==="prompt"||mode==="password"){field=document.createElement("input");field.type=mode==="password"?"password":"text";field.autocomplete=mode==="password"?"current-password":"off";field.className="form-input rainbow-alert-input";field.value=defaultValue||"";field.placeholder=mode==="password"?"Enter chat passphrase":"";card.appendChild(field);}
-            const actions=document.createElement("div"); actions.className="rainbow-alert-actions"; let settled=false;
-            const finish=value=>{if(settled)return;settled=true;backdrop.remove();document.removeEventListener("keydown",onKey);resolve(value);};
-            const onKey=e=>{if(e.key==="Escape")finish(mode==="alert"?undefined:mode==="confirm"?false:null);else if(e.key==="Enter"&&(mode==="prompt"||mode==="password"))finish(field.value);};
-            if(mode!=="alert"){const cancel=document.createElement("button");cancel.type="button";cancel.className="btn btn-secondary";cancel.textContent="Cancel";cancel.addEventListener("click",()=>finish(mode==="confirm"?false:null));actions.appendChild(cancel);}
-            const ok=document.createElement("button");ok.type="button";ok.textContent=mode==="confirm"?"Continue":mode==="prompt"?"Save":mode==="password"?"Unlock":"OK";ok.addEventListener("click",()=>finish(mode==="prompt"||mode==="password"?field.value:mode==="confirm"?true:undefined));actions.appendChild(ok);
-            card.appendChild(actions);backdrop.appendChild(card);document.body.appendChild(backdrop);
-            backdrop.addEventListener("click",e=>{if(e.target===backdrop)finish(mode==="alert"?undefined:mode==="confirm"?false:null);});
-            document.addEventListener("keydown",onKey);(field||ok).focus();
+            // Resolve an older dialog before replacing it; never leave its promise pending.
+            activeRainbowDialogCancel?.();
+            const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+            const backdrop = document.createElement("div");
+            backdrop.id = "rainbowAlertBackdrop";
+            backdrop.className = "rainbow-alert-backdrop";
+            const card = document.createElement("section");
+            card.className = "rainbow-alert-card";
+            card.setAttribute("role", mode === "alert" ? "alertdialog" : "dialog");
+            card.setAttribute("aria-modal", "true");
+            card.setAttribute("aria-labelledby", "rainbowAlertTitle");
+            card.setAttribute("aria-describedby", "rainbowAlertMessage");
+            const title = document.createElement("h2");
+            title.id = "rainbowAlertTitle";
+            title.textContent = "Rainbow AI";
+            const body = document.createElement("p");
+            body.id = "rainbowAlertMessage";
+            body.textContent = String(message ?? "");
+            card.append(title, body);
+            let field = null;
+            if (mode === "prompt" || mode === "password") {
+              field = document.createElement("input");
+              field.type = mode === "password" ? "password" : "text";
+              field.autocomplete = mode === "password" ? "current-password" : "off";
+              field.className = "form-input rainbow-alert-input";
+              field.value = defaultValue || "";
+              field.placeholder = mode === "password" ? "Enter chat passphrase" : "";
+              field.setAttribute("aria-label", mode === "password" ? "Chat passphrase" : "Enter a value");
+              card.appendChild(field);
+            }
+            const actions = document.createElement("div");
+            actions.className = "rainbow-alert-actions";
+            let settled = false;
+            const cancelValue = mode === "alert" ? undefined : mode === "confirm" ? false : null;
+            const finish = value => {
+              if (settled) return;
+              settled = true;
+              if (activeRainbowDialogCancel === cancelActive) activeRainbowDialogCancel = null;
+              document.removeEventListener("keydown", onKey, true);
+              backdrop.remove();
+              if (previouslyFocused?.isConnected) previouslyFocused.focus();
+              resolve(value);
+            };
+            const cancelActive = () => finish(cancelValue);
+            const onKey = event => {
+              if (event.key === "Escape") {
+                event.preventDefault();
+                event.stopPropagation();
+                finish(cancelValue);
+                return;
+              }
+              if (event.key === "Enter" && (mode === "prompt" || mode === "password") && event.target === field) {
+                event.preventDefault();
+                finish(field.value);
+                return;
+              }
+              if (event.key !== "Tab") return;
+              const focusable = [...card.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])')].filter(node => node.getClientRects().length);
+              if (!focusable.length) {
+                event.preventDefault();
+                card.focus();
+                return;
+              }
+              const first = focusable[0], last = focusable[focusable.length - 1];
+              if (event.shiftKey && (document.activeElement === first || !card.contains(document.activeElement))) {
+                event.preventDefault();
+                last.focus();
+              } else if (!event.shiftKey && (document.activeElement === last || !card.contains(document.activeElement))) {
+                event.preventDefault();
+                first.focus();
+              }
+            };
+            if (mode !== "alert") {
+              const cancel = document.createElement("button");
+              cancel.type = "button";
+              cancel.className = "btn btn-secondary";
+              cancel.textContent = "Cancel";
+              cancel.addEventListener("click", () => finish(cancelValue));
+              actions.appendChild(cancel);
+            }
+            const ok = document.createElement("button");
+            ok.type = "button";
+            ok.textContent = mode === "confirm" ? "Continue" : mode === "prompt" ? "Save" : mode === "password" ? "Unlock" : "OK";
+            ok.addEventListener("click", () => finish(mode === "prompt" || mode === "password" ? field.value : mode === "confirm" ? true : undefined));
+            actions.appendChild(ok);
+            card.appendChild(actions);
+            backdrop.appendChild(card);
+            document.body.appendChild(backdrop);
+            backdrop.addEventListener("click", event => {
+              if (event.target === backdrop) finish(cancelValue);
+            });
+            activeRainbowDialogCancel = cancelActive;
+            document.addEventListener("keydown", onKey, true);
+            (field || ok).focus();
           });
         }
         window.alert = function(message) { void rainbowDialog(message, "alert"); };
