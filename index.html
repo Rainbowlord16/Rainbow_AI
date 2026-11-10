@@ -5964,9 +5964,14 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
 
             const saved = JSON.parse(raw);
             if (Array.isArray(saved.conversations)) {
-              // Normalize stored data so malformed or older chats cannot break rendering.
+              // Normalize stored data and discard duplicate or unusable IDs before chat actions rely on them.
+              const seenConversationIds = new Set();
               state.conversations = saved.conversations
-                .filter((c) => c && typeof c.id === "string" && Array.isArray(c.messages))
+                .filter((c) => {
+                  if (!c || typeof c.id !== "string" || !c.id.trim() || c.id.length > 128 || !Array.isArray(c.messages) || seenConversationIds.has(c.id)) return false;
+                  seenConversationIds.add(c.id);
+                  return true;
+                })
                 .map((c) => ({
                   ...c,
                   title: typeof c.title === "string" && c.title.trim() ? c.title : "New Conversation",
@@ -5988,6 +5993,9 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
 
             if (typeof saved.activeId === "string")
               state.activeId = saved.activeId;
+            // A deleted or malformed active ID must not leave the app pointing at a nonexistent chat.
+            if (!state.conversations.some((conversation) => conversation.id === state.activeId))
+              state.activeId = state.conversations[0]?.id || null;
             if (typeof saved.gateway === "string") {
               try { state.gateway = safeGateway(saved.gateway); } catch { state.gateway = DEFAULT_GATEWAY; }
             }
