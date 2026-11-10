@@ -6869,18 +6869,29 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         $("#wipeAllStorageBtn")?.addEventListener("click", async () => {
           if (!await window.confirm("Erase Rainbow AI's saved chats, settings, and profile from this browser? This cannot be undone.")) return;
           try {
-            localStorage.removeItem(STORAGE_KEY);
-            localStorage.removeItem("rainbow_ai_profile");
-            localStorage.removeItem("rainbow_ai_canvas_snapshot");
-            localStorage.removeItem(ACCENT_KEY);
-            localStorage.removeItem(CUSTOM_SYSTEM_PROMPT_KEY);
-          } catch {}
+            // Remove Rainbow AI-owned persisted data, including modules that were
+            // added after the original reset list was written. Leave unrelated
+            // applications' localStorage entries untouched.
+            const ownedPrefixes = ["rainbow_ai_", "rainbow_nova_", "rainbow_agents_", "rainbow_workspace_"];
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+              const key = localStorage.key(i);
+              if (key && (ownedPrefixes.some(prefix => key.startsWith(prefix)) || key === "rainbow:handoff:v1")) localStorage.removeItem(key);
+            }
+          } catch (error) { console.warn("Some Rainbow AI browser data could not be cleared.", error); }
           state.conversations = [];
+          state.unlockedIds.clear();
+          state.pendingEdit = null;
+          if (state.controller) state.controller.abort();
           state.activeId = null;
           state.gateway = DEFAULT_GATEWAY;
           state.theme = "dark";
           state.studyMode = false;
-          newConversation(); setTheme("dark"); applyAccent("rainbow"); if ($("#customSystemPromptInput")) $("#customSystemPromptInput").value = ""; syncProfile();
+          if (secondaryInput) secondaryInput.value = "";
+          if ($("#customSystemPromptInput")) $("#customSystemPromptInput").value = "";
+          ["proProfessionInput","proIndustryInput","proExpertiseInput","proResponseStyleInput","proExpertiseAreasInput","proGoalsInput","proCustomInstructionsInput"].forEach(id => { const field = document.getElementById(id); if (field) field.value = id === "proResponseStyleInput" ? "balanced" : ""; });
+          if (typeof customTemplates !== "undefined") { customTemplates = []; if (typeof renderCustomTemplates === "function") renderCustomTemplates(); }
+          if (typeof novaHistory !== "undefined") novaHistory = [];
+          newConversation(); setTheme("dark"); applyAccent("rainbow"); syncProfile();
           if (el.gateway) el.gateway.value = state.gateway;
           notify("Local Rainbow AI data erased.");
         });
