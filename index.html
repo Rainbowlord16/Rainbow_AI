@@ -2569,6 +2569,18 @@
         pointer-events: none;
       }
 
+      .toast {
+        max-width: min(520px, calc(100vw - 2rem));
+        white-space: normal;
+        overflow-wrap: anywhere;
+        line-height: 1.55;
+        padding: 14px 16px;
+        border-radius: 12px;
+        background: var(--panel, #181b26);
+        color: var(--text, #f8fafc);
+        border: 1px solid var(--border-strong, rgba(148,163,184,.3));
+        box-shadow: 0 12px 36px rgba(0,0,0,.28);
+      }
       .toast-item {
         pointer-events: auto;
         display: flex;
@@ -5675,19 +5687,29 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         window.prompt = function(message, defaultValue = "") { return rainbowDialog(message, "prompt", defaultValue); };
         window.rainbowPassword = function(message) { return rainbowDialog(message, "password"); };
 
+        function heartfeltErrorMessage(message) {
+          const detail = String(message || "An unexpected issue interrupted this step.").trim();
+          const looksLikeError = /error|failed|invalid|unable|cannot|can't|missing|unavailable|denied|blocked|timed out|not valid|not found|must be|limit reached|exceeds|exceed|requires|problem|could not|no file|empty|unsupported|not connected|not configured|not implemented|offline|HTTP\s*\d{3}|returned an incomplete|cancelled by the browser/i.test(detail);
+          if (!looksLikeError || detail.startsWith("I’m sorry —")) return detail;
+          return "I’m sorry — I know it’s frustrating when something you were trying to do doesn’t work, and I appreciate your patience. " + detail + " Nothing about this message means you did anything wrong. Please take a moment to check the detail above, confirm any relevant settings or connection, and try again when you feel ready. If it still doesn’t work, keep this message so we can trace the issue together. Your time and work matter, and Rainbow AI should make things easier, not leave you guessing.";
+        }
+
         function notify(message) {
+          const displayMessage = heartfeltErrorMessage(message);
           if (el.toast) {
             el.toast.textContent = "";
             const item = document.createElement("div");
             item.className = "toast";
-            item.textContent = message;
+            item.setAttribute("role", "status");
+            item.setAttribute("aria-live", "polite");
+            item.textContent = displayMessage;
             el.toast.appendChild(item);
-            setTimeout(() => item.remove(), 4000);
+            setTimeout(() => item.remove(), displayMessage.startsWith("I’m sorry —") ? 10000 : 4000);
           } else {
-            console.info("[Rainbow AI]", message);
+            console.info("[Rainbow AI]", displayMessage);
           }
 
-          if (el.announce) el.announce.textContent = message;
+          if (el.announce) el.announce.textContent = displayMessage;
         }
 
         function setStatus(message, online = null) {
@@ -7172,7 +7194,7 @@ document.getElementById("rainbowAgentsSidebarBtn")?.addEventListener("click",()=
     try{const localDocumentContext=window.RainbowWorkspace?.documents?.retrieve(claim)||"";const payload=await window.RainbowWorkspace.api.post("/api/truthlens/analyze",{claim,sources:valid,mode:"evidence_first",require_citations:true,local_document_context:localDocumentContext},{timeout:60000});
       if(!payload||typeof payload!=="object"||!payload.verdict)throw new Error("The evidence service returned an incomplete report. No verdict was displayed.");
       renderReport(payload);$("#tlStatus").textContent="Analysis returned. Review each source and its relevance before relying on the verdict.";
-    }catch(error){$("#tlStatus").textContent="TruthLens could not complete the analysis: "+(error.message||"Evidence service unavailable")+". No unsupported verdict was generated."; }
+    }catch(error){$("#tlStatus").textContent=heartfeltErrorMessage("TruthLens could not complete the analysis: "+(error.message||"The evidence service is unavailable right now")+". No unsupported verdict was generated, so you are not being shown a guess in place of evidence."); }
     finally{btn.disabled=false;btn.textContent="Analyze claim";}
   });
 })();
@@ -7528,11 +7550,11 @@ $("rhSaveStory")?.addEventListener("click",()=>{const title=$("rhStoryTitle").va
 $("rhSendStory")?.addEventListener("click",()=>{const title=$("rhStoryTitle").value.trim()||"Untitled world";populateChat("Help me develop this story scene.\\nWorld: "+title+"\\nWorld and characters: "+$("rhStoryWorld").value+"\\nScene: "+$("rhStoryScene").value);});
 $("rhApiRun")?.addEventListener("click",async()=>{
  const path=$("rhApiPath").value.trim(),method=$("rhApiMethod").value;
- if(!/^\/api\/[a-z0-9/_-]+$/i.test(path)||path.startsWith("//")){$("rhApiOutput").textContent="Invalid path. Use a relative /api/... endpoint only.";return;}
- let body;try{body=method==="POST"?JSON.parse($("rhApiBody").value||"{}"):undefined;}catch{$("rhApiOutput").textContent="Request body is not valid JSON.";return;}
+ if(!/^\/api\/[a-z0-9/_-]+$/i.test(path)||path.startsWith("//")){$("rhApiOutput").textContent=heartfeltErrorMessage("This API path is not valid. Please use a relative path beginning with /api/ so Rainbow AI can keep the request safely inside your configured gateway.");return;}
+ let body;try{body=method==="POST"?JSON.parse($("rhApiBody").value||"{}"):undefined;}catch{$("rhApiOutput").textContent=heartfeltErrorMessage("The request body is not valid JSON. Please check the commas, quotation marks, brackets, and braces, then try again; your draft is still in the editor.");return;}
  $("rhApiRun").disabled=true;$("rhApiOutput").textContent="Sending request…";
  try{const result=await window.RainbowWorkspace.api.request(path,{method,body,timeout:30000});$("rhApiOutput").textContent=JSON.stringify(result,null,2);}
- catch(error){$("rhApiOutput").textContent="Request failed: "+(error.message||String(error));}
+ catch(error){$("rhApiOutput").textContent=heartfeltErrorMessage("The API request could not be completed: "+(error.message||String(error))+". Please check that your gateway is running and that the endpoint is available before trying again.");}
  finally{$("rhApiRun").disabled=false;}
 });
 let focusRemaining=25*60,focusTimer=null,focusCompleted=read("focusCompleted",0);
