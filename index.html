@@ -5719,7 +5719,7 @@ svg[data-rw-motion="shield"]:hover [data-rw-part="shield"],button:hover svg[data
         "use strict";
 
         const $ = (selector, root = document) => root.querySelector(selector);
-        const $ = (selector, root = document) => [...root.querySelectorAll(selector)];
+        const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
         const MODEL = "Rainbow-AI-Unified-12B";
         const DEFAULT_GATEWAY = "https://treatment-excluding-terrain-antibodies.trycloudflare.com";
@@ -6738,7 +6738,7 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         // Search/filter conversation history.
         $("#sidebarSearchInput")?.addEventListener("input", (event) => {
           const query = event.target.value.trim().toLowerCase();
-          $(".history-item", el.history || document).forEach((item) => {
+          $$(".history-item", el.history || document).forEach((item) => {
             item.hidden = !item.textContent.toLowerCase().includes(query);
           });
           $("#sidebarSearchClearBtn")?.classList.toggle("hidden", !query);
@@ -6995,12 +6995,12 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         }
 
         function showSettingsTab(tabName) {
-          $("[data-settings-tab]").forEach((button) => {
+          $$("[data-settings-tab]").forEach((button) => {
             const active = button.dataset.settingsTab === tabName;
             button.classList.toggle("active", active);
             button.setAttribute("aria-selected", String(active));
           });
-          $("[data-settings-panel]").forEach((panel) => {
+          $$("[data-settings-panel]").forEach((panel) => {
             const active = panel.dataset.settingsPanel === tabName;
             panel.classList.toggle("hidden", !active);
             panel.style.display = active ? "flex" : "none";
@@ -7009,12 +7009,12 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         }
 
         function showPromptCategory(category) {
-          $("[data-prompt-cat]").forEach((button) => {
+          $$("[data-prompt-cat]").forEach((button) => {
             const active = button.dataset.promptCat === category;
             button.classList.toggle("active", active);
             button.setAttribute("aria-selected", String(active));
           });
-          $("[data-prompt-category]").forEach((item) => {
+          $$("[data-prompt-category]").forEach((item) => {
             item.classList.toggle("hidden", category !== "all" && item.dataset.promptCategory !== category);
           });
         }
@@ -7112,8 +7112,8 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
         // Clear active project filter.
         $("#clearActiveProjectBtn")?.addEventListener("click", () => {
           $("#activeProjectBanner")?.classList.add("hidden");
-          $(".history-item").forEach(item => item.hidden = false);
-          $("[data-filter]").forEach(item => {
+          $$(".history-item").forEach(item => item.hidden = false);
+          $$("[data-filter]").forEach(item => {
             item.classList.toggle("active", item.dataset.filter === "all");
             item.setAttribute("aria-selected", String(item.dataset.filter === "all"));
           });
@@ -7349,7 +7349,7 @@ addCanvasTool("canvasFormatBtn","Executive format",()=>{const e=$("#canvasTextar
 addCanvasTool("canvasTestsBtn","Extract tests",()=>{const e=$("#canvasTextarea");if(!e||!e.value.trim())return notify("Paste code into Canvas first.");if(el.input)el.input.value="Review this code and generate a practical unit-test suite and useful docstrings. Preserve the original code and clearly label assumptions.\n\n"+e.value;sendMessage();});
 addCanvasTool("canvasDiffBtn","Suggest patch",()=>{const e=$("#canvasTextarea");if(!e||!e.value.trim())return notify("Canvas is empty.");if(el.input)el.input.value="Review this document and return a unified diff patch. Use - lines for removals and + lines for additions, then explain the changes.\n\n"+e.value;sendMessage();});}
         // Settings tabs and save action.
-        $("[data-settings-tab]").forEach((button) => button.addEventListener("click", () => showSettingsTab(button.dataset.settingsTab)));
+        $$("[data-settings-tab]").forEach((button) => button.addEventListener("click", () => showSettingsTab(button.dataset.settingsTab)));
         $("#saveSettingsBtn")?.addEventListener("click", () => {
           const theme = $("#themeSelect")?.value;
           if (theme) setTheme(theme);
@@ -7364,7 +7364,7 @@ addCanvasTool("canvasDiffBtn","Suggest patch",()=>{const e=$("#canvasTextarea");
         });
 
         // Prompt Studio category tabs and create-template form visibility.
-        $("[data-prompt-cat]").forEach(button => button.addEventListener("click", () => showPromptCategory(button.dataset.promptCat)));
+        $$("[data-prompt-cat]").forEach(button => button.addEventListener("click", () => showPromptCategory(button.dataset.promptCat)));
         $("#toggleNewPromptFormBtn")?.addEventListener("click", () => { $("#editPromptIdInput").value=""; $("#newPromptTitleInput").value=""; $("#newPromptContentInput").value=""; togglePanel("promptEditorForm", true); });
         $("#cancelPromptFormBtn")?.addEventListener("click", () => togglePanel("promptEditorForm", false));
         const TEMPLATE_KEY="rainbow_ai_custom_templates"; let customTemplates=[]; try{const saved=JSON.parse(localStorage.getItem(TEMPLATE_KEY)||"[]");if(Array.isArray(saved))customTemplates=saved;}catch{}
@@ -7424,14 +7424,14 @@ addCanvasTool("canvasDiffBtn","Suggest patch",()=>{const e=$("#canvasTextarea");
         });
 
         // History filters and utility buttons.
-        $("[data-filter]").forEach((button) => button.addEventListener("click", () => {
+        $$("[data-filter]").forEach((button) => button.addEventListener("click", () => {
           const filter = button.dataset.filter;
-          $("[data-filter]").forEach((item) => {
+          $$("[data-filter]").forEach((item) => {
             const active = item === button;
             item.classList.toggle("active", active);
             item.setAttribute("aria-selected", String(active));
           });
-          $(".history-item", el.history || document).forEach((item) => {
+          $$(".history-item", el.history || document).forEach((item) => {
             const conversation = state.conversations.find((c) => c.title === item.textContent);
             item.hidden = filter === "pinned" ? !conversation?.pinned : filter === "archived" ? !conversation?.archived : filter === "project" ? !conversation?.projectId : false;
           });
@@ -7450,7 +7450,7 @@ addCanvasTool("canvasDiffBtn","Suggest patch",()=>{const e=$("#canvasTextarea");
         const PROFILE_KEY = "rainbow_ai_profile";
         function readProfile() { try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || "{}"); } catch { return {}; } }
         function setProfileAvatar(imageSrc) {
-          $(".profile-avatar").forEach(node => {
+          $$(".profile-avatar").forEach(node => {
             if (imageSrc) { node.textContent = ""; node.style.backgroundImage = "url("+JSON.stringify(imageSrc)+")"; node.style.backgroundSize = "cover"; node.style.backgroundPosition = "center"; }
             else { node.style.backgroundImage = ""; node.textContent = ((readProfile().name || "Rainbow User")[0] || "R").toUpperCase(); }
           });
@@ -7460,7 +7460,7 @@ addCanvasTool("canvasDiffBtn","Suggest patch",()=>{const e=$("#canvasTextarea");
         function syncProfile() {
           const profile = readProfile(), name = (profile.name || "").trim();
           if ($("#profileDisplayName")) $("#profileDisplayName").textContent = name || "Rainbow User";
-          $(".profile-avatar").forEach(node => { if(!profile.image) { node.style.backgroundImage=""; node.textContent=(name[0]||"R").toUpperCase(); }});
+          $$(".profile-avatar").forEach(node => { if(!profile.image) { node.style.backgroundImage=""; node.textContent=(name[0]||"R").toUpperCase(); }});
           if ($("#profileNameInput")) $("#profileNameInput").value = name;
           if ($("#profileGreetingSelect")) $("#profileGreetingSelect").value = profile.greeting || "random";
           if ($("#profileImageUrlInput")) $("#profileImageUrlInput").value = profile.image && /^https?:/i.test(profile.image) ? profile.image : "";
