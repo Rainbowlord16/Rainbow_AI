@@ -3129,6 +3129,80 @@ svg[data-rw-motion="generic"]:hover [data-rw-part="stroke"],button:hover svg[dat
 @media(prefers-reduced-motion:reduce){#rainbowHubOverlay *{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 
 
+
+      /* Mobile interaction audit: preserve reachability without squeezing the chat header. */
+      @media (max-width: 768px) {
+        .sidebar {
+          top: max(2px, env(safe-area-inset-top, 0px));
+          bottom: env(safe-area-inset-bottom, 0px);
+          padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+        }
+        .sidebar-backdrop { touch-action: manipulation; }
+        .mobile-menu-trigger {
+          flex: 0 0 44px;
+          width: 44px;
+          min-width: 44px;
+          min-height: 44px;
+          touch-action: manipulation;
+        }
+        .header-right {
+          flex: 0 1 auto;
+          min-width: 0;
+          max-width: 48vw;
+          overflow-x: auto;
+          overflow-y: hidden;
+          scrollbar-width: none;
+          overscroll-behavior-x: contain;
+          -webkit-overflow-scrolling: touch;
+          touch-action: pan-x;
+        }
+        .header-right::-webkit-scrollbar { display: none; }
+        .header-right > * { flex: 0 0 auto; }
+        .header-right .icon-btn,
+        .header-right .mode-toggle-btn {
+          min-height: 44px;
+          touch-action: manipulation;
+        }
+        .message-action-btn {
+          min-height: 40px;
+          touch-action: manipulation;
+        }
+        .composer-tool-btn,
+        .send-btn,
+        .stop-btn,
+        .sidebar-nav-btn,
+        .sidebar-explore-btn {
+          touch-action: manipulation;
+        }
+      }
+      @media (max-width: 420px) {
+        .workspace-header { gap: 4px; }
+        .header-left { flex: 1 1 0; }
+        .header-right {
+          flex: 0 0 min(42vw, 170px);
+          width: min(42vw, 170px);
+          max-width: min(42vw, 170px);
+          gap: 3px;
+        }
+        .header-right .icon-btn {
+          width: 44px;
+          min-width: 44px;
+          height: 44px;
+        }
+        .header-right .mode-toggle-btn {
+          min-width: 44px;
+          padding-inline: 8px;
+        }
+        .header-right .mode-toggle-btn .hide-on-mobile { display: none; }
+      }
+      @media (max-width: 360px) {
+        .header-chat-title { max-width: 25vw; }
+        .header-chat-title-wrap { gap: 2px; }
+      }
+      @media (hover: none) and (pointer: coarse) {
+        .sidebar-explore-btn:hover { transform: none; }
+      }
+
       /* Keep recent conversations directly beneath Explore; tools scroll independently. */
       .sidebar-chat-section {
         display: flex;
