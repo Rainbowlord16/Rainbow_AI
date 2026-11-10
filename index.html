@@ -2804,6 +2804,11 @@
       .profile-menu.hidden { display:none !important; }
       #appShell.mobile-sidebar-open .sidebar { z-index: 60; }
       #appShell.mobile-sidebar-open .sidebar-backdrop { z-index: 55; }
+      body.mobile-nav-open { overflow: hidden; }
+      @media (max-width: 768px) {
+        #appShell .sidebar { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+        #appShell.mobile-sidebar-open .sidebar { touch-action: pan-y; }
+      }
       #profileModal { position: fixed; inset: 0; z-index: 1000; }
       #profileModal.hidden { display: none !important; }
       #profileModal:not(.hidden) { display: flex; align-items: center; justify-content: center; }
@@ -6387,10 +6392,13 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           $("#chatHistoryList")?.scrollTo({ top: 0, behavior: "smooth" });
         });
 
-        function closeMobileSidebar() {
+        function closeMobileSidebar({ restoreFocus = false } = {}) {
+          const wasOpen = $("#appShell")?.classList.contains("mobile-sidebar-open");
           $("#appShell")?.classList.remove("mobile-sidebar-open");
           $("#sidebarBackdrop")?.classList.remove("visible");
+          document.body.classList.remove("mobile-nav-open");
           $("#mobileMenuBtn")?.setAttribute("aria-expanded", "false");
+          if (restoreFocus && wasOpen && window.innerWidth <= 768) $("#mobileMenuBtn")?.focus({ preventScroll: true });
         }
         $("#mobileMenuBtn")?.addEventListener("click", () => {
           const shell = $("#appShell");
@@ -6398,11 +6406,24 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           const opening = !shell.classList.contains("mobile-sidebar-open");
           shell.classList.toggle("mobile-sidebar-open", opening);
           $("#sidebarBackdrop")?.classList.toggle("visible", opening);
+          document.body.classList.toggle("mobile-nav-open", opening);
           $("#mobileMenuBtn")?.setAttribute("aria-expanded", String(opening));
+          if (opening) {
+            const firstAction = $("#sidebar")?.querySelector('button:not([disabled]), a[href], input:not([disabled])');
+            firstAction?.focus({ preventScroll: true });
+          }
         });
-        $("#sidebarBackdrop")?.addEventListener("click", closeMobileSidebar);
-        $("#chatHistoryList")?.addEventListener("click", event => {
-          if (event.target.closest("button")) closeMobileSidebar();
+        $("#sidebarBackdrop")?.addEventListener("click", () => closeMobileSidebar({ restoreFocus: true }));
+        $("#sidebar")?.addEventListener("click", event => {
+          if (window.innerWidth > 768 || !$("#appShell")?.classList.contains("mobile-sidebar-open")) return;
+          if (event.target.closest("button, a[href], [role='menuitem']")) closeMobileSidebar();
+        });
+        document.addEventListener("keydown", event => {
+          if (event.key === "Escape" && $("#appShell")?.classList.contains("mobile-sidebar-open")) {
+            event.preventDefault();
+            event.stopPropagation();
+            closeMobileSidebar({ restoreFocus: true });
+          }
         });
 
         // Search/filter conversation history.
