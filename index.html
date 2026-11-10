@@ -5984,7 +5984,8 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
 
         async function requestGateway(prompt, signal, personaOverride = null, gatewayOverride = null) {
           const base = safeGateway(gatewayOverride || el.gateway?.value.trim() || state.gateway || DEFAULT_GATEWAY);
-          state.gateway = base;
+          // A one-off fallback must never replace the user's configured primary gateway.
+          if (!gatewayOverride) state.gateway = base;
           const timeoutValue = Number($("#requestTimeoutInput")?.value);
           const timeout = Number.isFinite(timeoutValue)
             ? Math.min(120, Math.max(10, timeoutValue)) * 1000
