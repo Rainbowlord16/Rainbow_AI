@@ -8995,6 +8995,146 @@ body { overflow: hidden; }
   .sidebar, .sidebar-backdrop, .workspace-main, .rw-workspace-panel,
   #novaDrawer, #rainbowExplorePanel { transition: none !important; }
 }
+
+/* Text containment pass: prevent labels and long content escaping their surfaces. */
+#appShell :where(.workspace-header, .header-left, .header-center, .header-right,
+  .chat-column, .chat-scroll-container, .chat-stream-inner, .message-row,
+  .message-bubble, .message-content, .welcome-screen, .welcome-capabilities,
+  .starter-prompts-section, .starter-grid, .starter-card, .composer-region,
+  .composer-container, .composer-box, .composer-toolbar, .composer-tools-left,
+  .composer-tools-right, .modal-dialog, .modal-panel, .modal-header,
+  .modal-body, .modal-footer, .settings-content, .settings-section,
+  .canvas-drawer, .canvas-header, .canvas-toolbar, .canvas-editor-wrap,
+  .canvas-preview-pane, .canvas-footer) {
+  min-width: 0;
+  max-width: 100%;
+}
+#appShell :where(button, .btn, .icon-btn, .mode-toggle-btn, .sidebar-nav-btn,
+  .composer-tool-btn, .message-action-btn, .capability-chip, .starter-card,
+  .canvas-toolbar button, .modal button, .settings-tabs button) {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.35;
+}
+#appShell :where(.starter-card, .capability-chip, .message-bubble,
+  .message-content, .modal-body, .settings-section, .canvas-preview-pane) {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+#appShell :where(.starter-card-title, .starter-card-desc, .capability-chip,
+  .message-content p, .message-content li, .message-content blockquote,
+  .canvas-preview-pane p, .canvas-preview-pane li,
+  .canvas-preview-pane blockquote, .canvas-footer, .modal-body label) {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.canvas-drawer {
+  width: min(var(--canvas-width), 100%);
+  min-width: 0;
+  max-width: 100%;
+  flex: 0 1 var(--canvas-width);
+}
+.canvas-header, .canvas-footer {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.canvas-title-input {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.canvas-toolbar {
+  min-width: 0;
+  max-width: 100%;
+  align-items: center;
+}
+.canvas-toolbar > * {
+  min-width: 0;
+  max-width: 100%;
+  flex: 0 1 auto;
+}
+.canvas-textarea {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: pre-wrap;
+  tab-size: 2;
+}
+.canvas-preview-pane {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+}
+.canvas-preview-pane :where(h1, h2, h3, h4, p, li, blockquote, a) {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.canvas-preview-pane :where(pre, table) {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.canvas-preview-pane :where(img, video, iframe, svg) {
+  max-width: 100%;
+  height: auto;
+}
+.message-content :where(pre, table) {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.message-content :where(img, video, iframe, svg) {
+  max-width: 100%;
+  height: auto;
+}
+@media (max-width: 1024px) {
+  .canvas-drawer {
+    width: min(94vw, 680px);
+    min-width: 0;
+    max-width: 100vw;
+  }
+  .canvas-header, .canvas-toolbar, .canvas-footer {
+    padding-inline: clamp(8px, 2vw, 14px);
+  }
+  .canvas-toolbar button {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+}
+@media (max-width: 560px) {
+  #appShell :where(button, .btn, .sidebar-nav-btn, .message-action-btn) {
+    min-width: 0;
+  }
+  .canvas-drawer {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .canvas-header {
+    align-items: flex-start;
+  }
+  .canvas-toolbar {
+    gap: 5px;
+  }
+  .canvas-toolbar button {
+    min-height: 38px;
+    padding-inline: 8px;
+    font-size: .78rem;
+  }
+  .canvas-footer {
+    gap: 6px;
+    justify-content: flex-start;
+    font-size: .7rem;
+  }
+}
+
 </style>
 </body>
 </html>
