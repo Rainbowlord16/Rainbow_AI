@@ -6817,19 +6817,35 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
             const parsed = JSON.parse(await file.text());
             const imported = parsed.state || parsed;
             if (!Array.isArray(imported.conversations)) throw new Error("This file is not a valid Rainbow AI backup.");
+            const seenConversationIds = new Set();
             const normalized = imported.conversations
-              .filter(c => c && typeof c.id === "string" && Array.isArray(c.messages))
-              .map(c => ({
-                ...c,
-                title: typeof c.title === "string" && c.title.trim() ? c.title : "Imported conversation",
-                messages: c.messages.filter(m => m && ["user","assistant"].includes(m.role) && typeof m.content === "string")
-                  .map(m => ({ role: m.role, content: m.content })),
-                pinned: Boolean(c.pinned),
-                createdAt: Number.isFinite(c.createdAt) ? c.createdAt : Date.now()
-              }));
+              .filter(c => c && typeof c.id === "string" && c.id.trim() && c.id.length <= 128 && Array.isArray(c.messages) && !seenConversationIds.has(c.id) && seenConversationIds.add(c.id))
+              .map(c => {
+                const lockSalt = typeof c.lockSalt === "string" && /^[a-f0-9]{32}$/i.test(c.lockSalt) ? c.lockSalt : "";
+                const lockHash = typeof c.lockHash === "string" && /^[a-f0-9]{64}$/i.test(c.lockHash) ? c.lockHash : "";
+                return {
+                  ...c,
+                  id: c.id,
+                  title: typeof c.title === "string" && c.title.trim() ? c.title.trim().slice(0, 120) : "Imported conversation",
+                  messages: c.messages.filter(m => m && ["user","assistant"].includes(m.role) && typeof m.content === "string")
+                    .slice(-2000).map(m => ({ role: m.role, content: m.content.slice(0, 120000) })),
+                  pinned: Boolean(c.pinned),
+                  hidden: Boolean(c.hidden),
+                  locked: Boolean(c.locked && lockSalt && lockHash),
+                  lockSalt,
+                  lockHash,
+                  titleAttempted: Boolean(c.titleAttempted),
+                  titleGenerated: Boolean(c.titleGenerated),
+                  titleUserEdited: Boolean(c.titleUserEdited),
+                  // Invalidate any title request still running for an ID reused by this import.
+                  titleGenerationVersion: (Number(c.titleGenerationVersion) || 0) + 1,
+                  createdAt: Number.isFinite(c.createdAt) && c.createdAt > 0 ? c.createdAt : Date.now()
+                };
+              });
             if (!normalized.length) throw new Error("The backup contains no valid conversations.");
             // Imported lock state must be re-authenticated in this browser. Never
             // carry unlock grants or an in-progress prompt edit across a full import.
+            if (state.controller) state.controller.abort();
             state.unlockedIds.clear();
             state.pendingEdit = null;
             state.conversations = normalized;
