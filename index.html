@@ -7893,6 +7893,7 @@ renderFlow();renderStories();renderTimer();
  function closeWorkspace(){overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true");if(returnFocus&&typeof returnFocus.focus==="function")returnFocus.focus();returnFocus=null;}
  function chooseLayout(layout){if(!["two","three","four","focus"].includes(layout))return;state.layout=layout;overlay.dataset.layout=layout;overlay.querySelectorAll("[data-layout]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.layout===layout)));persist();}
  function activate(id){state.active=id;grid.querySelectorAll(".rw-window").forEach(w=>w.classList.toggle("is-active",w.dataset.windowId===id));persist();}
+ function activateMostRecentVisible(excludeId){const next=[...state.windows].reverse().find(w=>w.id!==excludeId&&!w.minimized)||null;activate(next?.id||null);}
  function renderEmpty(){if(!state.windows.length)grid.innerHTML='<div class="rw-workspace-empty"><strong>Your workspace, your layout.</strong>Open multiple Rainbow tools, duplicate the same tool, and arrange them side-by-side like Windows Snap Layouts.</div>';}
  function syncOrderFromDOM(){const ids=Array.from(grid.querySelectorAll(".rw-window")).map(el=>el.dataset.windowId);state.windows.sort((a,b)=>ids.indexOf(a.id)-ids.indexOf(b.id));persist();}
  function addWindow(item,restored){
@@ -7916,9 +7917,9 @@ renderFlow();renderStories();renderTimer();
   frame.src=win.url;
   rename.addEventListener("click",e=>{e.stopPropagation();const next=prompt("Name this workspace tab:",win.label);if(next&&next.trim()){win.label=next.trim().slice(0,48);name.textContent=win.label;frame.title=win.label;close.setAttribute("aria-label","Close "+win.label);rename.setAttribute("aria-label","Rename "+win.label);persist();}});
   name.addEventListener("dblclick",()=>rename.click());
-  minimize.addEventListener("click",e=>{e.stopPropagation();win.minimized=!win.minimized;card.classList.toggle("is-minimized",win.minimized);minimize.textContent=win.minimized?"+":"−";minimize.title=win.minimized?"Restore window":"Minimize window";minimize.setAttribute("aria-label",minimize.title);persist();});
+  minimize.addEventListener("click",e=>{e.stopPropagation();win.minimized=!win.minimized;card.classList.toggle("is-minimized",win.minimized);minimize.textContent=win.minimized?"+":"−";minimize.title=win.minimized?"Restore window":"Minimize window";minimize.setAttribute("aria-label",minimize.title);if(win.minimized&&state.active===win.id)activateMostRecentVisible(win.id);else if(!win.minimized)activate(win.id);else persist();});
   maximize.addEventListener("click",e=>{e.stopPropagation();activate(win.id);chooseLayout("focus");});
-  close.addEventListener("click",e=>{e.stopPropagation();const timer=loadingTimers.get(win.id);if(timer)clearTimeout(timer);loadingTimers.delete(win.id);state.windows=state.windows.filter(w=>w.id!==win.id);card.remove();if(state.active===win.id)state.active=state.windows.length?state.windows[state.windows.length-1].id:null;activate(state.active);renderEmpty();persist();});
+  close.addEventListener("click",e=>{e.stopPropagation();const timer=loadingTimers.get(win.id);if(timer)clearTimeout(timer);loadingTimers.delete(win.id);state.windows=state.windows.filter(w=>w.id!==win.id);card.remove();if(state.active===win.id)activateMostRecentVisible();else activate(state.active);renderEmpty();persist();});
   head.addEventListener("click",()=>activate(win.id));actions.append(rename,minimize,maximize,close);head.append(name,status,actions);card.append(head,frame);
   head.draggable=true;head.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/rw-window",win.id);e.dataTransfer.effectAllowed="move";});
   card.addEventListener("dragover",e=>{e.preventDefault();e.dataTransfer.dropEffect="move";});
