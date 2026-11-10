@@ -3379,18 +3379,12 @@ svg[data-rw-motion="shield"]:hover [data-rw-part="shield"],button:hover svg[data
 @keyframes rw-sidebar-slide{0%{transform:translateX(0)}60%{transform:translateX(3px)}100%{transform:translateX(1px)}}
 @keyframes rw-shield-check{0%{transform:scale(.94)}55%{transform:scale(1.1)}100%{transform:scale(1)}}
 @media(prefers-reduced-motion:reduce){[data-rw-motion]{animation:none!important}}
-</style><style id="rw-ambient-intelligence-and-background-generation">
-html[data-rw-ambient="idle"] #neural-canvas{opacity:.72;filter:saturate(1.04)}
-html[data-rw-ambient="typing"] #neural-canvas{opacity:.84;filter:saturate(1.12)}
-html[data-rw-ambient="thinking"] #neural-canvas{opacity:.96;filter:saturate(1.22)}
-.composer-box{transition:box-shadow .35s ease,border-color .35s ease}
-html[data-rw-ambient="typing"] .composer-box{box-shadow:0 0 0 1px rgba(59,130,246,.16),0 0 22px rgba(59,130,246,.10)}
-html[data-rw-ambient="thinking"] .composer-box{box-shadow:0 0 0 1px rgba(16,185,129,.18),0 0 24px rgba(59,130,246,.12)}
+</style><style id="rw-background-generation-ui">
 .bg-generation-indicator{display:inline-flex;align-items:center;gap:5px;flex:0 0 auto;margin-inline-start:5px;padding:3px 7px;border-radius:999px;font-size:10px;line-height:1.3;color:var(--text,#f8fafc);background:rgba(59,130,246,.14);border:1px solid rgba(59,130,246,.24);white-space:nowrap}
 .bg-generation-indicator::before{content:"";width:6px;height:6px;border-radius:50%;background:#3b82f6;box-shadow:0 0 8px rgba(59,130,246,.7);animation:rw-generation-pulse 1.35s ease-in-out infinite}
 .bg-background-generation-banner{position:sticky;top:8px;z-index:2;max-width:min(100%,760px);margin:8px auto 14px;padding:9px 12px;border:1px solid rgba(59,130,246,.22);border-radius:12px;background:rgba(59,130,246,.08);color:var(--text);font-size:12px;line-height:1.5;text-align:center;backdrop-filter:blur(8px)}
 @keyframes rw-generation-pulse{50%{opacity:.38;transform:scale(.78)}}
-@media(prefers-reduced-motion:reduce){.bg-generation-indicator::before{animation:none}.composer-box{transition:none}}
+@media(prefers-reduced-motion:reduce){.bg-generation-indicator::before{animation:none}}
 @media(max-width:560px){.bg-generation-indicator{font-size:9px;padding:2px 5px;margin-inline-start:3px}.bg-background-generation-banner{font-size:11px;margin:5px auto 10px}}
 </style>
 </head>
@@ -6598,6 +6592,31 @@ button,input,select,textarea{min-width:0;max-width:100%}
         }
         initializeProfessionalPersonalization();
 
+        // Passive adaptive context: infer a lightweight task mode locally without
+        // extra model calls, then supply a bounded hint to the existing request.
+        function inferConversationIntent(prompt) {
+          const value=String(prompt||"").toLowerCase();
+          if(/\b(error|bug|debug|fix|exception|not working|fails? to|stack trace)\b/.test(value))return "troubleshooting";
+          if(/\b(code|program|function|javascript|python|html|css|sql|api|script|implement)\b/.test(value))return "coding";
+          if(/\b(compare|versus|\bvs\b|difference between|pros and cons)\b/.test(value))return "comparison";
+          if(/\b(plan|roadmap|schedule|steps|strategy|organize)\b/.test(value))return "planning";
+          if(/\b(idea|brainstorm|story|write|draft|design|creative)\b/.test(value))return "creative";
+          if(/\b(explain|teach|learn|meaning|how does|what is|why does)\b/.test(value))return "explanation";
+          return "general";
+        }
+        function intentInstruction(intent) {
+          const guidance={
+            troubleshooting:"Prioritize diagnosis, likely causes, safe checks and a concrete fix. Ask for missing evidence instead of guessing.",
+            coding:"Prioritize correct, runnable implementation, compatibility with the stated stack, and concise integration instructions.",
+            comparison:"Compare options using consistent criteria and make trade-offs explicit.",
+            planning:"Organize the answer into practical, ordered steps and flag dependencies.",
+            creative:"Offer original, coherent ideas while respecting the user's constraints and requested style.",
+            explanation:"Explain clearly in progressive steps, define unfamiliar terms and use an example where useful.",
+            general:"Choose the clearest useful response format for the request."
+          };
+          return guidance[intent]||guidance.general;
+        }
+
         async function sendMessage(textOverride = null) {
           if (state.busy || novaBusy) {
             notify("Rainbow AI or Nova is still responding. Please wait or cancel the active request.");
@@ -6625,11 +6644,13 @@ button,input,select,textarea{min-width:0;max-width:100%}
           const styleGuidance=({professional:"Use a polished, workplace-appropriate professional tone.",concise:"Prefer concise answers and avoid unnecessary elaboration.",detailed:"Give thorough explanations, context and practical examples.",technical:"Use precise technical language and include implementation details where useful.","beginner-friendly":"Explain unfamiliar concepts in accessible steps and define jargon."})[professionalProfile.responseStyle]||"";
           const personalizationPrompt=(professionalContext||styleGuidance||professionalProfile.customInstructions)?"USER PERSONALIZATION (use as helpful context, not as facts beyond what is stated):\n"+(professionalContext||"No occupation or expertise details supplied.")+"\n"+(styleGuidance?"Response preference: "+styleGuidance+"\n":"")+(professionalProfile.customInstructions?"Additional user instructions: "+professionalProfile.customInstructions+"\n":"")+"Do not force this profile into unrelated answers. If a detail is irrelevant, ignore it.\n\n":"";
           const outputMode=$("#rainbowOutputMode")?.value||"normal",custom=$("#customSystemPromptInput")?.value?.trim()||"",projectInstructions=$("#projectInstructionsInput")?.value?.trim()||"";
-          const recent=(activeConversation()?.messages||[]).slice(-8).map(m=>(m.role==="user"?"User: ":"Assistant: ")+m.content).join("\n\n");
+          const recent=(activeConversation()?.messages||[]).slice(-10).map(m=>(m.role==="user"?"User: ":"Assistant: ")+String(m.content||"")).join("\n\n").slice(-7000);
+          const inferredIntent=inferConversationIntent(text);
+          const adaptiveContext="PASSIVE ADAPTIVE MODE: "+inferredIntent+". "+intentInstruction(inferredIntent)+" This is a response-style hint, not a replacement for the user request.";
           const study=state.studyMode?"\nSTUDY MODE: Teach Socratically, give hints before answers and ask one guiding question at a time.":"";
           const format=outputMode==="json"?"\nReturn valid JSON only, without Markdown fences.":outputMode==="markdown"?"\nUse clear Markdown headings and lists.":outputMode==="diagram"?"\nReturn a valid Mermaid flowchart in a mermaid code fence, followed by a brief explanation.":"";
           const relay=$("#rainbowRelayToggle")?.checked?"\nAGENT RELAY: Present concise labeled Researcher, Architect and Concise stages. Give useful conclusions only; do not reveal private chain-of-thought.":"";
-          const creativityValue=Math.max(0,Math.min(1.5,Number($("#temperatureInput")?.value??0.7)));const creativityGuidance=creativityValue<=0.3?"CREATIVITY PREFERENCE: Be focused, precise and conservative.":creativityValue<=0.7?"CREATIVITY PREFERENCE: Balance clarity, accuracy and originality.":creativityValue<=1.1?"CREATIVITY PREFERENCE: Be expressive and exploratory while staying grounded and accurate.":"CREATIVITY PREFERENCE: Be imaginative and offer fresh angles, but distinguish facts from ideas and never invent facts.";const fileContext=retrieveRainbowContext(text);text=creativityGuidance+"\n\n"+personalizationPrompt+(custom?"GLOBAL INSTRUCTIONS: "+custom+"\n\n":"")+(projectInstructions?"ACTIVE PROJECT INSTRUCTIONS: "+projectInstructions+"\n\n":"")+(recent?"RECENT CHAT CONTEXT (bounded):\n"+recent+"\n\n":"")+(fileContext?"RELEVANT UPLOADED FILE EXCERPTS:\n"+fileContext+"\n\n":"")+text+study+format;if(text.length>14000)text=text.slice(-14000);
+          const creativityValue=Math.max(0,Math.min(1.5,Number($("#temperatureInput")?.value??0.7)));const creativityGuidance=creativityValue<=0.3?"CREATIVITY PREFERENCE: Be focused, precise and conservative.":creativityValue<=0.7?"CREATIVITY PREFERENCE: Balance clarity, accuracy and originality.":creativityValue<=1.1?"CREATIVITY PREFERENCE: Be expressive and exploratory while staying grounded and accurate.":"CREATIVITY PREFERENCE: Be imaginative and offer fresh angles, but distinguish facts from ideas and never invent facts.";const fileContext=retrieveRainbowContext(text);text=adaptiveContext+"\n\n"+creativityGuidance+"\n\n"+personalizationPrompt+(custom?"GLOBAL INSTRUCTIONS: "+custom+"\n\n":"")+(projectInstructions?"ACTIVE PROJECT INSTRUCTIONS: "+projectInstructions+"\n\n":"")+(recent?"RECENT CHAT CONTEXT (bounded):\n"+recent+"\n\n":"")+(fileContext?"RELEVANT UPLOADED FILE EXCERPTS:\n"+fileContext+"\n\n":"")+text+study+format;if(text.length>14000)text=text.slice(-14000);
 
           let conversation = ensureConversation();
           const targetId = conversation.id;
@@ -6649,7 +6670,6 @@ button,input,select,textarea{min-width:0;max-width:100%}
           state.busy = true;
           const generationId = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2));
           state.activeGeneration = { id: generationId, conversationId: targetId, startedAt: Date.now(), status: "running" };
-          document.documentElement.dataset.rwAmbient = "thinking";
           if (el.send) el.send.disabled = true;
           $("#stopGenerationBtn")?.classList.remove("hidden");
           state.controller = new AbortController();
@@ -6701,7 +6721,6 @@ button,input,select,textarea{min-width:0;max-width:100%}
             state.busy = false;
             if (state.activeGeneration?.id === generationId) state.activeGeneration = null;
             if (state.controller === controller) state.controller = null;
-            document.documentElement.dataset.rwAmbient = el.input?.value?.trim() ? "typing" : "idle";
             if (el.send) el.send.disabled = !String(el.input?.value || "").trim();
             $("#stopGenerationBtn")?.classList.add("hidden");
             renderAll();
