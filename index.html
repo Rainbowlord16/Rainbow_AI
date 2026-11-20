@@ -6476,6 +6476,8 @@ button,input,select,textarea{min-width:0;max-width:100%}
         }
 
         function extractAssistantText(payload, mode) {
+          // Accept the FastAPI adapter's { data: [text] } response and
+          // common FastAPI / OpenAI-style response shapes.
           const candidates = [
             payload?.data?.[0],
             payload?.output,
@@ -6484,13 +6486,45 @@ button,input,select,textarea{min-width:0;max-width:100%}
             payload?.choices?.[0]?.text,
             payload?.message?.content,
             payload?.content,
+            payload?.generated_text,
+            payload?.text,
+            payload?.result,
           ];
-          const value = candidates.find(v => typeof v === "string" || typeof v === "number");
-          if (value === undefined) {
-            const detail = payload?.detail || payload?.error || payload?.message;
-            throw new Error(typeof detail === "string" ? detail : "The gateway returned an unrecognized response format.");
+
+          const readText = (value, depth = 0) => {
+            if (depth > 3 || value == null) return null;
+            if (typeof value === "string" || typeof value === "number") {
+              const text = String(value);
+              return text.trim() ? text : null;
+            }
+            if (Array.isArray(value)) {
+              for (const item of value) {
+                const text = readText(item, depth + 1);
+                if (text !== null) return text;
+              }
+              return null;
+            }
+            if (typeof value === "object") {
+              for (const key of ["text", "content", "generated_text", "output", "response"]) {
+                if (key in value) {
+                  const text = readText(value[key], depth + 1);
+                  if (text !== null) return text;
+                }
+              }
+            }
+            return null;
+          };
+
+          for (const candidate of candidates) {
+            const text = readText(candidate);
+            if (text !== null) return text;
           }
-          return String(value);
+
+          const detail = payload?.detail || payload?.error || payload?.message;
+          if (typeof detail === "string" && detail.trim()) throw new Error(detail);
+          throw new Error(
+            "The gateway returned JSON, but no non-empty assistant text was found. Check the FastAPI response's data/output field."
+          );
         }
 
         async function requestGateway(prompt, signal, personaOverride = null, gatewayOverride = null) {
