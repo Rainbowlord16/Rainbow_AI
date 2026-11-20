@@ -22,8 +22,14 @@
     <title>Rainbow AI — Intelligent Workspace</title>
 
     <!-- Rainbow AI favicon -->
-    <link rel="icon" type="image/png" href="./icon-new.png" />
-    <link rel="apple-touch-icon" href="./icon-new.png" />
+<!-- Adaptive Browser Favicons -->
+<link rel="icon" type="image/png" href="./icon-light.png" media="(prefers-color-scheme: light)" />
+<link rel="icon" type="image/png" href="./icon-dark.png" media="(prefers-color-scheme: dark)" />
+<link rel="icon" type="image/png" href="./icon-dark.png" />
+
+<!-- iOS Home Screen / PWA Icon -->
+<link rel="apple-touch-icon" href="./icon-dark.png" />
+
 
     <!-- Typography: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -3386,6 +3392,13 @@ svg[data-rw-motion="shield"]:hover [data-rw-part="shield"],button:hover svg[data
 @keyframes rw-generation-pulse{50%{opacity:.38;transform:scale(.78)}}
 @media(prefers-reduced-motion:reduce){.bg-generation-indicator::before{animation:none}}
 @media(max-width:560px){.bg-generation-indicator{font-size:9px;padding:2px 5px;margin-inline-start:3px}.bg-background-generation-banner{font-size:11px;margin:5px auto 10px}}
+
+.brand-logo-light { display: none; }
+.brand-logo-dark  { display: inline-block; }
+
+[data-theme="light"] .brand-logo-dark  { display: none; }
+[data-theme="light"] .brand-logo-light { display: inline-block; }
+
 </style>
 </head>
 
@@ -3429,7 +3442,9 @@ svg[data-rw-motion="shield"]:hover [data-rw-part="shield"],button:hover svg[data
             title="Rainbow AI — New Chat"
           >
             <span class="brand-icon" aria-hidden="true">
-              <img class="brand-logo-image" src="./icon-new.png" alt="" />
+              <img src="./icon-dark.png" alt="Rainbow AI" class="brand-logo-dark" />
+              <img src="./icon-light.png" alt="Rainbow AI" class="brand-logo-light" />
+
               <svg class="brand-collapse-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
               <svg class="brand-original-mark" viewBox="0 0 64 64" fill="none">
                 <defs>
@@ -4169,7 +4184,9 @@ svg[data-rw-motion="shield"]:hover [data-rw-part="shield"],button:hover svg[data
               <div id="chatStreamInner" class="chat-stream-inner">
                 <div id="welcomeScreen" class="welcome-screen">
                   <div class="welcome-prism-badge" aria-hidden="true">
-                    <img src="./icon-new.png" alt="" class="welcome-logo-image" />
+                    <img src="./icon-dark.png" alt="Rainbow AI" class="brand-logo-dark" />
+                    <img src="./icon-light.png" alt="Rainbow AI" class="brand-logo-light" />
+
                     <svg class="welcome-original-mark" viewBox="0 0 64 64" fill="none">
                       <path
                         d="M10 46 A22 22 0 0 1 54 46"
@@ -6175,7 +6192,7 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
           for (const message of conversation?.messages || []) {
             const row=document.createElement("div");row.className="message-row "+(message.role==="user"?"user-row":"assistant-row");
             const header=document.createElement("div");header.className="message-header";
-            if(message.role==="assistant"){const avatar=document.createElement("img");avatar.className="message-avatar assistant-avatar-img";avatar.src="./icon-new.png";avatar.alt="Rainbow AI";header.appendChild(avatar);}else{const avatar=document.createElement("div");avatar.className="message-avatar user-avatar";avatar.textContent="Y";header.appendChild(avatar);}
+            if(message.role==="assistant"){const avatar=document.createElement("img");avatar.className="message-avatar assistant-avatar-img";avatar.src="./icon-dark.png";avatar.alt="Rainbow AI";header.appendChild(avatar);}else{const avatar=document.createElement("div");avatar.className="message-avatar user-avatar";avatar.textContent="Y";header.appendChild(avatar);}
             const label=document.createElement("span");label.className="message-author";label.textContent=message.role==="user"?"You":"Rainbow AI";header.appendChild(label);
             const bubble=document.createElement("div");bubble.className="message-bubble";const content=document.createElement("div");content.className="message-content";
             if(message.role==="assistant"&&typeof window.marked?.parse==="function"&&typeof window.DOMPurify?.sanitize==="function")content.innerHTML=window.DOMPurify.sanitize(window.marked.parse(String(message.content||"")));else content.textContent=String(message.content||"");
