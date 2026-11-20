@@ -77,7 +77,7 @@ A local server is recommended over opening files directly with `file://`, especi
 
 ## Branding
 
-The root folder contains the shared Rainbow SVG logo/favicon assets and the workspace icon. Keep these asset paths intact when moving or deploying the pages.
+The approved PNG icon assets are `icon-dark.png`, `icon-light.png`, and `icon-transparent.png`. Use the dark/light variants where the surrounding theme requires contrast, and use the transparent variant when a background-independent icon is needed. Keep these filenames and their paths intact when moving or deploying the pages. `icon-new.png` is obsolete and must not be referenced or reintroduced.
 
 ## Rainbow AI assistance across the ecosystem
 
