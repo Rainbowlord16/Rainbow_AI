@@ -3480,6 +3480,54 @@ svg[data-rw-motion="shield"]:hover [data-rw-part="shield"],button:hover svg[data
     border-radius: 28% !important;
   }
 </style>
+
+<style id="rw-theme-logo-and-motion-polish">
+  /* Keep dark/light marks mutually exclusive in every brand placement. */
+  html:not([data-theme="light"]) .brand-logo-dark,
+  html[data-theme="dark"] .brand-logo-dark,
+  html[data-theme="midnight"] .brand-logo-dark { display: block !important; }
+  html:not([data-theme="light"]) .brand-logo-light,
+  html[data-theme="dark"] .brand-logo-light,
+  html[data-theme="midnight"] .brand-logo-light { display: none !important; }
+  html[data-theme="light"] .brand-logo-dark { display: none !important; }
+  html[data-theme="light"] .brand-logo-light { display: block !important; }
+
+  /* Smooth image compositing and clean antialiased squircle edges. */
+  img, picture, canvas, video { image-rendering: auto; }
+  .sidebar-header .brand-icon, .welcome-prism-badge {
+    overflow: hidden !important;
+    border-radius: 28% !important;
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  .sidebar-header .brand-icon > img.brand-logo-dark,
+  .sidebar-header .brand-icon > img.brand-logo-light,
+  .welcome-prism-badge > img.brand-logo-dark,
+  .welcome-prism-badge > img.brand-logo-light {
+    border-radius: 28% !important;
+    object-fit: cover !important;
+    image-rendering: auto;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  /* Browser-native refresh synchronization; no artificial timer-based FPS cap. */
+  html { scroll-behavior: smooth; }
+  button, a, [role="button"], input, select, textarea,
+  .modal-panel, .drawer, .toast, .chat-item {
+    transition-timing-function: cubic-bezier(.2,.75,.25,1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto !important; }
+    *, *::before, *::after {
+      scroll-behavior: auto !important;
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+    }
+  }
+</style>
 </head>
 
   <body>
