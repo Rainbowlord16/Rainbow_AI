@@ -6202,7 +6202,18 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
             state.gatewayMode = "fastapi";
             if (Number.isFinite(saved.requestTimeout))
               state.requestTimeout = Math.min(120000, Math.max(10000, saved.requestTimeout));
-            if (["dark", "midnight", "light"].includes(saved.theme)) {
+            // Prefer the dedicated theme preference, while migrating older saved state.
+            let persistedTheme = null;
+            try { persistedTheme = localStorage.getItem(THEME_STORAGE_KEY); } catch {}
+            if (!["dark", "midnight", "light"].includes(persistedTheme)) {
+              try {
+                const legacyTheme = localStorage.getItem("rainbow_theme");
+                if (["dark", "midnight", "light"].includes(legacyTheme)) persistedTheme = legacyTheme;
+              } catch {}
+            }
+            if (["dark", "midnight", "light"].includes(persistedTheme)) {
+              state.theme = persistedTheme;
+            } else if (["dark", "midnight", "light"].includes(saved.theme)) {
               state.theme = saved.theme;
             }
             state.studyMode = Boolean(saved.studyMode);
@@ -6965,10 +6976,19 @@ button,input,select,textarea{min-width:0;max-width:100%}
           }
         }, true);
 
+        const THEME_STORAGE_KEY = "rainbow_ai_theme_preference";
         function setTheme(theme) {
           if (!["dark", "midnight", "light"].includes(theme)) return;
           state.theme = theme;
           document.documentElement.dataset.theme = theme;
+          const themeSelect = $("#themeSelect");
+          if (themeSelect && themeSelect.value !== theme) themeSelect.value = theme;
+          try {
+            localStorage.setItem(THEME_STORAGE_KEY, theme);
+          } catch (error) {
+            console.warn("Rainbow AI could not persist the theme preference.", error);
+            notify("Theme changed for this session, but browser storage could not save it.");
+          }
           save();
         }
         const ACCENT_KEY = "rainbow_ai_accent_preset";
