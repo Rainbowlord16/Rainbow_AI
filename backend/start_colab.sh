@@ -6,7 +6,17 @@ ROOT="${RAINBOW_ROOT:-/content}"
 MODEL="${RAINBOW_MODEL_PATH:-$ROOT/models/Rainbow-AI-12B-Unified.Q4_K_M.gguf}"
 LLAMA_BIN="${LLAMA_SERVER_BIN:-$ROOT/llama-prebuilt/cuda-12.8/llama-server}"
 LLAMA_LIB="${LLAMA_LIB_DIR:-$ROOT/llama-prebuilt/cuda-12.8}"
-API_FILE="${RAINBOW_API_FILE:-$ROOT/Rainbow_AI/backend/rainbow_fastapi.py}"
+REPO_DIR="$ROOT/Rainbow_AI"
+if [[ ! -d "$REPO_DIR/.git" ]]; then
+  git clone --depth 1 https://github.com/Rainbowlord16/Rainbow_AI.git "$REPO_DIR"
+else
+  git -C "$REPO_DIR" pull --ff-only
+fi
+python -m pip install -q -r "$REPO_DIR/backend/requirements.txt"
+if ! command -v tesseract >/dev/null 2>&1; then
+  apt-get update -qq && apt-get install -y -qq tesseract-ocr
+fi
+API_FILE="${RAINBOW_API_FILE:-$REPO_DIR/backend/rainbow_fastapi.py}"
 API_LOG="$ROOT/rainbow_fastapi.log"
 LLAMA_LOG="$ROOT/llama_server.log"
 TUNNEL_LOG="$ROOT/cloudflared.log"
