@@ -3438,6 +3438,48 @@ svg[data-rw-motion="shield"]:hover [data-rw-part="shield"],button:hover svg[data
 [data-theme="light"] .brand-logo-light { display: inline-block; }
 
 </style>
+
+<style id="rw-squircle-brand-assets">
+  /* Render the approved PNG marks as soft squircles in both brand locations. */
+  .sidebar-header .brand-icon {
+    width: 32px !important;
+    height: 32px !important;
+    flex: 0 0 32px !important;
+    overflow: hidden !important;
+    border-radius: 28% !important;
+    background: transparent !important;
+    isolation: isolate;
+  }
+  .sidebar-header .brand-icon > img.brand-logo-dark,
+  .sidebar-header .brand-icon > img.brand-logo-light {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 28% !important;
+    overflow: hidden;
+  }
+  .welcome-prism-badge {
+    width: 64px !important;
+    height: 64px !important;
+    flex: 0 0 64px !important;
+    display: grid !important;
+    place-items: center !important;
+    overflow: hidden !important;
+    border-radius: 28% !important;
+  }
+  .welcome-prism-badge > img.brand-logo-dark,
+  .welcome-prism-badge > img.brand-logo-light {
+    width: 42px !important;
+    height: 42px !important;
+    max-width: 42px !important;
+    max-height: 42px !important;
+    object-fit: cover !important;
+    border-radius: 28% !important;
+  }
+</style>
 </head>
 
   <body>
