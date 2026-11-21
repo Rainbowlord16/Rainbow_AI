@@ -1405,6 +1405,11 @@
         flex: 0 0 38px;
       }
       .welcome-prism-badge { flex: 0 0 64px; overflow: hidden; }
+      /* The welcome badge contains both theme assets; show only the active variant. */
+      .welcome-prism-badge .brand-logo-dark { display: block !important; }
+      .welcome-prism-badge .brand-logo-light { display: none !important; }
+      html[data-theme="light"] .welcome-prism-badge .brand-logo-dark { display: none !important; }
+      html[data-theme="light"] .welcome-prism-badge .brand-logo-light { display: block !important; }
 
       .welcome-heading {
         font-size: clamp(1.5rem, 3vw, 2.15rem);
