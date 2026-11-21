@@ -5932,7 +5932,7 @@ function indexRainbowText(name,text){const clean=String(text||"").slice(0,120000
 function retrieveRainbowContext(query){const terms=String(query).toLowerCase().match(/[a-z0-9]{3,}/g)||[];if(!terms.length||!rainbowFileChunks.length)return "";const ranked=rainbowFileChunks.map(c=>{const hay=c.text.toLowerCase();let score=0;for(const term of terms){const count=hay.split(term).length-1;if(count)score+=Math.min(count,4)*(term.length>6?2:1);}return {...c,score};}).filter(c=>c.score>0).sort((a,b)=>b.score-a.score).slice(0,4);return ranked.map(c=>"SOURCE "+c.name+":\n"+c.text).join("\n\n---\n\n");}
 window.RainbowWorkspace=window.RainbowWorkspace||{};window.RainbowWorkspace.documents={retrieve:retrieveRainbowContext,list:()=>[...new Set(rainbowFileChunks.map(x=>x.name))],count:()=>rainbowFileChunks.length,add:indexRainbowText};
 const secondaryWrap=document.createElement("div");secondaryWrap.className="form-group";secondaryWrap.innerHTML='<label class="form-label" for="secondaryGatewayInput">Optional backup gateway</label><input id="secondaryGatewayInput" class="form-input" type="url" placeholder="https://your-backup-gateway.example"><p class="form-help">Used only after a primary network, 502 or 504 failure. Leave blank to disable fallback.</p>';const gatewayPanel=$("#settingsTabGateway");if(gatewayPanel){const primary=$("#gatewayUrlInput")?.closest(".form-group");if(primary)primary.after(secondaryWrap);else gatewayPanel.appendChild(secondaryWrap);}const secondaryInput=$("#secondaryGatewayInput");if(secondaryInput){try{secondaryInput.value=localStorage.getItem("rainbow_ai_secondary_gateway")||"";}catch{}secondaryInput.addEventListener("change",()=>{const value=secondaryInput.value.trim();if(!value){localStorage.removeItem("rainbow_ai_secondary_gateway");notify("Backup gateway disabled.");return;}try{const safe=safeGateway(value);localStorage.setItem("rainbow_ai_secondary_gateway",safe);secondaryInput.value=safe;notify("Backup gateway saved on this device.");}catch(e){notify(e.message);}});}
-async function requestGatewayWithFallback(prompt,signal,personaOverride=null){try{return await requestGateway(prompt,signal,personaOverride);}catch(error){if(signal?.aborted||error.name==="AbortError")throw error;const eligible=[502,503,504].includes(error.status)||error.name==="TimeoutError"||error.name==="TypeError"||/failed to fetch|network/i.test(error.message||"");let backup="";try{backup=localStorage.getItem("rainbow_ai_secondary_gateway")||"";}catch{}if(!eligible||!backup)throw error;let safeBackup;try{safeBackup=safeGateway(backup);}catch{throw error;}const primary=safeGateway(el.gateway?.value.trim()||state.gateway||DEFAULT_GATEWAY);if(safeBackup===primary)throw error;setStatus("Trying backup gateway…",null);return requestGateway(prompt,signal,personaOverride,safeBackup);}}
+async function requestGatewayWithFallback(prompt,signal,personaOverride=null,attachments=[]){try{return await requestGateway(prompt,signal,personaOverride,null,attachments);}catch(error){if(signal?.aborted||error.name==="AbortError")throw error;const eligible=[502,503,504].includes(error.status)||error.name==="TimeoutError"||error.name==="TypeError"||/failed to fetch|network/i.test(error.message||"");let backup="";try{backup=localStorage.getItem("rainbow_ai_secondary_gateway")||"";}catch{}if(!eligible||!backup)throw error;let safeBackup;try{safeBackup=safeGateway(backup);}catch{throw error;}const primary=safeGateway(el.gateway?.value.trim()||state.gateway||DEFAULT_GATEWAY);if(safeBackup===primary)throw error;setStatus("Trying backup gateway…",null);return requestGateway(prompt,signal,personaOverride,safeBackup,attachments);}}
 const powerBar=document.createElement("div");powerBar.className="rainbow-power-tools";powerBar.innerHTML='<label class="form-help">Output <select id="rainbowOutputMode" class="form-select"><option value="normal">Normal</option><option value="markdown">Markdown</option><option value="json">Strict JSON</option><option value="diagram">Mermaid diagram</option></select></label><label class="form-help"><input id="rainbowRelayToggle" type="checkbox"> Agent relay</label><label class="form-help"><input id="rainbowAutoSpeak" type="checkbox"> Speak replies</label><button id="rainbowPolishBtn" class="composer-tool-btn" type="button">Polish prompt</button><button id="rainbowBranchBtn" class="composer-tool-btn" type="button">Fork latest turn</button>';const composerBox=$("#composerBox");if(composerBox)composerBox.insertBefore(powerBar,composerBox.querySelector(".composer-toolbar"));
 const svgActionIcons={polish:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-rw-icon="polish"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></svg>',fork:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-rw-icon="fork"><path d="M6 3v12a4 4 0 0 0 4 4h2"/><path d="m14 15 4 4-4 4"/><circle cx="6" cy="5" r="2"/><circle cx="18" cy="5" r="2"/><path d="M6 7c0 5 12 0 12-2"/></svg>'};
 const polishBtn=powerBar.querySelector("#rainbowPolishBtn"),forkBtn=powerBar.querySelector("#rainbowBranchBtn");if(polishBtn)polishBtn.innerHTML=svgActionIcons.polish+'<span>Polish prompt</span>';if(forkBtn)forkBtn.innerHTML=svgActionIcons.fork+'<span>Fork latest turn</span>';
@@ -6666,7 +6666,7 @@ button,input,select,textarea{min-width:0;max-width:100%}
           );
         }
 
-        async function requestGateway(prompt, signal, personaOverride = null, gatewayOverride = null) {
+        async function requestGateway(prompt, signal, personaOverride = null, gatewayOverride = null, attachments = []) {
           const base = safeGateway(gatewayOverride || el.gateway?.value.trim() || state.gateway || DEFAULT_GATEWAY);
           // A one-off fallback must never replace the user's configured primary gateway.
           if (!gatewayOverride) state.gateway = base;
@@ -6693,7 +6693,7 @@ button,input,select,textarea{min-width:0;max-width:100%}
                 "Accept": "application/json",
               },
               signal: controller.signal,
-              body: JSON.stringify({ data: [prompt, model] }),
+              body: JSON.stringify({ data: [prompt, model], attachments: await Promise.all(attachments.map(rainbowFileToPayload)) }),
             });
 
             const contentType = response.headers.get("content-type") || "";
@@ -6814,7 +6814,9 @@ button,input,select,textarea{min-width:0;max-width:100%}
           }
 
           let text = String(textOverride ?? el.input?.value ?? "").trim();
-          if (!text) return;
+          const messageAttachments = [...stagedRainbowFiles];
+          if (!text && !messageAttachments.length) return;
+          if (!text && messageAttachments.length) text = "Please analyze the attached file(s) and explain their contents.";
           const visibleUserText=text;
           const pendingEdit=textOverride===null?state.pendingEdit:null;
           if(pendingEdit){
@@ -6847,7 +6849,7 @@ button,input,select,textarea{min-width:0;max-width:100%}
           let conversation = ensureConversation();
           const targetId = conversation.id;
 
-          conversation.messages.push({ role: "user", content: visibleUserText });
+          conversation.messages.push({ role: "user", content: visibleUserText, attachments: messageAttachments.map(file => ({ name: file.name, type: file.type || "application/octet-stream", size: file.size })) });
 
           const shouldGenerateTitle=!conversation.titleAttempted&&(conversation.title==="New Conversation"||conversation.title==="New Chat");
 
@@ -6880,13 +6882,14 @@ button,input,select,textarea{min-width:0;max-width:100%}
           try {
             let output;
             if($("#rainbowRelayToggle")?.checked){
-              const research=await requestGatewayWithFallback("Researcher stage: extract relevant facts, constraints and unknowns for this task. Return a concise brief, not hidden reasoning.\n\n"+text,controller.signal);
-              const architecture=await requestGatewayWithFallback("Architect stage: turn this research brief into a sound plan or solution. Identify risks and concrete steps.\n\nOriginal task:\n"+text+"\n\nResearch brief:\n"+research,controller.signal);
-              output=await requestGatewayWithFallback("Concise stage: write the final user-facing answer using this design. Do not reveal private reasoning; present only the useful result.\n\nOriginal task:\n"+text+"\n\nDesign brief:\n"+architecture,controller.signal);
-            }else{output=await requestGatewayWithFallback(text,controller.signal);}
+              const research=await requestGatewayWithFallback("Researcher stage: extract relevant facts, constraints and unknowns for this task. Return a concise brief, not hidden reasoning.\n\n"+text,controller.signal,null,messageAttachments);
+              const architecture=await requestGatewayWithFallback("Architect stage: turn this research brief into a sound plan or solution. Identify risks and concrete steps.\n\nOriginal task:\n"+text+"\n\nResearch brief:\n"+research,controller.signal,null,messageAttachments);
+              output=await requestGatewayWithFallback("Concise stage: write the final user-facing answer using this design. Do not reveal private reasoning; present only the useful result.\n\nOriginal task:\n"+text+"\n\nDesign brief:\n"+architecture,controller.signal,null,messageAttachments);
+            }else{output=await requestGatewayWithFallback(text,controller.signal,null,messageAttachments);}
             const current = state.conversations.find((c) => c.id === targetId);
             if (current && !controller.signal.aborted) {
               current.messages.push({ role: "assistant", content: output });
+              if (messageAttachments.length) { stagedRainbowFiles.splice(0, messageAttachments.length); renderStagedRainbowFiles(); }
               if($("#rainbowOutputMode")?.value==="json"){try{JSON.parse(output);}catch{current.messages.push({role:"assistant",content:"⚠️ JSON validation warning: the response was not valid JSON. Try regenerating or ask for corrected JSON."});}}
               save();
               if(shouldGenerateTitle)void generateConversationTitle(targetId,visibleUserText,output);
@@ -7556,40 +7559,60 @@ button,input,select,textarea{min-width:0;max-width:100%}
  window.RainbowFileIntelligence={extract,version:1};
 })();
 
-        // Functional handlers for controls that previously had no action.
-        // File attachments: read text-based files locally and add their contents to the composer.
-        $("#attachFileBtn")?.addEventListener("click", () => {
-          let picker = $("#rainbowAttachmentPicker");
-          if (!picker) {
-            picker = document.createElement("input");
-            picker.id = "rainbowAttachmentPicker";
-            picker.type = "file";
-            picker.multiple = true;
-            picker.accept = "*/*";
-            picker.hidden = true;
-            document.body.appendChild(picker);
-            picker.addEventListener("change", async () => {
-              const files = Array.from(picker.files || []);
-              if (!files.length) return;
-              const parts = [];
-              let readable=0,metadataOnly=0;
-              for (const file of files) {
-                try {
-                  const result=await window.RainbowFileIntelligence.extract(file);
-                  if(result.text){indexRainbowText(file.name,result.text);parts.push("\\n\\n[Attached file indexed locally: "+file.name+". Extracted text is available for relevant passage retrieval.]");readable++;}
-                  else{metadataOnly++;parts.push("\\n\\n[File selected: "+file.name+" ("+result.meta.type+", "+file.size+" bytes). "+result.note+"]");}
-                }catch(error){notify(file.name+": "+(error?.message||"could not be processed"));}
-              }
-              if(el.input&&parts.length){
-                el.input.value=(el.input.value?el.input.value+"\\n\\n":"")+parts.join("");
-                el.input.dispatchEvent(new Event("input",{bubbles:true}));el.input.focus();
-                notify(readable+" file(s) indexed; "+metadataOnly+" accepted as metadata only.");
-              }
-              picker.value = "";
-            });
+        // Attachment transport v2: keep real File objects in memory until the request.
+        const stagedRainbowFiles = [];
+        const stagedRainbowIds = new WeakMap();
+        const attachmentInput = $("#fileAttachmentInput");
+        function renderStagedRainbowFiles() {
+          const host = $("#composerAttachments");
+          if (!host) return;
+          host.replaceChildren();
+          host.classList.toggle("hidden", stagedRainbowFiles.length === 0);
+          stagedRainbowFiles.forEach((file, index) => {
+            const pill = document.createElement("span");
+            pill.className = "staged-file-pill";
+            pill.textContent = (file.type.startsWith("image/") ? "Image: " : "File: ") + file.name;
+            const remove = document.createElement("button");
+            remove.type = "button"; remove.className = "staged-file-remove";
+            remove.setAttribute("aria-label", "Remove " + file.name); remove.textContent = "×";
+            remove.addEventListener("click", () => { stagedRainbowFiles.splice(index, 1); renderStagedRainbowFiles(); });
+            pill.appendChild(remove); host.appendChild(pill);
+          });
+        }
+        $("#attachFileBtn")?.addEventListener("click", () => attachmentInput?.click());
+        attachmentInput?.addEventListener("change", async () => {
+          const files = Array.from(attachmentInput.files || []);
+          if (!files.length) return;
+          let added = 0;
+          for (const file of files) {
+            try {
+              if (file.size > 25 * 1024 * 1024) throw new Error("Maximum attachment size is 25 MB.");
+              const result = await window.RainbowFileIntelligence.extract(file);
+              if (result.text) indexRainbowText(file.name, result.text);
+              stagedRainbowFiles.push(file);
+              added++;
+            } catch (error) { notify(file.name + ": " + (error?.message || "could not be processed")); }
           }
-          picker.click();
+          renderStagedRainbowFiles();
+          if (added) notify(added + " attachment(s) ready. Original file content will be sent with your next message.");
+          attachmentInput.value = "";
         });
+        async function rainbowFileToPayload(file) {
+          const bytes = new Uint8Array(await file.arrayBuffer());
+          let binary = "";
+          const chunkSize = 0x8000;
+          for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+            binary += String.fromCharCode(...bytes.subarray(offset, Math.min(offset + chunkSize, bytes.length)));
+          }
+          return {
+            id: (crypto.randomUUID ? crypto.randomUUID() : "att-" + Date.now() + "-" + Math.random().toString(36).slice(2)),
+            name: file.name,
+            mime_type: file.type || "application/octet-stream",
+            size: file.size,
+            type: file.type.startsWith("image/") ? "image" : "document",
+            content_base64: btoa(binary)
+          };
+        }
 
         // Study mode visibly toggles and persists.
         $("#studyModeToggleBtn")?.addEventListener("click", () => {
