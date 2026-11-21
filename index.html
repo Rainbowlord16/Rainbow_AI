@@ -2858,6 +2858,28 @@
       #profileModal .modal-panel, #profileModal .modal-panel * { pointer-events: auto; }
       @media (max-width: 768px) { #sidebarBackdrop { display: block; } }
 
+      /* Light-theme contrast repair for controls added by workspace extensions. */
+      [data-theme="light"] #rwWorkspaceLauncher,
+      [data-theme="light"] #rwCustomizeNavBtn {
+        background: var(--bg-surface-2) !important;
+        color: var(--text-primary) !important;
+        border-color: var(--border-default) !important;
+      }
+      [data-theme="light"] #rwWorkspaceLauncher:hover,
+      [data-theme="light"] #rwCustomizeNavBtn:hover {
+        background: var(--bg-surface-3) !important;
+        color: var(--text-primary) !important;
+      }
+      [data-theme="light"] .ai-accuracy-notice {
+        background: var(--bg-surface-1) !important;
+        color: var(--text-secondary) !important;
+        border-color: var(--border-default) !important;
+      }
+      [data-theme="light"] .rainbow-power-tools input[type="checkbox"] {
+        accent-color: var(--accent-primary);
+        color-scheme: light;
+      }
+
       /* Profile modal: visible, shaped panel above the intentional blur backdrop. */
       #profileModal:not(.hidden) {
         position: fixed !important;
