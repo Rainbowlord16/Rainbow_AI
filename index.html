@@ -5878,7 +5878,7 @@ svg[data-rw-motion="shield"]:hover [data-rw-part="shield"],button:hover svg[data
         const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
         const MODEL = "Rainbow-AI-Unified-12B";
-        const DEFAULT_GATEWAY = "https://treatment-excluding-terrain-antibodies.trycloudflare.com";
+        const DEFAULT_GATEWAY = "https://hearings-supposed-logic-yamaha.trycloudflare.com";
         const STORAGE_KEY = "rainbow_ai_part3_state";
         const DEFAULT_REQUEST_TIMEOUT = 45000;
 
@@ -6195,9 +6195,8 @@ $("#rainbowBranchBtn")?.addEventListener("click",()=>{const c=activeConversation
             // A deleted or malformed active ID must not leave the app pointing at a nonexistent chat.
             if (!state.conversations.some((conversation) => conversation.id === state.activeId))
               state.activeId = state.conversations[0]?.id || null;
-            if (typeof saved.gateway === "string") {
-              try { state.gateway = safeGateway(saved.gateway); } catch { state.gateway = DEFAULT_GATEWAY; }
-            }
+            // The active Colab tunnel is the source of truth. Ignore stale browser backups.
+            state.gateway = DEFAULT_GATEWAY;
             // Migrate previous Gradio/OpenAI preferences to the actual FastAPI adapter.
             state.gatewayMode = "fastapi";
             if (Number.isFinite(saved.requestTimeout))
@@ -6667,9 +6666,9 @@ button,input,select,textarea{min-width:0;max-width:100%}
         }
 
         async function requestGateway(prompt, signal, personaOverride = null, gatewayOverride = null, attachments = []) {
-          const base = safeGateway(gatewayOverride || el.gateway?.value.trim() || state.gateway || DEFAULT_GATEWAY);
-          // A one-off fallback must never replace the user's configured primary gateway.
-          if (!gatewayOverride) state.gateway = base;
+          // Gateway is embedded in the application build; no Settings/localStorage value is required.
+          const base = safeGateway(gatewayOverride || DEFAULT_GATEWAY);
+          if (!gatewayOverride) state.gateway = DEFAULT_GATEWAY;
           const timeoutValue = Number($("#requestTimeoutInput")?.value);
           const timeout = Number.isFinite(timeoutValue)
             ? Math.min(120, Math.max(10, timeoutValue)) * 1000
